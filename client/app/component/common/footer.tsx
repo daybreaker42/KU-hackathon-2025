@@ -23,7 +23,7 @@ function FooterItem({ icon, text, isSelected, url }: FooterItemProps) {
 export default function Footer({ url }: { url: string }) {
   return (
     <div className={styles.footer}>
-      <FooterItem icon="dictionary" text="식물사전" isSelected={url === "식물사전"} url={"/식물사전"} />
+      <FooterItem icon="dictionary" text="식물사전" isSelected={url === "dictionary"} url={"/dictionary"} />
       <FooterItem icon="home" text="홈" isSelected={url === ""} url={"/"} />
       <FooterItem icon="local_cafe" text="식물카페" isSelected={url === "community"} url={"/community"} />
     </div>
