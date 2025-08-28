@@ -33,18 +33,22 @@ export default function FriendsPage() {
 
   // --- Data Fetching Effects ---
 
+  // Fetch friends function
+  const fetchFriends = async () => {
+    setFriendsLoading(true);
+    setFriendsError(null);
+    try {
+      const data = await getFriendsList();
+      setFriends(data);
+    } catch (err: any) {
+      setFriendsError(err.message || '친구 목록을 불러오는데 실패했습니다.');
+    } finally {
+      setFriendsLoading(false);
+    }
+  };
+
   // Fetch initial friends list
   useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const data = await getFriendsList();
-        setFriends(data);
-      } catch (err: any) {
-        setFriendsError(err.message || '친구 목록을 불러오는데 실패했습니다.');
-      } finally {
-        setFriendsLoading(false);
-      }
-    };
     fetchFriends();
   }, []);
 
