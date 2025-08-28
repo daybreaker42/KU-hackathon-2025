@@ -22,6 +22,33 @@ export default function Comments({ comments, onAddComment, onAddReply, onRefresh
     }
   };
 
+  // 댓글을 그룹화하는 함수
+  const groupComments = (comments: Comment[]) => {
+    const groups: { parent: Comment; replies: Comment[] }[] = [];
+
+    // 일반 댓글 찾기 (parentId가 없는 댓글들)
+    const parentComments = comments.filter(comment => !comment.parentId);
+
+    // 각 부모 댓글에 대해 대댓글 그룹 생성
+    parentComments.forEach(parent => {
+      const replies = comments.filter(comment => comment.parentId === parent.id);
+      // 시간 순서대로 정렬 (오래된 순으로)
+      replies.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+      groups.push({
+        parent,
+        replies
+      });
+    });
+
+    // 부모 댓글도 시간 순서대로 정렬 (오래된 순으로)
+    groups.sort((a, b) => new Date(a.parent.createdAt).getTime() - new Date(b.parent.createdAt).getTime());
+
+    return groups;
+  };
+
+  const commentGroups = groupComments(comments);
+
   return (
     <div>
       {/* 댓글 작성 섹션 */}
@@ -64,13 +91,25 @@ export default function Comments({ comments, onAddComment, onAddReply, onRefresh
 
         {/* 댓글 목록 */}
         <div className="space-y-[16px]">
-          {comments.map((comment) => (
-            <CommentItem
-              key={comment.id}
-              comment={comment}
-              onReply={onAddReply}
-              depth={comment.depth}
-            />
+          {commentGroups.map((group) => (
+            <div key={group.parent.id} className="space-y-[8px]">
+              {/* 부모 댓글 */}
+              <CommentItem
+                comment={group.parent}
+                onReply={onAddReply}
+                isReply={false}
+              />
+
+              {/* 대댓글 목록 */}
+              {group.replies.map((reply) => (
+                <CommentItem
+                  key={reply.id}
+                  comment={reply}
+                  onReply={onAddReply}
+                  isReply={true}
+                />
+              ))}
+            </div>
           ))}
         </div>
 

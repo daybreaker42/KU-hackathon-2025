@@ -26,16 +26,14 @@ const mockComments: Comment[] = [
     author: "성준 한",
     content: "아 그거 그렇게 하는거 아님데;",
     timeAgo: "5분전",
-    depth: 0,
-    replies: []
+    createdAt: "2025-01-28T10:00:00Z"
   },
   {
     id: 2,
     author: "성준 한",
     content: "감사합니다^^",
     timeAgo: "5분전",
-    depth: 0,
-    replies: []
+    createdAt: "2025-01-28T10:05:00Z"
   }
 ];
 
@@ -80,53 +78,16 @@ export default function PostDetailPage() {
 
   // 대댓글 작성 핸들러
   const handleReplySubmit = (parentId: number, content: string) => {
-    // 부모 댓글의 depth를 찾는 함수
-    const findParentDepth = (comments: Comment[], targetId: number): number => {
-      for (const comment of comments) {
-        if (comment.id === targetId) {
-          return comment.depth;
-        }
-        if (comment.replies) {
-          const depth = findParentDepth(comment.replies, targetId);
-          if (depth !== -1) return depth;
-        }
-      }
-      return -1;
-    };
-
-    const parentDepth = findParentDepth(comments, parentId);
-    const newReplyDepth = parentDepth + 1;
-
     const newReply: Comment = {
       id: Date.now(), // 간단한 ID 생성
       author: "현재 사용자", // TODO - 실제 사용자 정보로 대체
       content,
       timeAgo: "방금 전",
       parentId,
-      depth: newReplyDepth,
-      replies: []
+      createdAt: new Date().toISOString()
     };
 
-    // 재귀적으로 부모를 찾아서 대댓글 추가
-    const addReplyToParent = (comments: Comment[], targetId: number, reply: Comment): Comment[] => {
-      return comments.map(comment => {
-        if (comment.id === targetId) {
-          return {
-            ...comment,
-            replies: [...(comment.replies || []), reply]
-          };
-        }
-        if (comment.replies) {
-          return {
-            ...comment,
-            replies: addReplyToParent(comment.replies, targetId, reply)
-          };
-        }
-        return comment;
-      });
-    };
-
-    setComments(prevComments => addReplyToParent(prevComments, parentId, newReply));
+    setComments(prevComments => [...prevComments, newReply]);
   };
 
   // 댓글 새로고침 핸들러
@@ -251,8 +212,7 @@ export default function PostDetailPage() {
               author: "현재 사용자",
               content,
               timeAgo: "방금 전",
-              depth: 0,
-              replies: []
+              createdAt: new Date().toISOString()
             };
             setComments([...comments, comment]);
           }}
