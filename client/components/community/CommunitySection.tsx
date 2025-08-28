@@ -3,6 +3,7 @@
 import { CommunityPost, Plant } from '@/app/types/community/community'; // Plant 타입 import 추가
 import { useEffect, useState } from 'react';
 import { Heart, MessageCircle } from 'lucide-react'; // lucide-react 아이콘 import 추가
+import { useRouter } from 'next/navigation'; // Next.js 라우터 import 추가
 
 // Mock 식물 데이터 추가
 const mockPlants: Plant[] = [
@@ -79,6 +80,18 @@ interface CommunitySectionProps {
 export default function CommunitySection({ title, category, plantId, showMoreButton = true }: CommunitySectionProps) {
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter(); // 라우터 인스턴스 생성
+
+  // 더보기 버튼 클릭 핸들러 추가
+  const handleMoreClick = () => {
+    // 카테고리별 라우팅 경로 생성
+    const basePath = '/community/category';
+    if (category === 'plant' && plantId) {
+      router.push(`${basePath}/${category}?plantId=${plantId}`);
+    } else {
+      router.push(`${basePath}/${category}`);
+    }
+  };
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -142,7 +155,10 @@ export default function CommunitySection({ title, category, plantId, showMoreBut
       <div className="flex justify-between items-center mb-[15px]">
         <h2 className="text-[#023735] font-medium text-[18px]">{title}</h2>
         {showMoreButton && (
-          <button className="text-[#42CA71] text-[14px] hover:text-[#369F5C] transition-colors">
+          <button
+            onClick={handleMoreClick} // 더보기 버튼 클릭 이벤트 핸들러
+            className="text-[#42CA71] text-[14px] hover:text-[#369F5C] transition-colors"
+          >
             더보기
           </button>
         )}
@@ -210,3 +226,4 @@ export default function CommunitySection({ title, category, plantId, showMoreBut
     </div>
   );
 }
+
