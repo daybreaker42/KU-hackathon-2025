@@ -4,23 +4,27 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import BackButton from "@/app/component/common/BackButton";
+import { getPlantById, PlantDetailData } from "@/app/api/plantController";
 
-// 식물 데이터 타입 정의
+// 식물 데이터 타입 정의 (API 응답과 일치하도록 업데이트)
 interface Plant {
-  id: string;
-  name: string; // 애칭
-  species: string; // 종류
-  image: string;
-  lastWatered: number; // 며칠 전 물 줌
-  lastSunlight: number; // 며칠 전 햇빛 비춤
-  lastActivity: string; // 마지막 활동 타입 ('water' | 'sunlight')
-  wateringInterval: number; // 급수 주기 (일)
-  sunlightInterval: number; // 햇빛 주기 (일)
-  adoptionDate: string; // 입양일
-  description: string; // 식물 설명
+  id: number;
+  name: string;
+  variety: string;
+  img_url: string;
+  cycle_type: string;
+  cycle_value: string;
+  cycle_unit: string;
+  sunlight_needs: string;
+  purchase_date: string;
+  memo: string;
+  // API에 없는 필드는 제거하거나, 필요시 별도 처리
+  // lastWatered, lastSunlight, lastActivity 등은 API에서 직접 제공되지 않으므로,
+  // 필요하다면 별도의 계산 로직이나 다른 API를 통해 가져와야 합니다.
+  // 여기서는 API 응답에 있는 필드만 사용합니다.
 }
 
-// 식물 기록 데이터 타입
+// 식물 기록 데이터 타입 (API에 따라 업데이트 필요)
 interface PlantRecord {
   id: string;
   type: "water" | "sunlight" | "fertilizer" | "repot";
@@ -28,7 +32,7 @@ interface PlantRecord {
   notes?: string;
 }
 
-// 메모리 데이터 타입
+// 메모리 데이터 타입 (API에 따라 업데이트 필요)
 interface Memory {
   id: string;
   title: string;
@@ -37,7 +41,7 @@ interface Memory {
   content: string;
 }
 
-// 갤러리 이미지 타입
+// 갤러리 이미지 타입 (API에 따라 업데이트 필요)
 interface GalleryImage {
   id: string;
   url: string;
@@ -45,114 +49,105 @@ interface GalleryImage {
   caption?: string;
 }
 
-// TODO: API 연동 시 실제 데이터로 교체
-const mockPlants: Plant[] = [
-  {
-    id: "1",
-    name: "Peace Lily",
-    species: "스파티필럼",
-    image: "/images/plant-happy.png",
-    lastWatered: 1,
-    lastSunlight: 2,
-    lastActivity: "water",
-    wateringInterval: 7,
-    sunlightInterval: 3,
-    adoptionDate: "2024-01-15",
-    description: "평화로운 아이예요. 물을 좋아하고 간접광을 선호합니다."
-  },
-  {
-    id: "2", 
-    name: "Snake Plant",
-    species: "산세베리아",
-    image: "/images/plant-normal.png",
-    lastWatered: 3,
-    lastSunlight: 1,
-    lastActivity: "sunlight",
-    wateringInterval: 14,
-    sunlightInterval: 7,
-    adoptionDate: "2024-02-20",
-    description: "매우 강한 생명력을 가진 아이예요. 물을 자주 주지 않아도 괜찮습니다."
-  },
-  {
-    id: "3",
-    name: "Aloe Vera", 
-    species: "알로에",
-    image: "/images/plant-happy.png",
-    lastWatered: 2,
-    lastSunlight: 1,
-    lastActivity: "sunlight",
-    wateringInterval: 10,
-    sunlightInterval: 2,
-    adoptionDate: "2024-03-10",
-    description: "치유의 힘을 가진 아이예요. 햇빛을 좋아하고 건조한 환경을 선호합니다."
-  }
-];
-
-const mockRecords: PlantRecord[] = [
-  { id: "1", type: "water", date: "2024-08-27", notes: "토양이 건조해서 물을 줬어요" },
-  { id: "2", type: "sunlight", date: "2024-08-26", notes: "창가로 옮겨서 햇빛을 쬐였어요" },
-  { id: "3", type: "fertilizer", date: "2024-08-20", notes: "영양제를 주었어요" },
-];
-
-const mockMemories: Memory[] = [
-  {
-    id: "1",
-    title: "첫 만남",
-    date: "2024-01-15",
-    image: "/images/plant-happy.png",
-    content: "드디어 우리 집에 왔어요! 너무 예뻐요."
-  },
-  {
-    id: "2",
-    title: "새 잎이 나왔어요",
-    date: "2024-02-10",
-    content: "작은 새 잎이 돋아났어요. 정말 신기해요!"
-  }
-];
-
-const mockGallery: GalleryImage[] = [
-  { id: "1", url: "/images/plant-happy.png", date: "2024-08-27", caption: "오늘의 모습" },
-  { id: "2", url: "/images/plant-normal.png", date: "2024-08-20", caption: "일주일 전" },
-  { id: "3", url: "/images/plant-happy.png", date: "2024-08-15", caption: "성장 중" },
-  { id: "4", url: "/images/plant-normal.png", date: "2024-08-10", caption: "건강한 모습" },
-];
-
 export default function PlantDetailPage() {
   const params = useParams();
-  const plantId = params.id as string;
+  const plantId = parseInt(params.id as string, 10); // ID를 숫자로 변환
   
   const [plant, setPlant] = useState<Plant | null>(null);
-  const [records, setRecords] = useState<PlantRecord[]>([]);
-  const [memories, setMemories] = useState<Memory[]>([]);
-  const [gallery, setGallery] = useState<GalleryImage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // TODO: API 연동 시 실제 데이터로 교체
+  const mockRecords: PlantRecord[] = [
+    { id: "1", type: "water", date: "2024-08-27", notes: "토양이 건조해서 물을 줬어요" },
+    { id: "2", type: "sunlight", date: "2024-08-26", notes: "창가로 옮겨서 햇빛을 쬐였어요" },
+    { id: "3", type: "fertilizer", date: "2024-08-20", notes: "영양제를 주었어요" },
+  ];
+  
+  const mockMemories: Memory[] = [
+    {
+      id: "1",
+      title: "첫 만남",
+      date: "2024-01-15",
+      image: "/images/plant-happy.png",
+      content: "드디어 우리 집에 왔어요! 너무 예뻐요."
+    },
+    {
+      id: "2",
+      title: "새 잎이 나왔어요",
+      date: "2024-02-10",
+      content: "작은 새 잎이 돋아났어요. 정말 신기해요!"
+    }
+  ];
+  
+  const mockGallery: GalleryImage[] = [
+    { id: "1", url: "/images/plant-happy.png", date: "2024-08-27", caption: "오늘의 모습" },
+    { id: "2", url: "/images/plant-normal.png", date: "2024-08-20", caption: "일주일 전" },
+    { id: "3", url: "/images/plant-happy.png", date: "2024-08-15", caption: "성장 중" },
+    { id: "4", url: "/images/plant-normal.png", date: "2024-08-10", caption: "건강한 모습" },
+  ];
+
+  const [records, setRecords] = useState<PlantRecord[]>(mockRecords);
+  const [memories, setMemories] = useState<Memory[]>(mockMemories);
+  const [gallery, setGallery] = useState<GalleryImage[]>(mockGallery);
 
   useEffect(() => {
-    // TODO: 실제 API 호출로 교체
-    const foundPlant = mockPlants.find(p => p.id === plantId);
-    setPlant(foundPlant || null);
-    setRecords(mockRecords);
-    setMemories(mockMemories);
-    setGallery(mockGallery);
+    const fetchPlantDetails = async () => {
+      if (isNaN(plantId)) {
+        setError("유효하지 않은 식물 ID입니다.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const data = await getPlantById(plantId);
+        if (data) {
+          setPlant({
+            id: data.id,
+            name: data.name,
+            variety: data.variety,
+            img_url: data.img_url,
+            cycle_type: data.cycle_type,
+            cycle_value: data.cycle_value,
+            cycle_unit: data.cycle_unit,
+            sunlight_needs: data.sunlight_needs,
+            purchase_date: data.purchase_date,
+            memo: data.memo,
+          });
+          setError(null);
+        } else {
+          setPlant(null);
+          setError("식물 정보를 불러오지 못했습니다.");
+        }
+      } catch (err) {
+        console.error("Failed to fetch plant details:", err);
+        setError("식물 정보를 불러오는 중 오류가 발생했습니다.");
+        setPlant(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlantDetails();
   }, [plantId]);
 
   // 다음 급수일 계산
   const getNextWateringDate = (): string => {
     if (!plant) return "";
-    const lastWatered = new Date();
-    lastWatered.setDate(lastWatered.getDate() - plant.lastWatered);
-    const nextWatering = new Date(lastWatered);
-    nextWatering.setDate(nextWatering.getDate() + plant.wateringInterval);
-    return nextWatering.toLocaleDateString('ko-KR');
+    // API 응답에 lastWatered가 없으므로, cycle_value와 cycle_unit을 사용하여 계산해야 합니다.
+    // 현재는 mock 데이터의 lastWatered를 사용하던 로직이므로, API 연동 후 수정 필요
+    // 임시로 purchase_date를 기준으로 계산하거나, 별도의 API가 필요합니다.
+    return "정보 없음";
   };
 
   // 다음 햇빛 쬐기일 계산
   const getNextSunlightDate = (): string => {
     if (!plant) return "";
-    const lastSunlight = new Date();
-    lastSunlight.setDate(lastSunlight.getDate() - plant.lastSunlight);
-    const nextSunlight = new Date(lastSunlight);
-    nextSunlight.setDate(nextSunlight.getDate() + plant.sunlightInterval);
-    return nextSunlight.toLocaleDateString('ko-KR');
+    // API 응답에 lastSunlight가 없으므로, cycle_value와 cycle_unit을 사용하여 계산해야 합니다.
+    // 현재는 mock 데이터의 lastSunlight를 사용하던 로직이므로, API 연동 후 수정 필요
+    // 임시로 purchase_date를 기준으로 계산하거나, 별도의 API가 필요합니다.
+    return "정보 없음";
   };
 
   // 기록 타입별 아이콘 및 색상
@@ -170,6 +165,22 @@ export default function PlantDetailPage() {
         return { icon: "📝", color: "bg-gray-100 text-gray-700", label: "기록" };
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FAF6EC]">
+        <p className="text-[#4A6741] text-[16px]">식물 정보를 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FAF6EC]">
+        <p className="text-[#4A6741] text-[16px]">{error}</p>
+      </div>
+    );
+  }
 
   if (!plant) {
     return (
@@ -196,7 +207,7 @@ export default function PlantDetailPage() {
           {/* 원형 식물 이미지 */}
           <div className="relative w-[120px] h-[120px] rounded-full overflow-hidden mb-[16px] border-4 border-[#E5E7EB]">
             <Image
-              src={plant.image}
+              src={plant.img_url}
               alt={plant.name}
               fill
               className="object-cover"
@@ -209,7 +220,7 @@ export default function PlantDetailPage() {
               {plant.name}
             </h2>
             <p className="text-[#4A6741] text-[16px] mb-[12px]">
-              {plant.species}
+              {plant.variety}
             </p>
           </div>
         </div>
@@ -228,27 +239,27 @@ export default function PlantDetailPage() {
                   <div className="flex justify-between items-center">
                     <span className="text-[#4A6741] text-[14px]">입양일</span>
                     <span className="text-[#023735] text-[14px] font-medium">
-                      {new Date(plant.adoptionDate).toLocaleDateString('ko-KR')}
+                      {new Date(plant.purchase_date).toLocaleDateString('ko-KR')}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-[#4A6741] text-[14px]">급수 주기</span>
                     <span className="text-[#023735] text-[14px] font-medium">
-                      {plant.wateringInterval}일마다
+                      {plant.cycle_value} {plant.cycle_unit}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-[#4A6741] text-[14px]">햇빛 주기</span>
+                    <span className="text-[#4A6741] text-[14px]">햇빛 요구량</span>
                     <span className="text-[#023735] text-[14px] font-medium">
-                      {plant.sunlightInterval}일마다
+                      {plant.sunlight_needs}
                     </span>
                   </div>
                 </div>
               </div>
               <div className="rounded-[16px] p-[16px] border border-[#E5E7EB]">
-                <h4 className="text-[#023735] font-medium text-[14px] mb-[8px]">설명</h4>
+                <h4 className="text-[#023735] font-medium text-[14px] mb-[8px]">메모</h4>
                 <p className="text-[#4A6741] text-[14px] leading-[1.6]">
-                  {plant.description}
+                  {plant.memo}
                 </p>
               </div>
             </div>
@@ -385,7 +396,7 @@ export default function PlantDetailPage() {
                   <div className="text-right">
                     <p className="text-[#6B7280] text-[10px]">주기</p>
                     <p className="text-[#023735] text-[12px] font-medium">
-                      {plant.wateringInterval}일
+                      {plant.cycle_value} {plant.cycle_unit}
                     </p>
                   </div>
                 </div>
@@ -408,7 +419,7 @@ export default function PlantDetailPage() {
                   <div className="text-right">
                     <p className="text-[#6B7280] text-[10px]">주기</p>
                     <p className="text-[#023735] text-[12px] font-medium">
-                      {plant.sunlightInterval}일
+                      {plant.cycle_value} {plant.cycle_unit}
                     </p>
                   </div>
                 </div>
@@ -422,16 +433,19 @@ export default function PlantDetailPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-[#4A6741] text-[12px]">
-                      마지막 급수: {plant.lastWatered}일 전
+                      {/* API에 lastWatered가 없으므로, 임시로 표시하지 않거나 다른 방식으로 처리 */}
+                      마지막 급수: 정보 없음
                     </p>
                     <p className="text-[#4A6741] text-[12px]">
-                      마지막 햇빛: {plant.lastSunlight}일 전
+                      {/* API에 lastSunlight가 없으므로, 임시로 표시하지 않거나 다른 방식으로 처리 */}
+                      마지막 햇빛: 정보 없음
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-[#6B7280] text-[10px]">최근 활동</p>
                     <p className="text-[#023735] text-[12px] font-medium">
-                      {plant.lastActivity === 'water' ? '급수' : '햇빛'}
+                      {/* API에 lastActivity가 없으므로, 임시로 표시하지 않거나 다른 방식으로 처리 */}
+                      정보 없음
                     </p>
                   </div>
                 </div>
