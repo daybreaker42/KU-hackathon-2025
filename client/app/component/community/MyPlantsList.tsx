@@ -172,7 +172,7 @@ export default function MyPlantsList() {
         {plants.map((plant) => (
           <Link
             key={plant.id}
-            href={`/community/category/plant?plantId=${plant.id}`} // 동적 URL 생성
+            href={`/community/category/plant?variety=${plant.variety}`} // 동적 URL 생성
             className="flex flex-col w-[100px] flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
           >
             <div className="relative">
