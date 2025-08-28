@@ -103,7 +103,7 @@ export default function WritePostPage() {
 
         {/* 이미지 첨부 */}
         <div className="mb-[20px]">
-          <div className="flex items-center gap-[10px] overflow-x-auto pb-2">
+          <div className="flex items-center gap-[10px] overflow-x-auto p-2">
             <label className="flex-shrink-0 w-[80px] h-[80px] bg-white border-2 border-dashed border-[#E5E0D3] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#F5F2E8]">
               <Camera size={24} className="text-[#9CA3AF]" />
               <span className="text-[12px] text-[#9CA3AF] mt-1">{images.length}/10</span>
