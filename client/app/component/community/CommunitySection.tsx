@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PostCard from './PostCard';
 // API 및 타입 import
-import { autoLogin, isAuthenticated } from '@/app/api/authController';
+// import { autoLogin, isAuthenticated } from '@/app/api/authController';
 import { getCommunityPostsByCategory, type CommunityPost as ApiCommunityPost } from '@/app/api/communityController';
 import { CommunityPost } from '@/app/types/community/community'; // UI 컴포넌트용 타입
 
@@ -99,9 +99,9 @@ export default function CommunitySection({ title, category, plantId, showMoreBut
         setLoading(true);
         
         // 인증 확인 및 자동 로그인 (개발용)
-        if (!isAuthenticated()) {
-          autoLogin(); // 개발용 자동 로그인
-        }
+        // if (!isAuthenticated()) {
+        //   autoLogin(); // 개발용 자동 로그인
+        // }
         
         // 실제 API 호출 - 각 카테고리에서 최신 3개씩 가져오기
         const postsData = await getCommunityPostsByCategory(category, 1, 3);

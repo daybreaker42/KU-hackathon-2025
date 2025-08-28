@@ -112,7 +112,7 @@ export default function PlantDictionaryPage() {
       <div className="flex items-center justify-between p-4 bg-transparent">
         <BackButton onClick={() => window.history.back()} />
         <h1 className="text-[#023735] font-bold text-lg">식물 사전</h1>
-        <CloseButton />
+        <div className="w-[54px]"></div>
       </div>
 
       {/* 스크롤 가능한 컨텐츠 영역 */}

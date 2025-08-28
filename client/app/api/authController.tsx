@@ -61,14 +61,6 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
 
 /**
- * 임시 하드코딩된 JWT 토큰 (개발 중 테스트용)
- * 
- * ⚠️ 주의: 프로덕션에서는 절대 사용하지 마세요!
- * 이 토큰은 개발/테스트 목적으로만 사용되며, 실제 서버 API가 준비되면 제거해야 합니다.
- */
-const TEMP_AUTH_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbW…yMDR9.Y35qMi0yIfIU44msgp1p1eX1CIjT8mfeWOrcoBU5ErY';
-
-/**
  * 쿠키 설정 함수
  * 
  * @param name - 쿠키 이름
@@ -142,9 +134,20 @@ export const getAuthToken = (): string | null => {
  * 7일간 유효한 쿠키로 저장, 보안 설정 포함
  */
 export const setAuthToken = (token: string): void => {
-  console.log(token);
+  // console.log('토큰 저장 시도:', token); // 디버깅용 로그 추가
+  // console.log('토큰 타입:', typeof token); // 토큰 타입 확인
+  
+  if (!token || token === 'undefined') {
+    console.error('유효하지 않은 토큰:', token);
+    return;
+  }
+  
   // 7일간 유효한 쿠키로 저장
   setCookie('authToken', token, 7);
+  
+  // 저장 후 확인
+  const savedToken = getCookie('authToken');
+  console.log('저장된 토큰 확인:', savedToken);
 };
 
 /**
@@ -274,7 +277,7 @@ interface LoginRequest {
  * 로그인 응답 데이터 타입
  */
 interface LoginResponse {
-  access_token: string;
+  access_token: string; // API 문서에 따라 access_token으로 수정
   user: {
     id: number;
     email: string;
@@ -295,7 +298,7 @@ interface SignupRequest {
  * 회원가입 응답 데이터 타입
  */
 interface SignupResponse {
-  token: string;
+  access_token: string; // API 문서에 따라 access_token으로 수정
   user: {
     id: number;
     email: string;
@@ -322,20 +325,20 @@ interface SignupResponse {
  * console.log(isAuthenticated()); // true
  * ```
  */
-export const autoLogin = (): void => {
-  console.log('개발용 자동 로그인 - 하드코딩된 토큰 사용');
-  setAuthToken(TEMP_AUTH_TOKEN);
+// export const autoLogin = (): void => {
+//   console.log('개발용 자동 로그인 - 하드코딩된 토큰 사용');
+//   setAuthToken(TEMP_AUTH_TOKEN);
   
-  // Mock 사용자 정보 저장
-  const mockUser = {
-    id: 1,
-    email: 'user@example.com',
-    name: '테스트 사용자'
-  };
-  setCurrentUser(mockUser);
+//   // Mock 사용자 정보 저장
+//   const mockUser = {
+//     id: 1,
+//     email: 'user@example.com',
+//     name: '테스트 사용자'
+//   };
+//   setCurrentUser(mockUser);
   
-  console.log('자동 로그인 완료');
-};
+//   console.log('자동 로그인 완료');
+// };
 
 /**
  * Mock 로그인 함수 (개발/테스트용)
@@ -540,10 +543,11 @@ export const loginWithServer = async (loginData: LoginRequest): Promise<LoginRes
     }
 
     const data: LoginResponse = await response.json();
-
+    // console.log(`login token - ${JSON.stringify(data.access_token)}`); // access_token으로 수정
+    // console.log('전체 응답 데이터:', data); // 디버깅용 로그 추가
+    
     // 로그인 성공 시 토큰을 보안 쿠키에 저장
-    console.log(data);
-    setAuthToken(data.access_token);
+    setAuthToken(data.access_token); // access_token으로 수정
     // 사용자 정보 저장
     setCurrentUser(data.user);
 
@@ -590,9 +594,10 @@ export const signupWithServer = async (signupData: SignupRequest): Promise<Signu
     }
 
     const data: SignupResponse = await response.json();
+    console.log('회원가입 응답 데이터:', data); // 디버깅용 로그 추가
 
     // 회원가입 성공 시 토큰을 보안 쿠키에 저장
-    setAuthToken(data.token);
+    setAuthToken(data.access_token); // access_token으로 수정
     // 사용자 정보 저장
     setCurrentUser(data.user);
 

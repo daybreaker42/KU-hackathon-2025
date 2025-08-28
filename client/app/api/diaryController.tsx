@@ -1,5 +1,26 @@
 import { apiRequest } from "./authController";
 
+// 일기 메모리 조회 - 중요한 성장일기들
+export async function getDiaryMemories() {
+  try {
+    const response = await apiRequest("/diaries/memory", {
+      method: "GET"
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error fetching diary memories:", errorData);
+      throw new Error(errorData.message || "Unknown error");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching diary memories:", error);
+    throw error;
+  }
+}
+
 export async function getPlant() {
   try {
     const response = await apiRequest("/plants", {
@@ -42,7 +63,7 @@ export async function postDiary(data: {
     if (data.images && data.images.length > 0) {
       // FormData를 사용하여 이미지 업로드
       const formData = new FormData();
-      data.images.forEach((file, index) => {
+      req.images.forEach((file) => {
         formData.append(`file`, file);
       });
 

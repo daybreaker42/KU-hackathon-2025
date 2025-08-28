@@ -7,7 +7,7 @@ import Footer from '@/app/component/common/footer';
 import CloseButton from '@/app/component/common/CloseButton';
 import WritePostButton from '@/app/component/community/WritePostButton';
 // API 및 타입 import
-import { autoLogin, isAuthenticated } from '@/app/api/authController';
+// import { autoLogin, isAuthenticated } from '@/app/api/authController';
 import { getCommunityPosts, type CommunityPost as ApiCommunityPost } from '@/app/api/communityController';
 import { CommunityPost } from '@/app/types/community/community';
 
@@ -93,9 +93,9 @@ export default function CategoryPostsPage() {
         setLoading(true);
         
         // 인증 확인 및 자동 로그인 (개발용)
-        if (!isAuthenticated()) {
-          autoLogin();
-        }
+        // if (!isAuthenticated()) {
+        //   autoLogin();
+        // }
         
         // 실제 API 호출 - pagination 적용
         // page: 현재 페이지 번호 (1부터 시작)

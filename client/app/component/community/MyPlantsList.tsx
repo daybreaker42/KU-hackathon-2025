@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 // import Image from 'next/image'; // 임시로 주석 처리 - img 태그 테스트 중
 import Link from 'next/link'; // Link import 추가
 // API 및 타입 import
-import { autoLogin, isAuthenticated } from '@/app/api/authController';
+// import { autoLogin, isAuthenticated } from '@/app/api/authController';
 import { getMyPlants } from '@/app/api/communityController';
 
 /*
@@ -111,9 +111,9 @@ export default function MyPlantsList() {
         setError(null);
 
         // 인증 확인 및 자동 로그인 (개발용)
-        if (!isAuthenticated()) {
-          autoLogin(); // 개발용 자동 로그인
-        }
+        // if (!isAuthenticated()) {
+        //   autoLogin(); // 개발용 자동 로그인
+        // }
 
         // 실제 API 호출
         const plantsData = await getMyPlants();
