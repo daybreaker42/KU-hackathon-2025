@@ -30,7 +30,7 @@ const mapApiPostToUiPost = (apiPost: ApiCommunityPost): CommunityPost => {
     id: apiPost.id,
     title: apiPost.title,
     content: apiPost.content,
-    author: apiPost.author.name, // author 객체에서 name 추출
+    author: apiPost.author.name || '', // author 객체에서 name 추출
     timeAgo: getTimeAgo(apiPost.createdAt), // 생성일을 상대시간으로 변환
     likes: apiPost.likes_count, // likes_count를 likes로 매핑
     comments: apiPost.comments_count, // comments_count를 comments로 매핑
