@@ -179,14 +179,30 @@ export default function CommunitySection({ title, category, plantId, showMoreBut
 
       {/* 게시글 리스트 */}
       <div className="space-y-[10px]">
-        {posts.map((post) => (
-          <PostCard
-            key={post.id}
-            post={post}
-            onClick={handlePostClick}
-            variant="compact" // 컴팩트 모드로 표시
-          />
-        ))}
+        {posts.length === 0 ? (
+          // 게시글이 없는 경우 안내 메시지
+          <div className="bg-[#F5F1E7] rounded-lg p-[20px] border border-[#E8E3D5] text-center">
+            <div className="text-[#666666] text-[16px] mb-[5px]">
+              📝
+            </div>
+            <p className="text-[#666666] text-[14px]">
+              아직 게시판에 글이 없어요
+            </p>
+            <p className="text-[#999999] text-[12px] mt-[5px]">
+              첫 번째 글을 작성해보세요!
+            </p>
+          </div>
+        ) : (
+          // 게시글이 있는 경우 목록 표시
+          posts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              onClick={handlePostClick}
+              variant="compact" // 컴팩트 모드로 표시
+            />
+          ))
+        )}
       </div>
     </div>
   );
