@@ -54,7 +54,7 @@ function PlantCard({ plant }: { plant: Plant }) {
         {/* 식물 이미지 */}
         <div className="relative w-full aspect-square mb-[12px] overflow-hidden rounded-[16px] bg-transparent">
           <Image
-            src={getEmotionImage(plant.recentEmotion)}
+            src={plant.img_url || '/images/plant-happy.png'}
             alt={plant.name}
             fill
             className="object-cover"
@@ -96,6 +96,7 @@ export default function MyPlantsPage() {
       try {
         setLoading(true);
         const apiPlants: ApiPlantData[] = await getMyPlants();
+        // console.log(JSON.stringify(apiPlants));
         const mappedPlants: Plant[] = apiPlants.map(apiPlant => ({
           id: apiPlant.id,
           name: apiPlant.name,
@@ -138,6 +139,8 @@ export default function MyPlantsPage() {
     );
   }
 
+  // console.log(JSON.stringify(plants.length));
+  // console.log(JSON.stringify(plants[0]));
   return (
     <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] overflow-hidden">
       {/* 스크롤 가능한 컨텐츠 영역 */}
