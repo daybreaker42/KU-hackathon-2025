@@ -543,3 +543,76 @@ export const getMyPlants = async (): Promise<{ id: number; name: string; variety
     throw error;
   }
 };
+
+/**
+ * === Community Post 수정/삭제 API 함수들 ===
+ */
+
+// 게시글 수정 API
+export interface UpdateCommunityPostData {
+  title?: string;
+  content?: string;
+  category?: string;
+  plant_name?: string;
+  images?: string[];
+}
+
+export const updateCommunityPost = async (
+  postId: string | number,
+  postData: UpdateCommunityPostData
+): Promise<CommunityPost> => {
+  try {
+    const endpoint = `/community/posts/${postId}`;
+
+    const response = await apiRequest(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify(postData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        throw new Error('게시글 수정 권한이 없습니다.');
+      } else if (response.status === 404) {
+        throw new Error('게시글을 찾을 수 없습니다.');
+      } else {
+        const errorData = await response.json();
+        throw new Error(`게시글 수정 실패: ${errorData.message || response.status}`);
+      }
+    }
+
+    const data: CommunityPost = await response.json();
+    return data;
+  } catch (error) {
+    console.error('게시글 수정 중 오류 발생:', error);
+    throw error;
+  }
+};
+
+// 게시글 삭제 API
+export const deleteCommunityPost = async (
+  postId: string | number
+): Promise<void> => {
+  try {
+    const endpoint = `/community/posts/${postId}`;
+
+    const response = await apiRequest(endpoint, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        throw new Error('게시글 삭제 권한이 없습니다.');
+      } else if (response.status === 404) {
+        throw new Error('게시글을 찾을 수 없습니다.');
+      } else {
+        throw new Error(`게시글 삭제 실패: ${response.status}`);
+      }
+    }
+  } catch (error) {
+    console.error('게시글 삭제 중 오류 발생:', error);
+    throw error;
+  }
+};
