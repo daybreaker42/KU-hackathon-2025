@@ -204,9 +204,9 @@ export const removeAuthToken = (): void => {
  * - ngrok-skip-browser-warning: ngrok 경고 스킵
  * - Authorization: Bearer {token} (includeAuth가 true인 경우)
  */
-export const createAuthHeaders = (includeAuth: boolean = true): HeadersInit => {
+export const createAuthHeaders = (includeAuth: boolean = true, isFormData: boolean = false): HeadersInit => {
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
+    'Content-Type': isFormData ? 'multipart/form-data' : 'application/json',
     'ngrok-skip-browser-warning': 'true', // ngrok 브라우저 경고 스킵
   };
 
@@ -235,10 +235,11 @@ export const createAuthHeaders = (includeAuth: boolean = true): HeadersInit => {
 export const apiRequest = async (
   endpoint: string,
   options: RequestInit = {},
-  requireAuth: boolean = true
+  requireAuth: boolean = true,
+  isFormData: boolean = false
 ): Promise<Response> => {
   const url = `${BASE_URL}${endpoint}`;
-  const headers = createAuthHeaders(requireAuth);
+  const headers = createAuthHeaders(requireAuth, isFormData);
 
   const response = await fetch(url, {
     ...options,
@@ -525,7 +526,7 @@ export const isAuthenticated = (): boolean => {
  */
 export const loginWithServer = async (loginData: LoginRequest): Promise<LoginResponse> => {
   try {
-    const response = await apiRequest('/auth/login', {
+    const response = await apiRequest(`/auth/login`, {
       method: 'POST',
       body: JSON.stringify(loginData),
     }, false); // 로그인은 인증 토큰이 필요 없음
@@ -573,11 +574,12 @@ export const loginWithServer = async (loginData: LoginRequest): Promise<LoginRes
  */
 export const signupWithServer = async (signupData: SignupRequest): Promise<SignupResponse> => {
   try {
-    const response = await apiRequest('/auth/signup', {
+    const response = await apiRequest(`/auth/signup`, {
       method: 'POST',
       body: JSON.stringify(signupData),
     }, false); // 회원가입은 인증 토큰이 필요 없음
 
+    console.log(response);
     if (!response.ok) {
       throw new Error(`회원가입 실패: ${response.status}`);
     }

@@ -58,7 +58,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #023735;
+  color: #827D73;
   transition: all 0.2s;
 }
 
@@ -93,7 +93,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 5px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   cursor: grab;
   touch-action: pan-x; /* 수평 터치만 허용 */
 }
@@ -107,16 +107,16 @@
 }
 
 .dayItem {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
-  color: #666;
+  color: #827D73;
   position: relative;
   border: 2px solid transparent;
 }
@@ -128,7 +128,13 @@
 }
 
 .dayItem.selected {
-  border: 2px solid #023735;
+  border: 2px solid #DCB519;
+  color: #023735;
+  font-weight: bold;
+}
+
+.dayItem.today {
+  border: 2px solid #42CA71 !important;
   color: #023735;
   font-weight: bold;
 }
@@ -145,7 +151,8 @@
 
 /* 선택된 날짜 */
 .selectedDateHeader {
-  margin-bottom: 20px;
+  font-size: large;
+  margin-bottom: 10px;
 }
 
 .selectedDate {
@@ -157,81 +164,82 @@
 
 /* 일기 섹션 */
 .diarySection {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .diaryContent {
-  background-color: white;
-  border-radius: 15px;
-  padding: 20px;
-  border: 2px solid #E5E5E5;
+  border-radius: 27px;
+  padding: 17px;
+  border: 2px solid #DED9CC;
 }
 
 .diaryTitle {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   color: #023735;
-  margin: 0 0 15px 0;
+  margin-bottom: 15px;
 }
 
 .imageContainer {
-  margin: 15px 0;
   display: flex;
   gap: 10px;
 }
 
 .diaryImage {
   border-radius: 10px;
+  width: 100px;
+  height: 100px;
   object-fit: cover;
 }
 
 .diaryText {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.6;
-  color: #333;
   margin: 15px 0;
 }
 
 .diaryActions {
   display: flex;
-  gap: 10px;
-  margin-top: 15px;
+  gap: 7px;
+  margin-top: 10px;
+  flex-wrap: wrap;
 }
 
 .actionButton {
   background-color: #42CA71;
-  border: none;
-  border-radius: 20px;
-  padding: 8px 16px;
-  color: white;
-  font-size: 14px;
-  cursor: pointer;
+  color:#023735;
+  border-radius: 30px;
+  padding: 10px 20px;
+  font-size: small;
+  font-weight: bold;
 }
 
-.actionButton:hover {
-  background-color: #38b566;
+.actionButton.plant{
+  background-color: #008261;
+  color: #FAF6EC;
 }
 
 .noDiary {
   text-align: center;
-  padding: 40px 20px;
-  color: #666;
+  padding: 20px 0;
+  color: #827D73;
 }
 
 .noDiary p {
   margin-bottom: 20px;
-  font-size: 14px;
+  font-size: medium;
 }
 
 .addDiaryButton {
+  display: block;
   background-color: #023735;
-  color: white;
-  border: none;
-  border-radius: 25px;
+  color: #FAF6EC;
+  border-radius: 17px;
   padding: 12px 30px;
   font-size: 16px;
   cursor: pointer;
   width: 100%;
+  font-weight: bold;
 }
 
 .addDiaryButton:hover {
@@ -240,10 +248,9 @@
 
 /* 댓글 섹션 */
 .commentsSection {
-  background-color: white;
-  border-radius: 15px;
+  border-radius: 27px;
   padding: 20px;
-  border: 2px solid #E5E5E5;
+  border: 2px solid #DED9CC;
 }
 
 /* 스크롤바 스타일링 */
@@ -262,4 +269,12 @@
 
 .container::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+/* 미래 날짜 메시지 */
+.futureMessage {
+  color: #827D73;
+  font-size: 12px;
+  margin: 10px 0;
+  text-align: center;
 }

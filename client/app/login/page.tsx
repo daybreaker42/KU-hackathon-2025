@@ -1,120 +1,83 @@
 'use client';
 
 import { useState } from 'react';
-import { login, signup, logout, isAuthenticated } from '@/app/api/authController';
+import { useLoginController, useSignupController, useAuthGuard } from '@/app/api/loginController';
+import styles from './page.module.css';
 
 export default function LoginPage() {
+  // 인증 가드 - 로그인되어 있으면 메인 페이지로 리다이렉트
+  const { isCheckingAuth } = useAuthGuard('/');
+  
   // 상태 관리
   const [isLoginMode, setIsLoginMode] = useState(true); // true: 로그인, false: 회원가입
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
-  // 로그인 처리
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
+  // 로그인 컨트롤러
+  const {
+    email: loginEmail,
+    password: loginPassword,
+    isLoading: loginLoading,
+    error: loginError,
+    setEmail: setLoginEmail,
+    setPassword: setLoginPassword,
+    handleLogin,
+    resetForm: resetLoginForm
+  } = useLoginController();
 
-    try {
-      const result = await login({ email, password });
-      setSuccess(`로그인 성공! 환영합니다, ${result.user.name}님`);
-      console.log('로그인 결과:', result);
-      
-      // 폼 초기화
-      setEmail('');
-      setPassword('');
-    } catch (error) {
-      setError(error instanceof Error ? error.message : '로그인에 실패했습니다.');
-    } finally {
-      setLoading(false);
-    }
+  // 회원가입 컨트롤러
+  const {
+    name,
+    email: signupEmail,
+    password: signupPassword,
+    confirmPassword,
+    isLoading: signupLoading,
+    error: signupError,
+    setName,
+    setEmail: setSignupEmail,
+    setPassword: setSignupPassword,
+    setConfirmPassword,
+    handleSignup,
+    resetForm: resetSignupForm
+  } = useSignupController();
+
+  // 모드 전환 함수
+  const toggleMode = () => {
+    setIsLoginMode(!isLoginMode);
+    resetLoginForm();
+    resetSignupForm();
   };
 
-  // 회원가입 처리
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const result = await signup({ name, email, password });
-      setSuccess(`회원가입 성공! 환영합니다, ${result.user.name}님`);
-      console.log('회원가입 결과:', result);
-      
-      // 폼 초기화
-      setName('');
-      setEmail('');
-      setPassword('');
-    } catch (error) {
-      setError(error instanceof Error ? error.message : '회원가입에 실패했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 로그아웃 처리
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setSuccess('로그아웃되었습니다.');
-      setError(null);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : '로그아웃에 실패했습니다.');
-    }
-  };
+  // 인증 상태 확인 중이면 로딩 화면 표시
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-[#FAF6EC] flex items-center justify-center p-4">
+        <div className={styles.container}>
+          <div className="text-center">
+            <div className="animate-pulse">
+              <div className="w-8 h-8 bg-[#023735] rounded-full mx-auto mb-4"></div>
+              <p className="text-[#023735]">인증 상태 확인 중...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FAF6EC] flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+      <div className={styles.container}>
         {/* 헤더 */}
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-[#023735] mb-2">
             {isLoginMode ? '로그인' : '회원가입'}
           </h1>
-          <p className="text-gray-600">
-            식물 관리 커뮤니티에 {isLoginMode ? '로그인' : '가입'}하세요
-          </p>
         </div>
-
-        {/* 현재 인증 상태 표시 */}
-        <div className="mb-4 p-3 bg-gray-50 rounded">
-          <div className="text-sm">
-            <strong>인증 상태:</strong> {isAuthenticated() ? '✅ 로그인됨' : '❌ 로그아웃됨'}
-          </div>
-          {isAuthenticated() && (
-            <button
-              onClick={handleLogout}
-              className="mt-2 text-sm text-red-600 hover:text-red-800"
-            >
-              로그아웃하기
-            </button>
-          )}
-        </div>
-
-        {/* 성공/오류 메시지 */}
-        {success && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded text-green-700">
-            {success}
-          </div>
-        )}
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700">
-            {error}
-          </div>
-        )}
 
         {/* 폼 */}
         <form onSubmit={isLoginMode ? handleLogin : handleSignup}>
           {/* 회원가입일 때만 이름 필드 표시 */}
           {!isLoginMode && (
-            <div className="mb-4">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+            <div className={styles.inputContainer}>
+              <label htmlFor="name" className={styles.label}>
                 이름
               </label>
               <input
@@ -122,83 +85,87 @@ export default function LoginPage() {
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#023735]"
-                placeholder="김민준"
+                className={styles.input}
+                placeholder="이름 입력"
                 required
               />
             </div>
           )}
 
           {/* 이메일 필드 */}
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+          <div className={styles.inputContainer}>
+            <label htmlFor="email" className={styles.label}>
               이메일
             </label>
             <input
               type="email"
               id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#023735]"
+              value={isLoginMode ? loginEmail : signupEmail}
+              onChange={(e) => isLoginMode ? setLoginEmail(e.target.value) : setSignupEmail(e.target.value)}
+              className={styles.input}
               placeholder="user@example.com"
               required
             />
           </div>
 
           {/* 비밀번호 필드 */}
-          <div className="mb-6">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+          <div className={styles.inputContainer}>
+            <label htmlFor="password" className={styles.label}>
               비밀번호
             </label>
             <input
               type="password"
               id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#023735]"
+              value={isLoginMode ? loginPassword : signupPassword}
+              onChange={(e) => isLoginMode ? setLoginPassword(e.target.value) : setSignupPassword(e.target.value)}
+              className={styles.input}
               placeholder="password123"
               required
             />
           </div>
 
+          {/* 회원가입일 때만 비밀번호 확인 필드 표시 */}
+          {!isLoginMode && (
+            <div className={styles.inputContainer}>
+              <label htmlFor="confirmPassword" className={styles.label}>
+                비밀번호 확인
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className={styles.input}
+                placeholder="비밀번호 재입력"
+                required
+              />
+            </div>
+          )}
+
+          {/* 에러 메시지 - input 아래에 표시 */}
+          {(loginError || signupError) && (
+            <div className={styles.errorMessage}>
+              {isLoginMode ? loginError : signupError}
+            </div>
+          )}
+
           {/* 제출 버튼 */}
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-[#023735] text-white py-2 px-4 rounded-md hover:bg-[#034a47] focus:outline-none focus:ring-2 focus:ring-[#023735] disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isLoginMode ? loginLoading : signupLoading}
+            className={styles.submitButton}
           >
-            {loading ? '처리 중...' : (isLoginMode ? '로그인' : '회원가입')}
+            {(isLoginMode ? loginLoading : signupLoading) ? '처리 중...' : (isLoginMode ? '로그인' : '회원가입')}
           </button>
         </form>
 
         {/* 모드 전환 버튼 */}
         <div className="mt-6 text-center">
           <button
-            onClick={() => {
-              setIsLoginMode(!isLoginMode);
-              setError(null);
-              setSuccess(null);
-              setEmail('');
-              setPassword('');
-              setName('');
-            }}
+            onClick={toggleMode}
             className="text-[#023735] hover:text-[#034a47] text-sm"
           >
             {isLoginMode ? '계정이 없으신가요? 회원가입하기' : '이미 계정이 있으신가요? 로그인하기'}
-          </button>
-        </div>
-
-        {/* 테스트용 빠른 로그인 버튼 */}
-        <div className="mt-4 p-3 bg-blue-50 rounded">
-          <p className="text-sm text-blue-700 mb-2">💡 개발 테스트용 빠른 로그인:</p>
-          <button
-            onClick={() => {
-              setEmail('user@example.com');
-              setPassword('password123');
-            }}
-            className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-          >
-            테스트 계정 정보 자동 입력
           </button>
         </div>
       </div>

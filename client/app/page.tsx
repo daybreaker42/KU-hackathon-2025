@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import Footer from "./component/common/footer";
 import Link from "next/link";
-import { getDayDiary, getLastUploaded } from "./api/homeController";
+import { getDayDiary, getLastUploaded, getWeeklyDiary } from "./api/homeController";
 
 // 타입 정의
 interface NavProps {
@@ -92,9 +92,10 @@ interface DiaryProps {
   dayIndex: number;
   onClick: (day: number) => void;
   diaryData?: {title: string; content: string; photo: string | null} | null;
+  weeklyDiaryIndexes?: number[];
 }
 
-function Diary({ dayIndex, onClick, diaryData }: DiaryProps) {
+function Diary({ dayIndex, onClick, diaryData, weeklyDiaryIndexes = [] }: DiaryProps) {
   // 현재 주의 날짜들을 계산하는 함수
   const getCurrentWeekDates = () => {
     const today = new Date();
@@ -122,14 +123,14 @@ function Diary({ dayIndex, onClick, diaryData }: DiaryProps) {
       <div className={styles.weekContainer}>
         {weekDates.map((date, index) => {
           const isToday = date.toDateString() === today.toDateString();
-          const isWritten = index % 2 === 0; // 임시로 짝수 날짜에만 작성된 일기 표시
+          const isWritten = weeklyDiaryIndexes.includes(index); // 실제 주간 일기 데이터 기반
           return (
             <div 
               key={`week-${index}`} 
               className={`
                 ${styles.dayItem} ${isToday ? styles.today : ''} 
-                ${(dayIndex === index && !isToday) ? styles.selected : ''} 
-                ${isWritten ? styles.fill : ''}`}
+                ${isWritten ? styles.fill : ''}
+                ${(dayIndex === index && !isToday) ? styles.selected : ''}`}
               onClick={() => onClick(index)}
             >
               <div className={styles.dayDate}>{date.getDate()}</div>
@@ -213,6 +214,7 @@ export default function Home() {
   const [dayIndex, setDayIndex] = useState<number>(0);
   const [diaryData, setDiaryData] = useState<{title: string; content: string; photo: string | null} | null>(null);
   const [reactionData, setReactionData] = useState<ReactionList[]>([]);
+  const [weeklyDiaryIndexes, setWeeklyDiaryIndexes] = useState<number[]>([]);
 
   const plantContentDict = {
     "happy": {
@@ -322,8 +324,34 @@ export default function Home() {
       setCondition(condition);
     }
 
+    // 주간 일기 데이터 가져오기
+    const getWeeklyDiaryData = async () => {
+      // 현재 주의 날짜들 계산
+      const getCurrentWeekDates = () => {
+        const today = new Date();
+        const currentDay = today.getDay();
+        const dates = [];
+        
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - currentDay);
+        
+        for (let i = 0; i < 7; i++) {
+          const date = new Date(startOfWeek);
+          date.setDate(startOfWeek.getDate() + i);
+          dates.push(date);
+        }
+        
+        return dates;
+      };
+      
+      const weekDates = getCurrentWeekDates();
+      const indexes = await getWeeklyDiary(weekDates);
+      setWeeklyDiaryIndexes(indexes);
+    };
+
     getDiary();
     getCondition();
+    getWeeklyDiaryData();
   }, []);
 
   useEffect(() => {
@@ -370,7 +398,7 @@ export default function Home() {
   };
 
   return (
-    <main className={styles.main}>
+    <main>
       <div className={styles.container}>
         <div className={styles.content}>
           <Nav text={navText} img={""} />
@@ -384,7 +412,7 @@ export default function Home() {
                   <div className={styles.label}>작성한 일기</div>
                   <Link href="/diary" className={styles.moreLink}>더보기</Link>
                 </div>
-                <Diary dayIndex={dayIndex} onClick={handleDayClick} diaryData={diaryData}/>
+                <Diary dayIndex={dayIndex} onClick={handleDayClick} diaryData={diaryData} weeklyDiaryIndexes={weeklyDiaryIndexes}/>
               </div>
               <div>
                 <div className={styles.label}>친구들 반응</div>

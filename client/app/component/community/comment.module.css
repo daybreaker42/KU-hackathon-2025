@@ -1,0 +1,22 @@
+.commentInputContainer{ 
+    display: flex;
+    border: 2px solid #DED9CC;
+    border-radius: 17px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.commentInput{
+    flex: 1;
+    padding: 12px;
+    resize: none;
+    font-size: medium;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.commentButton{
+    padding: 12px 15px;
+    color: #008261;
+    font-weight: bold;
+}
