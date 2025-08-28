@@ -153,7 +153,7 @@ export default function CategoryPostsPage() {
   // 로딩 상태
   if (loading) {
     return (
-      <div className="p-[18px] bg-white min-h-screen w-[393px] mx-auto"> {/* width와 중앙 정렬 추가 */}
+      <div className="p-[18px] bg-[#DED9CC] min-h-screen w-[393px] mx-auto"> {/* 배경색을 #DED9CC로 변경 */}
         {/* 헤더 스켈레톤 */}
         <div className="flex items-center mb-[20px]">
           <div className="w-[24px] h-[24px] bg-gray-300 rounded animate-pulse mr-[12px]"></div>
@@ -188,7 +188,7 @@ export default function CategoryPostsPage() {
   }
 
   return (
-    <div className="p-[18px] bg-white min-h-screen w-[393px] mx-auto"> {/* width와 중앙 정렬 추가 */}
+    <div className="p-[18px] bg-[#DED9CC] min-h-screen w-[393px] mx-auto"> {/* 배경색을 #DED9CC로 변경 */}
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-[20px]">
         <div className="flex items-center">

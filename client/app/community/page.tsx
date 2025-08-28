@@ -4,7 +4,7 @@ import Footer from "../component/common/footer";
 
 export default function CommunityPage() {
   return (
-    <div className="min-h-screen max-h-screen flex flex-col bg-white overflow-hidden">
+    <div className="min-h-screen max-h-screen flex flex-col bg-[#DED9CC] overflow-hidden"> {/* 배경색을 #DED9CC로 변경 */}
       {/* 스크롤 가능한 컨텐츠 영역 */}
       <div className="flex-1 overflow-y-auto p-[18px] pb-[100px]"> {/* Footer 공간 확보를 위한 bottom padding */}
         <h1 className="pl-[7px] text-[#023735] font-medium text-[20px]">Community Page</h1>

@@ -110,7 +110,7 @@ export default function PostDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen max-h-screen flex flex-col bg-white w-[393px] mx-auto">
+      <div className="min-h-screen max-h-screen flex flex-col bg-[#DED9CC] w-[393px] mx-auto"> {/* 배경색을 #DED9CC로 변경 */}
         <div className="flex-1 overflow-y-auto p-[18px]">
           {/* 헤더 스켈레톤 */}
           <div className="flex items-center mb-[20px]">
@@ -140,7 +140,7 @@ export default function PostDetailPage() {
 
   if (!post) {
     return (
-      <div className="min-h-screen max-h-screen flex flex-col bg-white w-[393px] mx-auto">
+      <div className="min-h-screen max-h-screen flex flex-col bg-[#DED9CC] w-[393px] mx-auto"> {/* 배경색을 #DED9CC로 변경 */}
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <p className="text-gray-500 mb-[16px]">게시글을 찾을 수 없습니다.</p>
@@ -157,7 +157,7 @@ export default function PostDetailPage() {
   }
 
   return (
-    <div className="min-h-screen max-h-screen flex flex-col bg-white w-[393px] mx-auto">
+    <div className="min-h-screen max-h-screen flex flex-col bg-[#DED9CC] w-[393px] mx-auto"> {/* 배경색을 #DED9CC로 변경 */}
       <div className="flex-1 overflow-y-auto p-[18px] pb-[100px]">
         {/* 헤더 */}
         <div className="flex items-center mb-[20px]">
