@@ -5,84 +5,43 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import BackButton from "@/app/component/common/BackButton"; // BackButton 컴포넌트 추가
 import PlantManageButtons from "@/app/component/myPlant/PlantManageButtons"; // 식물 관리 버튼 컴포넌트 추가
+import { getMyPlants, ApiPlantData } from "@/app/api/homeController";
 
 // 식물 데이터 타입 정의
 interface Plant {
-  id: string;
+  id: number;
   name: string; // 애칭
-  species: string; // 종류
-  image: string;
-  lastWatered: number; // 며칠 전 물 줌
-  lastSunlight: number; // 며칠 전 햇빛 비춤
-  lastActivity: string; // 마지막 활동 타입 ('water' | 'sunlight')
+  variety: string; // 종류
+  img_url: string;
+  daysUntilWatering: number; // 물 주기까지 남은 일수
+  recentEmotion: string; // 최근 감정
 }
-
-// TODO: API 연동 시 실제 데이터로 교체
-const mockPlants: Plant[] = [
-  {
-    id: "1",
-    name: "Peace Lily",
-    species: "스파티필럼",
-    image: "/images/plant-happy.png",
-    lastWatered: 1,
-    lastSunlight: 2,
-    lastActivity: "water"
-  },
-  {
-    id: "2", 
-    name: "Snake Plant",
-    species: "산세베리아",
-    image: "/images/plant-normal.png",
-    lastWatered: 3,
-    lastSunlight: 1,
-    lastActivity: "sunlight"
-  },
-  {
-    id: "3",
-    name: "Aloe Vera", 
-    species: "알로에",
-    image: "/images/plant-happy.png",
-    lastWatered: 2,
-    lastSunlight: 1,
-    lastActivity: "sunlight"
-  },
-  {
-    id: "4",
-    name: "ZZ Plant",
-    species: "자미오쿨카스",
-    image: "/images/plant-normal.png", 
-    lastWatered: 5,
-    lastSunlight: 3,
-    lastActivity: "sunlight"
-  },
-  {
-    id: "5",
-    name: "Spider Plant",
-    species: "접란",
-    image: "/images/plant-sick.png",
-    lastWatered: 7,
-    lastSunlight: 4,
-    lastActivity: "sunlight"
-  },
-  {
-    id: "6",
-    name: "Monstera",
-    species: "몬스테라",
-    image: "/images/plant-happy.png",
-    lastWatered: 1,
-    lastSunlight: 1,
-    lastActivity: "water"
-  }
-];
 
 // 개별 식물 카드 컴포넌트
 function PlantCard({ plant }: { plant: Plant }) {
   // 마지막 활동 텍스트 생성
   const getLastActivityText = (plant: Plant): string => {
-    if (plant.lastActivity === 'water') {
-      return `마지막 활동: ${plant.lastWatered}일 전`;
+    if (plant.daysUntilWatering === 0) {
+      return `오늘 물 주기`;
+    } else if (plant.daysUntilWatering > 0) {
+      return `물 주기까지 ${plant.daysUntilWatering}일 남음`;
     } else {
-      return `마지막 활동: ${plant.lastSunlight}일 전`;
+      return `물 준지 ${Math.abs(plant.daysUntilWatering)}일 지남`;
+    }
+  };
+
+  const getEmotionImage = (emotion: string): string => {
+    switch (emotion) {
+      case '행복':
+        return '/images/plant-happy.png';
+      case '보통':
+        return '/images/plant-normal.png';
+      case '슬픔':
+        return '/images/plant-sad.png';
+      case '아픔':
+        return '/images/plant-sick.png';
+      default:
+        return '/images/plant-normal.png'; // 기본 이미지
     }
   };
 
@@ -95,7 +54,7 @@ function PlantCard({ plant }: { plant: Plant }) {
         {/* 식물 이미지 */}
         <div className="relative w-full aspect-square mb-[12px] overflow-hidden rounded-[16px] bg-transparent">
           <Image
-            src={plant.image}
+            src={getEmotionImage(plant.recentEmotion)}
             alt={plant.name}
             fill
             className="object-cover"
@@ -120,8 +79,25 @@ export default function MyPlantsPage() {
   const [plants, setPlants] = useState<Plant[]>([]);
 
   useEffect(() => {
-    // TODO: 실제 API 호출로 교체
-    setPlants(mockPlants);
+    const fetchPlants = async () => {
+      try {
+        const apiPlants: ApiPlantData[] = await getMyPlants();
+        const mappedPlants: Plant[] = apiPlants.map(apiPlant => ({
+          id: apiPlant.id,
+          name: apiPlant.name,
+          variety: apiPlant.variety,
+          img_url: apiPlant.img_url,
+          daysUntilWatering: apiPlant.daysUntilWatering,
+          recentEmotion: apiPlant.recentEmotion,
+        }));
+        setPlants(mappedPlants);
+      } catch (error) {
+        console.error("Failed to fetch plants:", error);
+        setPlants([]); // 에러 발생 시 빈 배열로 설정
+      }
+    };
+
+    fetchPlants();
   }, []);
 
   return (
