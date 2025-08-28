@@ -11,21 +11,6 @@ export interface Plant {
 // 식물 감정 상태
 export type PlantEmotion = '행복' | '보통' | '슬픔' | '아픔';
 
-// 식물 감정에 따른 이미지 매핑 유틸리티 함수
-export const getEmotionImage = (emotion: string): string => {
-  switch (emotion) {
-    case '행복':
-      return '/images/plant-happy.png';
-    case '보통':
-      return '/images/plant-normal.png';
-    case '슬픔':
-      return '/images/plant-sad.png';
-    case '아픔':
-      return '/images/plant-sick.png';
-    default:
-      return '/images/plant-normal.png'; // 기본 이미지
-  }
-};
 
 // 물 주기 텍스트 생성 유틸리티 함수
 export const getLastActivityText = (plant: Plant): string => {
