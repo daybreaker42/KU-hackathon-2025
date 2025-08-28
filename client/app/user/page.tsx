@@ -52,6 +52,10 @@ export default function UserProfilePage() {
     router.push(`/community/post/${postId}`);
   };
 
+  const handleLogout = () => {
+    
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF6EC]">
       <div className="flex-1 overflow-y-auto p-[18px]">
@@ -118,6 +122,10 @@ export default function UserProfilePage() {
                   <span className="font-bold text-lg text-[#023735]">친구 관리하기</span>
                   <ChevronRight className="text-gray-400" />
                 </Link>
+              </li>
+
+              <li> 
+                <button onClick={handleLogout}>로그 아웃</button>
               </li>
             </ul>
           </nav>

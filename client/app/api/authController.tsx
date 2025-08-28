@@ -284,106 +284,7 @@ export const autoLogin = (): void => {
   console.log('자동 로그인 완료');
 };
 
-/**
- * Mock 로그인 함수 (개발/테스트용)
- * 
- * @param loginData - 로그인 요청 데이터 (이메일, 비밀번호)
- * @returns 로그인 응답 데이터 (토큰, 사용자 정보)
- * 
- * 실제 서버 요청 없이 Mock 데이터로 로그인을 시뮬레이션합니다.
- * UI 테스트와 개발 단계에서 사용하세요.
- * 
- * @example
- * ```typescript
- * const result = await login({ 
- *   email: 'test@example.com', 
- *   password: 'password123' 
- * });
- * console.log(result.user.name); // 사용자 이름 출력
- * ```
- */
-export const login = async (loginData: LoginRequest): Promise<LoginResponse> => {
-  try {
-    // 임시로 서버 요청 없이 하드코딩된 토큰 사용
-    console.log('임시 로그인 - 하드코딩된 토큰 사용:', loginData);
 
-    // 실제 서버 요청은 나중에 구현
-    // const response = await apiRequest('/auth/login', {
-    //   method: 'POST',
-    //   body: JSON.stringify(loginData),
-    // }, false);
-
-    // 임시 응답 데이터 생성
-    const mockResponse: LoginResponse = {
-      token: TEMP_AUTH_TOKEN, // 하드코딩된 토큰 사용
-      user: {
-        id: 1,
-        email: loginData.email,
-        name: loginData.email === 'user@example.com' ? '테스트 사용자' : '김민준'
-      }
-    };
-
-    // 로그인 성공 시 토큰을 보안 쿠키에 저장
-    setAuthToken(mockResponse.token);
-    
-    console.log('임시 로그인 성공:', mockResponse);
-    return mockResponse;
-  } catch (error) {
-    console.error('로그인 중 오류 발생:', error);
-    throw error;
-  }
-};
-
-/**
- * Mock 회원가입 함수 (개발/테스트용)
- * 
- * @param signupData - 회원가입 요청 데이터 (이름, 이메일, 비밀번호)
- * @returns 회원가입 응답 데이터 (토큰, 사용자 정보)
- * 
- * 실제 서버 요청 없이 Mock 데이터로 회원가입을 시뮬레이션합니다.
- * UI 테스트와 개발 단계에서 사용하세요.
- * 
- * @example
- * ```typescript
- * const result = await signup({ 
- *   name: '김민준',
- *   email: 'test@example.com', 
- *   password: 'password123' 
- * });
- * console.log(result.user.name); // '김민준'
- * ```
- */
-export const signup = async (signupData: SignupRequest): Promise<SignupResponse> => {
-  try {
-    // 임시로 서버 요청 없이 하드코딩된 토큰 사용
-    console.log('임시 회원가입 - 하드코딩된 토큰 사용:', signupData);
-
-    // 실제 서버 요청은 나중에 구현
-    // const response = await apiRequest('/auth/signup', {
-    //   method: 'POST',
-    //   body: JSON.stringify(signupData),
-    // }, false);
-
-    // 임시 응답 데이터 생성
-    const mockResponse: SignupResponse = {
-      token: TEMP_AUTH_TOKEN, // 하드코딩된 토큰 사용
-      user: {
-        id: Math.floor(Math.random() * 1000) + 1, // 임시 랜덤 ID
-        email: signupData.email,
-        name: signupData.name
-      }
-    };
-
-    // 회원가입 성공 시 토큰을 보안 쿠키에 저장
-    setAuthToken(mockResponse.token);
-    
-    console.log('임시 회원가입 성공:', mockResponse);
-    return mockResponse;
-  } catch (error) {
-    console.error('회원가입 중 오류 발생:', error);
-    throw error;
-  }
-};
 
 /**
  * 로그아웃 함수
@@ -472,7 +373,7 @@ export const isAuthenticated = (): boolean => {
  */
 export const loginWithServer = async (loginData: LoginRequest): Promise<LoginResponse> => {
   try {
-    const response = await apiRequest('/auth/login', {
+    const response = await apiRequest(`/auth/login`, {
       method: 'POST',
       body: JSON.stringify(loginData),
     }, false); // 로그인은 인증 토큰이 필요 없음
@@ -518,11 +419,12 @@ export const loginWithServer = async (loginData: LoginRequest): Promise<LoginRes
  */
 export const signupWithServer = async (signupData: SignupRequest): Promise<SignupResponse> => {
   try {
-    const response = await apiRequest('/auth/signup', {
+    const response = await apiRequest(`/auth/signup`, {
       method: 'POST',
       body: JSON.stringify(signupData),
     }, false); // 회원가입은 인증 토큰이 필요 없음
 
+    console.log(response);
     if (!response.ok) {
       throw new Error(`회원가입 실패: ${response.status}`);
     }
