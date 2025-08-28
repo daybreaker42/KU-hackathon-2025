@@ -1,0 +1,265 @@
+.container {
+  width: 393px;
+  height: 852px;
+  margin: 0 auto;
+  background-color: #FAF6EC;
+  padding: 18px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* 헤더 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: x-large;
+  font-weight: bold;
+  color: #023735;
+  margin: 0;
+}
+
+.closeButton {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid #DED9CC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #023735;
+}
+
+/* 월 헤더 */
+.monthHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.monthNavigation {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.monthArrow {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #023735;
+  transition: all 0.2s;
+}
+
+.monthArrow:hover {
+  background-color: #DED9CC;
+}
+
+.monthTitle {
+  font-size: x-large;
+  font-weight: bold;
+  color: #023735;
+  margin: 0;
+}
+
+.viewModeButton {
+  background-color: transparent;
+  border: 2px solid #42CA71;
+  border-radius: 20px;
+  padding: 8px 16px;
+  color: #023735;
+  font-size: small;
+  cursor: pointer;
+}
+
+.viewModeButton.selected {
+  background-color: #42CA71;
+  color: #FAF6EC;
+}
+
+/* 달력 */
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 30px;
+  cursor: grab;
+  touch-action: pan-x; /* 수평 터치만 허용 */
+}
+
+.calendar:active {
+  cursor: grabbing;
+}
+
+.emptyDay {
+  height: 40px;
+}
+
+.dayItem {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  position: relative;
+  border: 2px solid transparent;
+}
+
+.dayItem.hasContent {
+  background-color: #FFD700;
+  color: #023735;
+  font-weight: bold;
+}
+
+.dayItem.selected {
+  border: 2px solid #023735;
+  color: #023735;
+  font-weight: bold;
+}
+
+.todayIndicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 6px;
+  height: 6px;
+  background-color: #42CA71;
+  border-radius: 50%;
+}
+
+/* 선택된 날짜 */
+.selectedDateHeader {
+  margin-bottom: 20px;
+}
+
+.selectedDate {
+  font-size: 18px;
+  font-weight: bold;
+  color: #023735;
+  margin: 0;
+}
+
+/* 일기 섹션 */
+.diarySection {
+  margin-bottom: 30px;
+}
+
+.diaryContent {
+  background-color: white;
+  border-radius: 15px;
+  padding: 20px;
+  border: 2px solid #E5E5E5;
+}
+
+.diaryTitle {
+  font-size: 16px;
+  font-weight: bold;
+  color: #023735;
+  margin: 0 0 15px 0;
+}
+
+.imageContainer {
+  margin: 15px 0;
+  display: flex;
+  gap: 10px;
+}
+
+.diaryImage {
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.diaryText {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  margin: 15px 0;
+}
+
+.diaryActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.actionButton {
+  background-color: #42CA71;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.actionButton:hover {
+  background-color: #38b566;
+}
+
+.noDiary {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.noDiary p {
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.addDiaryButton {
+  background-color: #023735;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 12px 30px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.addDiaryButton:hover {
+  background-color: #034d4a;
+}
+
+/* 댓글 섹션 */
+.commentsSection {
+  background-color: white;
+  border-radius: 15px;
+  padding: 20px;
+  border: 2px solid #E5E5E5;
+}
+
+/* 스크롤바 스타일링 */
+.container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}

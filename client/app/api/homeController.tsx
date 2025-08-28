@@ -21,17 +21,20 @@ export interface SimpleDiaryData {
     photo: string | null;
 }
 
+const header = {
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOjEsImlhdCI6MTc1NjM4OTY4OCwiZXhwIjoxNzU2NDc2MDg4fQ.hJ9Ki7FYZsErWkwpubq03cxZbw4v9SUt5nJASqTXccU`
+};
+const url = 'https://0350e7e6e842.ngrok-free.app';
+
 export async function getDayDiary(date: Date): Promise<SimpleDiaryData | null> {
   const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
   
   try {
     // 실제 서버 API 호출
-    const response = await fetch(`https://0350e7e6e842.ngrok-free.app/diaries/date/${dateString}`, {
+    const response = await fetch(`${url}/diaries/date/${dateString}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        // 'Authorization': `Bearer ${token}`, // 인증 토큰이 있다면
-      },
+      headers: header,
     });
 
     if (response.ok) {
@@ -78,12 +81,9 @@ export async function getDayDiary(date: Date): Promise<SimpleDiaryData | null> {
 export async function getLastUploaded(): Promise<number | null> {
   try {
     // 실제 서버 API 호출
-    const response = await fetch(`https://0350e7e6e842.ngrok-free.app/diary/lastUpload`, {
+    const response = await fetch(`${url}/diary/lastUpload`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        // 'Authorization': `Bearer ${token}`, // 인증 토큰이 있다면
-      },
+      headers: header,
     });
 
     if (response.ok) {
