@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Heart } from 'lucide-react';
-import { getCommunityPostById, CommunityPost, getCommunityPostComments, Comment as APIComment, CommentsResponse } from '@/app/api/communityController'; // API import
+import { getCommunityPostById, CommunityPost, getCommunityPostComments, Comment as APIComment, CommentsResponse, createCommunityComment, CreateCommentData, updateCommunityComment, UpdateCommentData, deleteCommunityComment } from '@/app/api/communityController'; // API import
 import BackButton from '@/app/component/common/BackButton';
 import Comments from '@/app/component/community/Comments';
 
@@ -12,6 +12,7 @@ import Comments from '@/app/component/community/Comments';
 export interface Comment {
   id: number;
   author: string;
+  authorId: number; // 삭제 권한 확인용
   content: string;
   timeAgo: string;
   createdAt: string;
@@ -41,6 +42,7 @@ const convertAPICommentToLocal = (apiComment: APIComment): Comment => {
   return {
     id: apiComment.id,
     author: apiComment.author.name,
+    authorId: apiComment.author.id,
     content: apiComment.content,
     timeAgo,
     createdAt: apiComment.createdAt,
@@ -78,6 +80,12 @@ export default function PostDetailPage() {
   const [likesCount, setLikesCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  // 현재 사용자 정보 (TODO: 실제 사용자 정보 API로 교체)
+  const currentUser = {
+    id: 1, // mock 사용자 ID
+    name: "현재 사용자"
+  };
+
   useEffect(() => {
     if (!postId) return;
 
@@ -110,20 +118,6 @@ export default function PostDetailPage() {
     // TODO: 좋아요 API 연동 필요
     setIsLiked(!isLiked);
     setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
-  };
-
-  // 대댓글 작성 핸들러
-  const handleReplySubmit = (parentId: number, content: string) => {
-    // TODO: 댓글 생성 API 연동 필요
-    const newReply: Comment = {
-      id: Date.now(),
-      author: "현재 사용자",
-      content,
-      timeAgo: "방금 전",
-      parentId,
-      createdAt: new Date().toISOString()
-    };
-    setComments(prevComments => [...prevComments, newReply]);
   };
 
   // 댓글 새로고침 핸들러
@@ -248,19 +242,97 @@ export default function PostDetailPage() {
         {/* 댓글 섹션 */}
         <Comments
           comments={comments}
-          onAddComment={(content) => {
-            // TODO: 댓글 생성 API 연동 필요
-            const comment: Comment = {
-              id: comments.length + 1,
-              author: "현재 사용자", // TODO: 실제 사용자 정보로 변경
-              content,
-              timeAgo: "방금 전",
-              createdAt: new Date().toISOString()
-            };
-            setComments([...comments, comment]);
+          onAddComment={async (content) => {
+            try {
+              // API 호출
+              const commentData: CreateCommentData = { content };
+              const newComment = await createCommunityComment(postId, commentData);
+
+              // 로컬 상태 업데이트
+              const localComment = convertAPICommentToLocal(newComment);
+              setComments(prevComments => [...prevComments, localComment]);
+            } catch (error) {
+              console.error('댓글 작성 실패:', error);
+              // API 실패 시 로컬에서 처리
+              const comment: Comment = {
+                id: comments.length + 1,
+                author: currentUser.name,
+                authorId: currentUser.id,
+                content,
+                timeAgo: "방금 전",
+                createdAt: new Date().toISOString()
+              };
+              setComments([...comments, comment]);
+            }
           }}
-          onAddReply={handleReplySubmit}
+          onAddReply={async (parentId: number, content: string) => {
+            try {
+              // API 호출
+              const commentData: CreateCommentData = { content, parent_id: parentId };
+              const newReply = await createCommunityComment(postId, commentData);
+
+              // 로컬 상태 업데이트
+              const localReply = convertAPICommentToLocal(newReply);
+              setComments(prevComments => [...prevComments, localReply]);
+            } catch (error) {
+              console.error('대댓글 작성 실패:', error);
+              // API 실패 시 로컬에서 처리
+              const newReply: Comment = {
+                id: Date.now(),
+                author: currentUser.name,
+                authorId: currentUser.id,
+                content,
+                timeAgo: "방금 전",
+                parentId,
+                createdAt: new Date().toISOString()
+              };
+              setComments(prevComments => [...prevComments, newReply]);
+            }
+          }}
           onRefresh={handleCommentsRefresh}
+          onEditComment={async (commentId: number, content: string) => {
+            try {
+              // API 호출
+              const commentData: UpdateCommentData = { content };
+              const updatedComment = await updateCommunityComment(commentId.toString(), commentData);
+
+              // 로컬 상태 업데이트
+              const localComment = convertAPICommentToLocal(updatedComment);
+              setComments(prevComments =>
+                prevComments.map(comment =>
+                  comment.id === commentId ? localComment : comment
+                )
+              );
+            } catch (error) {
+              console.error('댓글 수정 실패:', error);
+              // 로컬에서 직접 수정
+              setComments(prevComments =>
+                prevComments.map(comment =>
+                  comment.id === commentId
+                    ? { ...comment, content, timeAgo: "방금 전" }
+                    : comment
+                )
+              );
+            }
+          }}
+          onDeleteComment={async (commentId: number) => {
+            try {
+              // API 호출
+              await deleteCommunityComment(commentId.toString());
+
+              // 로컬 상태 업데이트
+              setComments(prevComments =>
+                prevComments.filter(comment => comment.id !== commentId)
+              );
+            } catch (error) {
+              console.error('댓글 삭제 실패:', error);
+              // 로컬에서 직접 삭제
+              setComments(prevComments =>
+                prevComments.filter(comment => comment.id !== commentId)
+              );
+            }
+          }}
+          currentUserId={currentUser.id}
         />
       </div>
     </div>

@@ -292,6 +292,99 @@ export const getCommunityPostComments = async (
   }
 };
 
+// 댓글 작성 API
+export interface CreateCommentData {
+  content: string;
+  parent_id?: number;
+}
+
+export const createCommunityComment = async (
+  postId: string | number,
+  commentData: CreateCommentData
+): Promise<Comment> => {
+  try {
+    const endpoint = `/community/posts/${postId}/comments`;
+
+    const response = await apiRequest(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(commentData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`댓글 작성 실패: ${errorData.message || response.status}`);
+    }
+
+    const data: Comment = await response.json();
+    return data;
+  } catch (error) {
+    console.error('댓글 작성 중 오류 발생:', error);
+    throw error;
+  }
+};
+
+// 댓글 수정 API
+export interface UpdateCommentData {
+  content: string;
+}
+
+export const updateCommunityComment = async (
+  commentId: string | number,
+  commentData: UpdateCommentData
+): Promise<Comment> => {
+  try {
+    const endpoint = `/community/comments/${commentId}`;
+
+    const response = await apiRequest(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify(commentData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`댓글 수정 실패: ${errorData.message || response.status}`);
+    }
+
+    const data: Comment = await response.json();
+    return data;
+  } catch (error) {
+    console.error('댓글 수정 중 오류 발생:', error);
+    throw error;
+  }
+};
+
+// 댓글 삭제 API
+export const deleteCommunityComment = async (
+  commentId: string | number
+): Promise<void> => {
+  try {
+    const endpoint = `/community/comments/${commentId}`;
+
+    const response = await apiRequest(endpoint, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        throw new Error('댓글 삭제 권한이 없습니다.');
+      } else if (response.status === 404) {
+        throw new Error('댓글을 찾을 수 없습니다.');
+      } else {
+        throw new Error(`댓글 삭제 실패: ${response.status}`);
+      }
+    }
+  } catch (error) {
+    console.error('댓글 삭제 중 오류 발생:', error);
+    throw error;
+  }
+};
+
 // 이미지 여러장 업로드 API
 export const uploadImages = async (
   files: File[]

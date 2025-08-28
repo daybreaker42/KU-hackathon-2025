@@ -3,15 +3,25 @@
 import { useState } from 'react';
 import { Comment } from '@/app/types/community/community';
 
+// 로컬 Comment 타입 (authorId 포함)
+interface LocalComment extends Comment {
+  authorId: number;
+}
+
 interface CommentItemProps {
-  comment: Comment;
+  comment: LocalComment;
   onReply: (parentId: number, content: string) => void;
+  onEdit?: (commentId: number, content: string) => void;
+  onDelete?: (commentId: number) => void;
+  currentUserId?: number;
   isReply?: boolean;
 }
 
-export default function CommentItem({ comment, onReply, isReply = false }: CommentItemProps) {
+export default function CommentItem({ comment, onReply, onEdit, onDelete, currentUserId, isReply = false }: CommentItemProps) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(comment.content);
 
   const handleReplySubmit = () => {
     if (replyContent.trim()) {
@@ -20,6 +30,22 @@ export default function CommentItem({ comment, onReply, isReply = false }: Comme
       setShowReplyForm(false);
     }
   };
+
+  const handleEditSubmit = () => {
+    if (editContent.trim() && onEdit) {
+      onEdit(comment.id, editContent);
+      setIsEditing(false);
+    }
+  };
+
+  const handleDelete = () => {
+    if (onDelete && window.confirm('댓글을 삭제하시겠습니까?')) {
+      onDelete(comment.id);
+    }
+  };
+
+  // 현재 사용자가 댓글 작성자인지 확인
+  const isCurrentUser = currentUserId ? comment.authorId === currentUserId : false;
 
   const marginLeft = isReply ? 20 : 0; // 대댓글은 20px margin
 
@@ -50,18 +76,64 @@ export default function CommentItem({ comment, onReply, isReply = false }: Comme
                 {comment.timeAgo}
               </span>
             </div>
-            {!isReply && (
-              <button
-                onClick={() => setShowReplyForm(!showReplyForm)}
-                className="text-[#42CA71] text-[12px] hover:underline"
-              >
-                답글 달기
-              </button>
-            )}
+            <div className="flex items-center space-x-[8px]">
+              {!isReply && (
+                <button
+                  onClick={() => setShowReplyForm(!showReplyForm)}
+                  className="text-[#42CA71] text-[12px] hover:underline"
+                >
+                  답글 달기
+                </button>
+              )}
+              {isCurrentUser && (
+                <>
+                  <button
+                    onClick={() => setIsEditing(!isEditing)}
+                    className="text-[#6C757D] text-[12px] hover:text-[#42CA71] transition-colors"
+                  >
+                    수정
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="text-[#6C757D] text-[12px] hover:text-red-500 transition-colors"
+                  >
+                    삭제
+                  </button>
+                </>
+              )}
+            </div>
           </div>
-          <p className="text-[#495057] text-[14px] leading-[1.5]">
-            {comment.content}
-          </p>
+          {isEditing ? (
+            <div className="space-y-[8px]">
+              <textarea
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                className="w-full p-[8px] border border-[#D4CDB8] bg-[#F5F1E7] rounded resize-none h-[60px] text-[12px] focus:outline-none focus:border-[#42CA71] transition-colors"
+              />
+              <div className="flex justify-end space-x-[8px]">
+                <button
+                  onClick={() => {
+                    setIsEditing(false);
+                    setEditContent(comment.content);
+                  }}
+                  className="px-[12px] py-[4px] text-[#6C757D] text-[12px] hover:text-[#42CA71] transition-colors"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={handleEditSubmit}
+                  disabled={!editContent.trim()}
+                  className="px-[12px] py-[4px] bg-[#42CA71] text-white text-[12px] font-medium rounded hover:bg-[#369F5C] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  수정
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-[#495057] text-[14px] leading-[1.5]">
+              {comment.content}
+            </p>
+          )}
         </div>
       </div>
 
