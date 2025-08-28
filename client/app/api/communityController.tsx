@@ -536,6 +536,7 @@ export const createPlant = async (
   try {
     const endpoint = '/plants';
 
+
     const response = await apiRequest(endpoint, {
       method: 'POST',
       body: JSON.stringify(plantData),

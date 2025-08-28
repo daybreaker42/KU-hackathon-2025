@@ -54,8 +54,6 @@ export async function postDiary(data: {
 }) {
   try {
 
-    // 새로운 구조에 맞게 수정
-
 
     let res;
     // 이미지가 있으면 먼저 이미지 업로드
@@ -63,7 +61,7 @@ export async function postDiary(data: {
     if (data.images && data.images.length > 0) {
       // FormData를 사용하여 이미지 업로드
       const formData = new FormData();
-      req.images.forEach((file) => {
+      data.images.forEach((file) => {
         formData.append(`file`, file);
       });
 
