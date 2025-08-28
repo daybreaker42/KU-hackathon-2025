@@ -66,7 +66,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000'
  * ⚠️ 주의: 프로덕션에서는 절대 사용하지 마세요!
  * 이 토큰은 개발/테스트 목적으로만 사용되며, 실제 서버 API가 준비되면 제거해야 합니다.
  */
-const TEMP_AUTH_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOjEsImlhdCI6MTc1NjM4OTY4OCwiZXhwIjoxNzU2NDc2MDg4fQ.hJ9Ki7FYZsErWkwpubq03cxZbw4v9SUt5nJASqTXccU';
+const TEMP_AUTH_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbW…yMDR9.Y35qMi0yIfIU44msgp1p1eX1CIjT8mfeWOrcoBU5ErY';
 
 /**
  * 쿠키 설정 함수
@@ -142,6 +142,7 @@ export const getAuthToken = (): string | null => {
  * 7일간 유효한 쿠키로 저장, 보안 설정 포함
  */
 export const setAuthToken = (token: string): void => {
+  console.log(token);
   // 7일간 유효한 쿠키로 저장
   setCookie('authToken', token, 7);
 };
@@ -245,7 +246,7 @@ export const apiRequest = async (
 ): Promise<Response> => {
   const url = `${BASE_URL}${endpoint}`;
   const headers = createAuthHeaders(requireAuth, isFormData);
-
+  console.log(headers);
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -273,7 +274,7 @@ interface LoginRequest {
  * 로그인 응답 데이터 타입
  */
 interface LoginResponse {
-  token: string;
+  access_token: string;
   user: {
     id: number;
     email: string;
@@ -541,7 +542,8 @@ export const loginWithServer = async (loginData: LoginRequest): Promise<LoginRes
     const data: LoginResponse = await response.json();
 
     // 로그인 성공 시 토큰을 보안 쿠키에 저장
-    setAuthToken(data.token);
+    console.log(data);
+    setAuthToken(data.access_token);
     // 사용자 정보 저장
     setCurrentUser(data.user);
 

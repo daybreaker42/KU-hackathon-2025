@@ -13,12 +13,39 @@ export interface ApiPlantData {
   recentEmotion: string;
 }
 
+// 오늘 할 일 관련 타입 정의
+export interface PlantTask {
+  type: "watering" | "sunlight";
+  plant: {
+    id: number;
+    name: string;
+    variety: string;
+  };
+}
+
+export interface TodayWateringResponse {
+  wateringCount: number;
+  sunlightCount: number;
+  totalTasks: number;
+  tasks: PlantTask[];
+}
+
+// 기존 타입은 호환성을 위해 유지
+export interface TodayWateringPlant {
+  id: number;
+  name: string;
+  variety: string;
+  img_url: string;
+  lastWatered: string;
+  wateringCycle: string;
+  daysOverdue: number;
+}
+
 /* HOME - 성준 추가 */
 export async function getMyPlants(): Promise<ApiPlantData[]> {
   try {
-    const response = await fetch(`${url}/home/my-plants`, {
+    const response = await apiRequest(`/home/my-plants`, {
       method: 'GET',
-      headers: getHeaders(),
     });
 
     if (response.ok) {
@@ -38,6 +65,33 @@ export async function getMyPlants(): Promise<ApiPlantData[]> {
   } catch (error) {
     console.error('Network error while fetching my plants:', error);
     return [];
+  }
+}
+
+/* 오늘 할 일 가져오기 */
+export async function getTodayWateringPlants(): Promise<TodayWateringResponse> {
+  try {
+    const response = await apiRequest(`/home/today-tasks`, {
+      method: 'GET',
+    });
+
+    if (response.ok) {
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('Response is not JSON:', contentType);
+        return { wateringCount: 0, sunlightCount: 0, totalTasks: 0, tasks: [] };
+      }
+      const data: TodayWateringResponse = await response.json();
+      return data;
+    } else {
+      console.error('Failed to fetch today tasks:', response.status, response.statusText);
+      const text = await response.text();
+      console.error('Error response:', text.substring(0, 200));
+      return { wateringCount: 0, sunlightCount: 0, totalTasks: 0, tasks: [] };
+    }
+  } catch (error) {
+    console.error('Network error while fetching today tasks:', error);
+    return { wateringCount: 0, sunlightCount: 0, totalTasks: 0, tasks: [] };
   }
 }
 
@@ -88,29 +142,19 @@ export interface MonthlyDiaryData {
     emotions: { [key: string]: string };
 }
 
-import { getAuthToken } from '@/app/api/authController';
-
-const getHeaders = () => {
-  const token = getAuthToken();
-  return {
-    'Content-Type': 'application/json',
-    'Authorization': token ? `Bearer ${token}` : '',
-    'ngrok-skip-browser-warning': 'true', // ngrok 브라우저 경고 스킵
-  };
-};
-const header = getHeaders();
-
-// 환경변수에서 BASE_URL 가져오기 (.env.local에서 관리)
-const url = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
-
 /* DIARY */
 export async function getDayDiary(date: Date): Promise<SimpleDiaryData | null> {
-  const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
+  console.log(date);
+  // 현지 시간대를 기준으로 날짜 문자열 생성 (시간대 변환 문제 해결)
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const dateString = `${year}-${month}-${day}`; // YYYY-MM-DD 형식으로 변환
   try {
     // 실제 서버 API 호출
-    const response = await fetch(`${url}/diaries/date/${dateString}`, {
+    console.log(dateString);
+    const response = await apiRequest(`/diaries/date/${dateString}`, {
       method: 'GET',
-      headers: header,
     });
 
     if (response.ok) {
@@ -148,8 +192,6 @@ export async function getDayDiary(date: Date): Promise<SimpleDiaryData | null> {
         };
       } catch (parseError) {
         console.error('JSON parse error:', parseError);
-        const text = await response.text();
-        console.error('Response text:', text.substring(0, 200));
         return null;
       }
     } else if (response.status === 404) {
@@ -172,9 +214,8 @@ export async function getDayDiary(date: Date): Promise<SimpleDiaryData | null> {
 export async function getMonthlyDiary(year: number, month: number): Promise<MonthlyDiaryData | null> {
   try {
     // 실제 서버 API 호출
-    const response = await fetch(`${url}/diaries/monthly/${year}/${month}`, {
+    const response = await apiRequest(`/diaries/monthly/${year}/${month}`, {
       method: 'GET',
-      headers: header,
     });
 
     if (response.ok) {
@@ -209,15 +250,19 @@ export async function getMonthlyDiary(year: number, month: number): Promise<Mont
 /* WEEKLY DIARY */
 export async function getWeeklyDiary(dates: Date[]): Promise<number[]> {
   try {
-    // 날짜 배열을 YYYY-MM-DD 형식으로 변환
-    const dateStrings = dates.map(date => date.toISOString().split('T')[0]);
+    // 날짜 배열을 YYYY-MM-DD 형식으로 변환 (현지 시간대 기준)
+    const dateStrings = dates.map(date => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    });
     
     // 각 날짜에 대해 일기 존재 여부 확인
     const diaryPromises = dateStrings.map(async (dateString) => {
       try {
-        const response = await fetch(`${url}/diaries/date/${dateString}`, {
+        const response = await apiRequest(`/diaries/date/${dateString}`, {
           method: 'GET',
-          headers: header,
         });
 
         if (response.ok) {
@@ -237,7 +282,7 @@ export async function getWeeklyDiary(dates: Date[]): Promise<number[]> {
     const results = await Promise.all(diaryPromises);
     
     // 일기가 있는 날짜의 인덱스들을 반환
-    return results.map((hasDiary, index) => hasDiary ? index : -1).filter(index => index !== -1);
+    return results.map((hasDiary, index) => hasDiary ? index-1 : -1).filter(index => index !== -1);
   } catch (error) {
     console.error('Network error while fetching weekly diary:', error);
   }
@@ -250,9 +295,8 @@ export async function getWeeklyDiary(dates: Date[]): Promise<number[]> {
 export async function getLastUploaded(): Promise<number | null> {
   try {
     // 실제 서버 API 호출
-    const response = await fetch(`${url}/diaries/lastUploaded`, {
+    const response = await apiRequest(`/diaries/lastUploaded`, {
       method: 'GET',
-      headers: header,
     });
 
     if (response.ok) {
@@ -265,6 +309,7 @@ export async function getLastUploaded(): Promise<number | null> {
 
       try {
         const data = await response.json();
+        console.log(data);
 
         // 새로운 응답 구조에 맞춘 처리: {lastUploadedAt: string, daysSinceLastUpload: number}
         if (typeof data.daysSinceLastUpload === 'number') {
@@ -307,7 +352,6 @@ export async function getDiaryComments(diaryId: number): Promise<CommentData[]> 
   try {
     const response = await apiRequest(`/diaries/${diaryId}/comments?page=1&limit=3`, {
       method: 'GET',
-      headers: header,
     });
 
     if (response.ok) {
@@ -332,7 +376,6 @@ export async function getRecentDiaryComments(): Promise<any[] | null> {
     // 이번달 일기 목록 조회
     const response = await apiRequest(`/diaries/monthly/${currentYear}/${currentMonth}`, {
       method: 'GET',
-      headers: header,
     });
 
     if (response.ok) {

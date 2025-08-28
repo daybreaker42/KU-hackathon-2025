@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import Footer from "./component/common/footer";
 import Link from "next/link";
-import { getDayDiary, getLastUploaded, getWeeklyDiary, getRecentDiaryComments, SimpleDiaryData } from "./api/homeController";
+import { getDayDiary, getLastUploaded, getWeeklyDiary, getRecentDiaryComments, SimpleDiaryData, getTodayWateringPlants, TodayWateringResponse, TodayWateringPlant } from "./api/homeController";
 
 // 타입 정의
 interface NavProps {
@@ -65,30 +65,34 @@ function AddPlantButton() {
   )
 }
 
-interface TodoProps {
+interface WateringProps {
   today: string;
-  todoList?: string[];
+  wateringData: TodayWateringResponse;
 }
 
-function Todo({ today, todoList }: TodoProps) {
+function Watering({ today, wateringData }: WateringProps) {
+  // 물주기 작업만 필터링
+  const wateringTasks = wateringData.tasks?.filter(task => task.type === "watering") || [];
+
   return (
     <div className={styles.todo}>
-      <div className={styles.todoTitle}>오늘 할일 - {today}</div>
+      <div className={styles.todoTitle}>오늘 물줘야 할 식물 - {today}</div>
       <div className={styles.todoList}>
-        {todoList?.length === 0
-        ? "오늘 할 일 모두 완료 했어요."
-        : todoList?.map((todo, index) => (
-          <div className={styles.todoItem} key={'todoList' + index}>
-            <div>{todo}</div>
-            {index < todoList.length - 1 && <hr key={`todoListhr${index}`}/>}
+        {wateringData.wateringCount === 0
+        ? "오늘 물줄 식물이 없어요!"
+        : (
+          <div className={styles.plantNameList}>
+            {wateringTasks.map((task, index) => (
+              <div className={styles.plantNamePill} key={`watering-${task.plant.id}-${index}`}>
+                {task.plant.name} - {task.plant.variety}
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
-}
-
-interface DiaryProps {
+}interface DiaryProps {
   dayIndex: number;
   onClick: (day: number) => void;
   diaryData?: SimpleDiaryData | null;
@@ -123,7 +127,7 @@ function Diary({ dayIndex, onClick, diaryData, weeklyDiaryIndexes = [] }: DiaryP
       <div className={styles.weekContainer}>
         {weekDates.map((date, index) => {
           const isToday = date.toDateString() === today.toDateString();
-          const isWritten = weeklyDiaryIndexes.includes(index); // 실제 주간 일기 데이터 기반
+          const isWritten = weeklyDiaryIndexes.includes(index-1); // 실제 주간 일기 데이터 기반
           return (
             <div 
               key={`week-${index}`} 
@@ -214,7 +218,7 @@ export default function Home() {
   const [navText, setNavText] = useState<string>("");
   const [plantContent, setPlantContent] = useState<PlantProps>({text: "", img: "/images/plant-normal.png"});
   const [today, setToday] = useState<string>("");
-  const [todoList, setTodoList] = useState<string[]>([]);
+  const [wateringData, setWateringData] = useState<TodayWateringResponse>({ wateringCount: 0, sunlightCount: 0, totalTasks: 0, tasks: [] });
   const [dayIndex, setDayIndex] = useState<number>(0);
   const [diaryData, setDiaryData] = useState<SimpleDiaryData | null>(null);
   const [reactionData, setReactionData] = useState<ReactionList[]>([]);
@@ -269,13 +273,6 @@ export default function Home() {
     return (now.getMonth() + 1) + '/' + now.getDate() + ' (' + now.toLocaleString('default', { weekday: 'short' }) + ')';
   };
 
-  const getTodoList = (): string[] => {
-    return [
-      "식물1 물주기",
-      "식물2 물주기"
-    ];
-  }
-
   const getReactionData = async (): Promise<ReactionList[]> => {
     try {
       const recentComments = await getRecentDiaryComments();
@@ -297,7 +294,6 @@ export default function Home() {
   useEffect(() => {
     setNavText(getNavText());
     setToday(getToday());
-    setTodoList(getTodoList());
     setDayIndex(getTodayIndex()); // 오늘 날짜의 인덱스로 초기화
 
     // 반응 데이터 비동기 로딩
@@ -306,6 +302,17 @@ export default function Home() {
       setReactionData(reactionData);
     };
     loadReactionData();
+
+    // 물주기 데이터 로딩
+    const loadWateringData = async () => {
+      try {
+        const watering = await getTodayWateringPlants();
+        setWateringData(watering);
+      } catch (error) {
+        console.error('Failed to fetch watering data:', error);
+      }
+    };
+    loadWateringData();
 
     // 오늘 일기 가져오기
     const getDiary = async () => {
@@ -351,11 +358,11 @@ export default function Home() {
   useEffect(() => {
     if (condition !== null) {
       // 0: happy, 1: normal, 3: sad, 7: sick
-      if (condition === 0) {
+      if (condition === -1) {
         setPlantContent(plantContentDict["happy"]);
-      } else if (condition === 1) {
+      } else if (condition === 0) {
         setPlantContent(plantContentDict["normal"]);
-      } else if (condition < 7) {
+      } else if (condition < 6) {
         setPlantContent(plantContentDict["sad"]);
       } else {
         setPlantContent(plantContentDict["sick"]);
@@ -400,7 +407,7 @@ export default function Home() {
           ? <AddPlantButton />
           : <>
             <Plant text={plantContent.text} img={plantContent.img} />
-              <Todo today={today} todoList={todoList} />
+              <Watering today={today} wateringData={wateringData} />
               <div>
                 <div className={styles.labelContainer}>
                   <div className={styles.label}>작성한 일기</div>

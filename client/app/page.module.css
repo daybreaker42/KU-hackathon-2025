@@ -97,6 +97,7 @@
 .todoTitle{
     font-size:small;
     margin-bottom:10px;
+    font-weight:bold;
 }
 
 .todoList{
@@ -116,6 +117,77 @@
 .todoItem hr{
     width:100%;
     border:1px solid #DED9CC;
+}
+
+/* 물주기 컴포넌트 스타일 */
+.wateringInfo {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: small;
+}
+
+.totalCount {
+    color: #42CA71;
+    font-weight: bold;
+}
+
+.wateringItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.wateringPlantInfo {
+    flex: 1;
+    text-align: left;
+}
+
+.wateringPlantName {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.wateringPlantDetails {
+    display: flex;
+    gap: 8px;
+    font-size: small;
+    color: #666;
+}
+
+.wateringCycle {
+    color: #42CA71;
+}
+
+.overdue {
+    color: #FF6B6B;
+    font-weight: bold;
+}
+
+.wateringStatus {
+    font-size: large;
+}
+
+/* 식물 이름 리스트 스타일 */
+.plantNameList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.plantNamePill {
+    background-color: #008261;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #FAF6EC;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    font-weight:bold;
 }
 
 .label{
