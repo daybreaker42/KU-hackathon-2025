@@ -183,6 +183,8 @@
 
 .dayItem.fill{
     background-color:#F9D131;
+    border:none;
+    line-height: 45px;
 }
 
 .diarySection{

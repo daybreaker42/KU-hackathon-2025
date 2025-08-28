@@ -21,6 +21,14 @@ export interface SimpleDiaryData {
     photo: string | null;
 }
 
+// 월별 일기 데이터 타입 정의
+export interface MonthlyDiaryData {
+    year: number;
+    month: number;
+    diaryDates: number[];
+    emotions: { [key: string]: string };
+}
+
 const header = {
   'Content-Type': 'application/json',
   'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOjEsImlhdCI6MTc1NjM4OTY4OCwiZXhwIjoxNzU2NDc2MDg4fQ.hJ9Ki7FYZsErWkwpubq03cxZbw4v9SUt5nJASqTXccU`,
@@ -96,6 +104,84 @@ export async function getDayDiary(date: Date): Promise<SimpleDiaryData | null> {
   };
 }
 
+/* MONTHLY DIARY */
+export async function getMonthlyDiary(year: number, month: number): Promise<MonthlyDiaryData | null> {
+  try {
+    // 실제 서버 API 호출
+    const response = await fetch(`${url}/diaries/monthly/${year}/${month}`, {
+      method: 'GET',
+      headers: header,
+    });
+
+    if (response.ok) {
+      // Content-Type 확인
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('Response is not JSON:', contentType);
+        return null;
+      }
+
+      try {
+        const data: MonthlyDiaryData = await response.json();
+        return data;
+      } catch (parseError) {
+        console.error('JSON parse error in getMonthlyDiary:', parseError);
+        const text = await response.text();
+        console.error('Response text:', text.substring(0, 200));
+        return null;
+      }
+    } else {
+      console.error('Failed to fetch monthly diary:', response.status, response.statusText);
+      const text = await response.text();
+      console.error('Error response:', text.substring(0, 200));
+    }
+  } catch (error) {
+    console.error('Network error while fetching monthly diary:', error);
+  }
+  
+  return null;
+}
+
+/* WEEKLY DIARY */
+export async function getWeeklyDiary(dates: Date[]): Promise<number[]> {
+  try {
+    // 날짜 배열을 YYYY-MM-DD 형식으로 변환
+    const dateStrings = dates.map(date => date.toISOString().split('T')[0]);
+    
+    // 각 날짜에 대해 일기 존재 여부 확인
+    const diaryPromises = dateStrings.map(async (dateString) => {
+      try {
+        const response = await fetch(`${url}/diaries/date/${dateString}`, {
+          method: 'GET',
+          headers: header,
+        });
+
+        if (response.ok) {
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const data: DiaryData[] = await response.json();
+            return data && data.length > 0;
+          }
+        }
+        return false;
+      } catch (error) {
+        console.error(`Error checking diary for ${dateString}:`, error);
+        return false;
+      }
+    });
+
+    const results = await Promise.all(diaryPromises);
+    
+    // 일기가 있는 날짜의 인덱스들을 반환
+    return results.map((hasDiary, index) => hasDiary ? index : -1).filter(index => index !== -1);
+  } catch (error) {
+    console.error('Network error while fetching weekly diary:', error);
+  }
+  
+  // 임시 데이터 반환 (개발용)
+  return [0, 2, 4, 6]; // 일, 화, 목, 토에 일기가 있다고 가정
+}
+
 /* CONDITION */
 export async function getLastUploaded(): Promise<number | null> {
   try {
@@ -115,21 +201,11 @@ export async function getLastUploaded(): Promise<number | null> {
 
       try {
         const data = await response.json();
-        console.log(data);
-        
+
+        console.log('Last uploaded response data:', data);
         // 새로운 응답 구조에 맞춘 처리: {lastUploadedAt: string, daysSinceLastUpload: number}
         if (typeof data.daysSinceLastUpload === 'number') {
           return data.daysSinceLastUpload;
-        }
-        
-        // 이전 구조 지원: {days: number}
-        if (typeof data.days === 'number') {
-          return data.days;
-        }
-        
-        // 숫자만 직접 반환하는 경우
-        if (typeof data === 'number') {
-          return data;
         }
         
         console.error('Unexpected response format:', data);
@@ -148,13 +224,7 @@ export async function getLastUploaded(): Promise<number | null> {
   } catch (error) {
     console.error('Network error while fetching last uploaded days:', error);
   }
-  
-  // 서버 호출 실패 시 임시 데이터 반환
-  // return null;
-  return 6;
-  // return 1;
-  // return 2;
-  // return 3;
+  return null;
 }
 
 
