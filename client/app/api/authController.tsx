@@ -249,7 +249,7 @@ export const apiRequest = async (
 ): Promise<Response> => {
   const url = `${BASE_URL}${endpoint}`;
   const headers = createAuthHeaders(requireAuth, isFormData);
-  console.log(headers);
+  // console.log(headers);
   const response = await fetch(url, {
     ...options,
     headers: {
