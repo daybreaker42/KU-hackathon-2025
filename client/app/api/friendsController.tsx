@@ -58,3 +58,28 @@ export const searchUsers = async (query: string): Promise<Friend[]> => {
     throw error;
   }
 };
+
+// New function for sending friend request
+export const sendFriendRequest = async (friendId: number): Promise<{ message: string }> => {
+  try {
+    const endpoint = '/friends/request';
+    const response = await apiRequest(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ friend_id: friendId }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `친구 요청 실패: ${response.status}`);
+    }
+
+    const data: { message: string } = await response.json();
+    return data;
+  } catch (error) {
+    console.error('친구 요청 중 오류 발생:', error);
+    throw error;
+  }
+};
