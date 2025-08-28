@@ -190,15 +190,15 @@ export default function MyPlantsList() {
                 height={100}
                 className="w-[100px] h-[100px] object-cover rounded-lg"
                 onError={(e) => {
-                  // 이미지 로드 실패 시 기본 이미지 표시
+                  // 이미지 로드 실패 시 회색 배경으로 변경
                   const target = e.target as HTMLImageElement;
-                  target.src = '/plant-normal.png';
+                  target.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
                 }}
               />
             </div>
             <div className="mt-[10px] text-center">
               <p className="text-[14px] font-medium text-[#023735] truncate">
-                {plant.variety || plant.name} {/* variety 필드 우선 사용, 없으면 name 사용 */}
+                {plant.name || plant.variety}
               </p>
             </div>
           </button>
