@@ -1,15 +1,37 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import styles from './page.module.css';
 import { postDiary, getPlant } from '@/app/api/diaryController';
-import { memoryUsage } from 'process';
 
 export default function DiaryWritePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // URL에서 날짜 파라미터 읽기
+  const getDateFromParams = () => {
+    const dateParam = searchParams.get('date');
+    if (dateParam) {
+      const date = new Date(dateParam);
+      if (!isNaN(date.getTime())) {
+        return {
+          year: date.getFullYear(),
+          month: date.getMonth() + 1,
+          day: date.getDate()
+        };
+      }
+    }
+    // 기본값은 오늘 날짜
+    const today = new Date();
+    return {
+      year: today.getFullYear(),
+      month: today.getMonth() + 1,
+      day: today.getDate()
+    };
+  };
   
   // 식물 정보 타입 정의
   interface PlantInfo {
@@ -29,8 +51,8 @@ export default function DiaryWritePage() {
     updatedAt: string;
     // 다이어리 작성용 로컬 상태
     growthNote?: string;
-    wateringDays?: number;
-    sunlightStatus?: string;
+    isWatered?: boolean;  // 급수 여부 (토글)
+    isSunlightAdjusted?: boolean;  // 햇빛 조절 여부 (토글)
   }
 
   // API 응답 타입 정의
@@ -43,13 +65,7 @@ export default function DiaryWritePage() {
   }
   
   // 상태 관리
-  const [selectedDate] = useState(() => {
-    const today = new Date();
-    return {
-      month: today.getMonth() + 1,
-      day: today.getDate()
-    };
-  });
+  const [selectedDate] = useState(() => getDateFromParams());
   
   const [title, setTitle] = useState('');
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
@@ -75,8 +91,8 @@ export default function DiaryWritePage() {
           const plantsWithLocalState = response.plants.map((plant: PlantInfo) => ({
             ...plant,
             growthNote: '',
-            wateringDays: 0,
-            sunlightStatus: '충분'
+            isWatered: false,
+            isSunlightAdjusted: false
           }));
           setUserPlants(plantsWithLocalState);
         }
@@ -106,9 +122,6 @@ export default function DiaryWritePage() {
     return moodOption ? moodOption.label : '기쁨';
   };
 
-  // 햇빛 상태 옵션들
-  const sunlightOptions = ['부족', '충분', '과다'];
-
   // 식물별 성장일기 업데이트
   const updatePlantGrowthNote = (plantId: number, note: string) => {
     setUserPlants(prev => 
@@ -118,20 +131,20 @@ export default function DiaryWritePage() {
     );
   };
 
-  // 식물별 급수일 업데이트
-  const updatePlantWateringDays = (plantId: number, days: number) => {
+  // 식물별 급수 토글
+  const togglePlantWatering = (plantId: number) => {
     setUserPlants(prev => 
       prev.map(plant => 
-        plant.id === plantId ? { ...plant, wateringDays: Math.max(0, days) } : plant
+        plant.id === plantId ? { ...plant, isWatered: !plant.isWatered } : plant
       )
     );
   };
 
-  // 식물별 햇빛 상태 업데이트
-  const updatePlantSunlightStatus = (plantId: number, status: string) => {
+  // 식물별 햇빛 조절 토글
+  const togglePlantSunlight = (plantId: number) => {
     setUserPlants(prev => 
       prev.map(plant => 
-        plant.id === plantId ? { ...plant, sunlightStatus: status } : plant
+        plant.id === plantId ? { ...plant, isSunlightAdjusted: !plant.isSunlightAdjusted } : plant
       )
     );
   };
@@ -184,6 +197,17 @@ export default function DiaryWritePage() {
 
   // 일기 저장
   const handleSave = async () => {
+    // 제목과 내용 유효성 검사
+    if (!title.trim()) {
+      alert('제목을 입력해주세요.');
+      return;
+    }
+    
+    if (!content.trim()) {
+      alert('내용을 입력해주세요.');
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
@@ -191,16 +215,16 @@ export default function DiaryWritePage() {
       const selectedPlants = userPlants.filter(plant => plant.growthNote && plant.growthNote.trim() !== '');
       const plant_id = selectedPlants.map(plant => plant.id);
       
-      // 물을 준 식물들의 ID 수집 (wateringDays가 0보다 큰 것들)
-      const water = userPlants.filter(plant => plant.wateringDays && plant.wateringDays > 0).map(plant => plant.id);
+      // 물을 준 식물들의 ID 수집 (isWatered가 true인 것들)
+      const water = userPlants.filter(plant => plant.isWatered).map(plant => plant.id);
       
-      // 햇빛 상태가 설정된 식물들의 ID 수집 (기본값이 아닌 것들)
-      const sun = userPlants.filter(plant => plant.sunlightStatus && plant.sunlightStatus !== '충분').map(plant => plant.id);
+      // 햇빛 조절한 식물들의 ID 수집 (isSunlightAdjusted가 true인 것들)
+      const sun = userPlants.filter(plant => plant.isSunlightAdjusted).map(plant => plant.id);
       
       // 메모리 데이터 생성 (성장일기가 있는 식물들)
-      const memory = selectedPlants.map(plant => ({
+      const memory = selectedPlants.filter(plant => plant.growthNote !== '').map(plant => ({
         id: plant.id,
-        memo: plant.growthNote || ''
+        memo: plant.growthNote!
       }));
 
       const diaryData = {
@@ -216,11 +240,7 @@ export default function DiaryWritePage() {
       
       const res = await postDiary(diaryData) as unknown as { success: boolean };
       
-      if (res.success) {
-        router.push('/diary');
-      } else {
-        alert('일기 저장에 실패했습니다.');
-      }
+      router.push('/diary');
     } catch (error) {
       console.error('일기 저장 실패:', error);
       alert('일기 저장에 실패했습니다.');
@@ -249,7 +269,7 @@ export default function DiaryWritePage() {
 
         {/* 날짜 */}
         <div className={styles.dateSection}>
-          <h2 className={styles.date}>{selectedDate.month}월 {selectedDate.day}일</h2>
+          <h2 className={styles.date}>{selectedDate.year}년 {selectedDate.month}월 {selectedDate.day}일</h2>
         </div>
 
         {/* 제목 */}
@@ -379,9 +399,7 @@ export default function DiaryWritePage() {
 
         {/* 선택된 식물의 관리 영역 */}
         {selectedPlant && (
-          <div className={styles.selectedPlantManagement}>
-            <h3 className={styles.managementTitle}>{selectedPlant.name} 관리</h3>
-            
+          <div>
             {/* 성장일기 */}
             <div className={styles.inputContainer}>
               <label className={styles.label}>성장일기</label>
@@ -389,47 +407,33 @@ export default function DiaryWritePage() {
                 type="text"
                 value={selectedPlant.growthNote}
                 onChange={(e) => updatePlantGrowthNote(selectedPlant.id, e.target.value)}
-                placeholder="새싹 출현/ 꽃망울 수 / 식물의 키"
+                placeholder="새싹 출현 / 꽃망울 수 / 식물의 키"
                 className={styles.input}
               />
             </div>
 
             {/* 급수 관리 */}
-            <div className={styles.inputContainer}>
-              <label className={styles.label}>다음 급수까지</label>
-              <div className={styles.wateringControls}>
-                <button
-                  onClick={() => updatePlantWateringDays(selectedPlant.id, (selectedPlant.wateringDays || 0) - 1)}
-                  className={styles.controlButton}
-                >
-                  -
-                </button>
-                <span className={styles.wateringValue}>{selectedPlant.wateringDays || 0}일</span>
-                <button
-                  onClick={() => updatePlantWateringDays(selectedPlant.id, (selectedPlant.wateringDays || 0) + 1)}
-                  className={styles.controlButton}
-                >
-                  +
-                </button>
-              </div>
+            <div className={styles.plantContainer}>
+              <label className={styles.plantLabel}>급수 관리</label>
+              <button
+                type="button"
+                onClick={() => togglePlantWatering(selectedPlant.id)}
+                className={`${styles.toggleButton} ${selectedPlant.isWatered ? styles.active : ''}`}
+              >
+                급수
+              </button>
             </div>
 
             {/* 햇빛 관리 */}
-            <div className={styles.inputContainer}>
-              <label className={styles.label}>햇빛 상태</label>
-              <div className={styles.sunlightControls}>
-                {sunlightOptions.map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => updatePlantSunlightStatus(selectedPlant.id, option)}
-                    className={`${styles.sunlightButton} ${
-                      selectedPlant.sunlightStatus === option ? styles.selected : ''
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
+            <div className={styles.plantContainer}>
+              <label className={styles.plantLabel}>햇빛 관리</label>
+              <button
+                type="button"
+                onClick={() => togglePlantSunlight(selectedPlant.id)}
+                className={`${styles.toggleButton} ${selectedPlant.isSunlightAdjusted ? styles.active : ''}`}
+              >
+                햇빛 조절
+              </button>
             </div>
           </div>
         )}
@@ -437,7 +441,7 @@ export default function DiaryWritePage() {
         {/* 저장 버튼 */}
         <button
           onClick={handleSave}
-          disabled={isLoading}
+          disabled={isLoading || !title.trim() || !content.trim()}
           className={styles.saveButton}
         >
           {isLoading ? '저장 중...' : '작성완료'}

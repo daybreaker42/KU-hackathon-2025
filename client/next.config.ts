@@ -23,6 +23,36 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: '*.s3.amazonaws.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.s3.*.amazonaws.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'example.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.ngrok-free.app',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'ku-hackathon.s3.ap-southeast-2.amazonaws.com',
         port: '',
         pathname: '/**',
@@ -38,7 +68,7 @@ const nextConfig: NextConfig = {
         hostname: '*.s3.*.amazonaws.com',
         port: '',
         pathname: '/**',
-      },
+      }
     ],
   },
 };
