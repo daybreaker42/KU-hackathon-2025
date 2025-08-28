@@ -23,7 +23,7 @@ const mockPlants: Plant[] = [
     id: "1",
     name: "Peace Lily",
     species: "스파티필럼",
-    image: "/plant-happy.png",
+    image: "/images/plant-happy.png",
     lastWatered: 1,
     lastSunlight: 2,
     lastActivity: "water"
@@ -32,7 +32,7 @@ const mockPlants: Plant[] = [
     id: "2", 
     name: "Snake Plant",
     species: "산세베리아",
-    image: "/plant-normal.png",
+    image: "/images/plant-normal.png",
     lastWatered: 3,
     lastSunlight: 1,
     lastActivity: "sunlight"
@@ -41,7 +41,7 @@ const mockPlants: Plant[] = [
     id: "3",
     name: "Aloe Vera", 
     species: "알로에",
-    image: "/plant-happy.png",
+    image: "/images/plant-happy.png",
     lastWatered: 2,
     lastSunlight: 1,
     lastActivity: "sunlight"
@@ -50,7 +50,7 @@ const mockPlants: Plant[] = [
     id: "4",
     name: "ZZ Plant",
     species: "자미오쿨카스",
-    image: "/plant-normal.png", 
+    image: "/images/plant-normal.png", 
     lastWatered: 5,
     lastSunlight: 3,
     lastActivity: "sunlight"
@@ -59,7 +59,7 @@ const mockPlants: Plant[] = [
     id: "5",
     name: "Spider Plant",
     species: "접란",
-    image: "/plant-sick.png",
+    image: "/images/plant-sick.png",
     lastWatered: 7,
     lastSunlight: 4,
     lastActivity: "sunlight"
@@ -68,7 +68,7 @@ const mockPlants: Plant[] = [
     id: "6",
     name: "Monstera",
     species: "몬스테라",
-    image: "/plant-happy.png",
+    image: "/images/plant-happy.png",
     lastWatered: 1,
     lastSunlight: 1,
     lastActivity: "water"
@@ -147,7 +147,7 @@ export default function MyPlantsPage() {
         {plants.length === 0 && (
           <div className="flex flex-col items-center justify-center h-[400px] text-center">
             <Image
-              src="/plang-sad.png"
+              src="/images/plant-sad.png"
               alt="No plants"
               width={120}
               height={120}
