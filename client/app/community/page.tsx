@@ -6,7 +6,7 @@ import CommunitySection from "@/app/component/community/CommunitySection";
 import Footer from "@/app/component/common/footer";
 import WritePostButton from "@/app/component/community/WritePostButton";
 // Auth 및 Community API 컨트롤러 import
-import { login, signup, logout, isAuthenticated } from '@/app/api/authController';
+import { signup, logout, isAuthenticated, autoLogin } from '@/app/api/authController';
 import { getCommunityPosts, type CommunityResponse } from '@/app/api/communityController';
 
 export default function CommunityPage() {
@@ -28,13 +28,10 @@ export default function CommunityPage() {
     try {
       console.log('=== API 테스트 시작 ===');
 
-      // 1. 로그인 테스트 (테스트용 계정)
-      console.log('1. 로그인 테스트 시작...');
-      const loginResult = await login({
-        email: 'user@example.com',
-        password: 'password123'
-      });
-      console.log('로그인 성공:', loginResult);
+      // 1. 개발용 자동 로그인 (하드코딩된 토큰 사용)
+      console.log('1. 자동 로그인 시작...');
+      autoLogin(); // 하드코딩된 토큰으로 즉시 로그인
+      console.log('자동 로그인 완료');
 
       // 2. 인증 상태 확인
       console.log('2. 인증 상태 확인:', isAuthenticated());
@@ -48,7 +45,6 @@ export default function CommunityPage() {
       });
       console.log('커뮤니티 게시글 조회 성공:', posts);
       setCommunityData(posts);
-
     } catch (error) {
       console.error('API 테스트 중 오류:', error);
       setError(error instanceof Error ? error.message : '알 수 없는 오류');

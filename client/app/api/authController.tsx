@@ -3,6 +3,9 @@
 // 환경변수에서 BASE_URL 가져오기 (.env.local에서 관리)
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
 
+// 임시 하드코딩된 JWT 토큰 (개발 중 테스트용)
+const TEMP_AUTH_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOjEsImlhdCI6MTc1NjM4OTY4OCwiZXhwIjoxNzU2NDc2MDg4fQ.hJ9Ki7FYZsErWkwpubq03cxZbw4v9SUt5nJASqTXccU';
+
 // 쿠키 유틸리티 함수들
 const setCookie = (name: string, value: string, days: number = 7): void => {
   if (typeof window !== 'undefined') {
@@ -119,48 +122,66 @@ interface SignupResponse {
   };
 }
 
-// 로그인 API 함수
+// 로그인 API 함수 (임시 구현 - 하드코딩된 토큰 사용)
 export const login = async (loginData: LoginRequest): Promise<LoginResponse> => {
   try {
-    const response = await apiRequest('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(loginData),
-    }, false); // 로그인은 인증 토큰이 필요 없음
+    // 임시로 서버 요청 없이 하드코딩된 토큰 사용
+    console.log('임시 로그인 - 하드코딩된 토큰 사용:', loginData);
 
-    if (!response.ok) {
-      throw new Error(`로그인 실패: ${response.status}`);
-    }
+    // 실제 서버 요청은 나중에 구현
+    // const response = await apiRequest('/auth/login', {
+    //   method: 'POST',
+    //   body: JSON.stringify(loginData),
+    // }, false);
 
-    const data: LoginResponse = await response.json();
+    // 임시 응답 데이터 생성
+    const mockResponse: LoginResponse = {
+      token: TEMP_AUTH_TOKEN, // 하드코딩된 토큰 사용
+      user: {
+        id: 1,
+        email: loginData.email,
+        name: loginData.email === 'user@example.com' ? '테스트 사용자' : '김민준'
+      }
+    };
+
+    // 로그인 성공 시 토큰을 보안 쿠키에 저장
+    setAuthToken(mockResponse.token);
     
-    // 로그인 성공 시 토큰을 보안 쿠키에 저장 (보안 개선)
-    setAuthToken(data.token);
-    
-    return data;
+    console.log('임시 로그인 성공:', mockResponse);
+    return mockResponse;
   } catch (error) {
     console.error('로그인 중 오류 발생:', error);
     throw error;
   }
 };
 
-// 회원가입 API 함수
+// 회원가입 API 함수 (임시 구현 - 하드코딩된 토큰 사용)
 export const signup = async (signupData: SignupRequest): Promise<SignupResponse> => {
   try {
-    const response = await apiRequest('/auth/signup', {
-      method: 'POST',
-      body: JSON.stringify(signupData),
-    }, false); // 회원가입은 인증 토큰이 필요 없음
+    // 임시로 서버 요청 없이 하드코딩된 토큰 사용
+    console.log('임시 회원가입 - 하드코딩된 토큰 사용:', signupData);
 
-    if (!response.ok) {
-      throw new Error(`회원가입 실패: ${response.status}`);
-    }
+    // 실제 서버 요청은 나중에 구현
+    // const response = await apiRequest('/auth/signup', {
+    //   method: 'POST',
+    //   body: JSON.stringify(signupData),
+    // }, false);
 
-    const data: SignupResponse = await response.json();
+    // 임시 응답 데이터 생성
+    const mockResponse: SignupResponse = {
+      token: TEMP_AUTH_TOKEN, // 하드코딩된 토큰 사용
+      user: {
+        id: Math.floor(Math.random() * 1000) + 1, // 임시 랜덤 ID
+        email: signupData.email,
+        name: signupData.name
+      }
+    };
+
+    // 회원가입 성공 시 토큰을 보안 쿠키에 저장
+    setAuthToken(mockResponse.token);
     
-    // 회원가입 성공 시 토큰을 보안 쿠키에 저장 (보안 개선)
-    setAuthToken(data.token);
-    
-    return data;
+    console.log('임시 회원가입 성공:', mockResponse);
+    return mockResponse;
   } catch (error) {
     console.error('회원가입 중 오류 발생:', error);
     throw error;
@@ -185,7 +206,62 @@ export const logout = async (): Promise<void> => {
   }
 };
 
+// 개발용 자동 로그인 함수 (하드코딩된 토큰으로 즉시 로그인)
+export const autoLogin = (): void => {
+  console.log('개발용 자동 로그인 - 하드코딩된 토큰 사용');
+  setAuthToken(TEMP_AUTH_TOKEN);
+  console.log('자동 로그인 완료');
+};
+
 // 인증 상태 확인 함수
 export const isAuthenticated = (): boolean => {
   return getAuthToken() !== null;
+};
+
+// 실제 서버 로그인 함수 (나중에 사용할 때를 위해 준비)
+export const loginWithServer = async (loginData: LoginRequest): Promise<LoginResponse> => {
+  try {
+    const response = await apiRequest('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(loginData),
+    }, false); // 로그인은 인증 토큰이 필요 없음
+
+    if (!response.ok) {
+      throw new Error(`로그인 실패: ${response.status}`);
+    }
+
+    const data: LoginResponse = await response.json();
+
+    // 로그인 성공 시 토큰을 보안 쿠키에 저장
+    setAuthToken(data.token);
+
+    return data;
+  } catch (error) {
+    console.error('서버 로그인 중 오류 발생:', error);
+    throw error;
+  }
+};
+
+// 실제 서버 회원가입 함수 (나중에 사용할 때를 위해 준비)
+export const signupWithServer = async (signupData: SignupRequest): Promise<SignupResponse> => {
+  try {
+    const response = await apiRequest('/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify(signupData),
+    }, false); // 회원가입은 인증 토큰이 필요 없음
+
+    if (!response.ok) {
+      throw new Error(`회원가입 실패: ${response.status}`);
+    }
+
+    const data: SignupResponse = await response.json();
+
+    // 회원가입 성공 시 토큰을 보안 쿠키에 저장
+    setAuthToken(data.token);
+
+    return data;
+  } catch (error) {
+    console.error('서버 회원가입 중 오류 발생:', error);
+    throw error;
+  }
 };
