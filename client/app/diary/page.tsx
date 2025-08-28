@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./page.module.css";
-import { getDayDiary, SimpleDiaryData } from "../api/homeController";
+import { getDayDiary, SimpleDiaryData, getMonthlyDiary, MonthlyDiaryData } from "../api/homeController";
 import Comments from "../component/community/Comments";
 import { Comment } from "../types/community/community";
 
@@ -16,6 +16,7 @@ export default function DiaryPage() {
   const [diaryData, setDiaryData] = useState<SimpleDiaryData | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [isEmotion, setIsEmotion] = useState<boolean>(false);
+  const [monthlyDiary, setMonthlyDiary] = useState<MonthlyDiaryData | null>(null);
 
   // 터치/드래그 관련 상태
   const [touchStart, setTouchStart] = useState<number>(0);
@@ -42,6 +43,7 @@ export default function DiaryPage() {
 
   // 이전달로 이동
   const goToPreviousMonth = () => {
+    setMonthlyDiary(null);
     if (currentMonth === 0) {
       setCurrentMonth(11);
       setCurrentYear(currentYear - 1);
@@ -52,6 +54,7 @@ export default function DiaryPage() {
 
   // 다음달로 이동
   const goToNextMonth = () => {
+    setMonthlyDiary(null);
     if (currentMonth === 11) {
       setCurrentMonth(0);
       setCurrentYear(currentYear + 1);
@@ -179,6 +182,16 @@ export default function DiaryPage() {
     handleDateClick(today.getDate());
   }, []);
 
+  // 월별 일기 데이터 로드
+  useEffect(() => {
+    const loadMonthlyDiary = async () => {
+      const data = await getMonthlyDiary(currentYear, currentMonth + 1); // API는 1-12월을 사용
+      setMonthlyDiary(data);
+    };
+    
+    loadMonthlyDiary();
+  }, [currentYear, currentMonth]);
+
   const days = getDaysInMonth(currentYear, currentMonth);
   const monthNames = [
     "1월", "2월", "3월", "4월", "5월", "6월",
@@ -186,118 +199,134 @@ export default function DiaryPage() {
   ];
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>내가 작성한 일기</h1>
-        <Link href="/" className={styles.closeButton}>
-          <span className="material_symbols_outlined">close</span>
-        </Link>
-      </div>
-
-      {/* 월 표시 */}
-      <div className={styles.monthHeader}>
-        <div className={styles.monthNavigation}>
-          <button 
-            className={styles.monthArrow}
-            onClick={goToPreviousMonth}
-            aria-label="이전 달"
-          >
-            <span className="material_symbols_outlined">chevron_left</span>
-          </button>
-          <h2 className={styles.monthTitle}>{monthNames[currentMonth]}</h2>
-          <button 
-            className={styles.monthArrow}
-            onClick={goToNextMonth}
-            aria-label="다음 달"
-          >
-            <span className="material_symbols_outlined">chevron_right</span>
-          </button>
+    <main>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>내가 작성한 일기</h1>
+          <Link href="/" className={styles.closeButton}>
+            <span className="material_symbols_outlined">close</span>
+          </Link>
         </div>
-        <button className={`${styles.viewModeButton} ${isEmotion ? styles.selected : ''}`} onClick={() => setIsEmotion(!isEmotion)}>감정 보기</button>
-      </div>
 
-      {/* 달력 */}
-      <div 
-        className={styles.calendar}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp} // 마우스가 달력 영역을 벗어날 때도 드래그 종료
-        style={{ userSelect: 'none' }} // 텍스트 선택 방지
-      >
-        {days.map((day, index) => {
-          if (day === null) {
-            return <div key={index} className={styles.emptyDay}></div>;
-          }
-
-          const isSelected = day === selectedDay;
-          const isToday = 
-            day === new Date().getDate() && 
-            currentMonth === new Date().getMonth() && 
-            currentYear === new Date().getFullYear();
-          
-          // 임시로 일부 날짜에만 일기가 있다고 표시
-          const hasContent = day % 3 === 0 || day % 5 === 0;
-
-          return (
-            <div
-              key={index}
-              className={`${styles.dayItem} ${isSelected ? styles.selected : ''} ${hasContent ? styles.hasContent : ''}`}
-              onClick={() => handleDateClick(day)}
+        {/* 월 표시 */}
+        <div className={styles.monthHeader}>
+          <div className={styles.monthNavigation}>
+            <button 
+              className={styles.monthArrow}
+              onClick={goToPreviousMonth}
+              aria-label="이전 달"
             >
-              {day}
-              {isToday && <div className={styles.todayIndicator}></div>}
-            </div>
-          );
-        })}
-      </div>
+              <span className="material_symbols_outlined">chevron_left</span>
+            </button>
+            <h2 className={styles.monthTitle}>{monthNames[currentMonth]}</h2>
+            <button 
+              className={styles.monthArrow}
+              onClick={goToNextMonth}
+              aria-label="다음 달"
+            >
+              <span className="material_symbols_outlined">chevron_right</span>
+            </button>
+          </div>
+          <button className={`${styles.viewModeButton} ${isEmotion ? styles.selected : ''}`} onClick={() => setIsEmotion(!isEmotion)}>감정 보기</button>
+        </div>
 
-      {/* 선택된 날짜 */}
-      <div className={styles.selectedDateHeader}>
-        <h3 className={styles.selectedDate}>{currentMonth + 1}월 {selectedDay}일</h3>
-      </div>
+        {/* 달력 */}
+        <div 
+          className={styles.calendar}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp} // 마우스가 달력 영역을 벗어날 때도 드래그 종료
+          style={{ userSelect: 'none' }} // 텍스트 선택 방지
+        >
+          {days.map((day, index) => {
+            if (day === null) {
+              return <div key={index} className={styles.emptyDay}></div>;
+            }
 
-      {/* 일기 내용 */}
-      <div className={styles.diarySection}>
-        {diaryData ? (
-          <div className={styles.diaryContent}>
-            <h4 className={styles.diaryTitle}>{diaryData.title}</h4>
-            {diaryData.photo && (
-              <div className={styles.imageContainer}>
-                <Image
-                  src={diaryData.photo}
-                  alt="일기 사진"
-                  width={300}
-                  height={200}
-                  className={styles.diaryImage}
-                />
-              </div>
-            )}
-            <p className={styles.diaryText}>{diaryData.content}</p>
+            const isSelected = day === selectedDay;
+            const isToday = 
+              day === new Date().getDate() && 
+              currentMonth === new Date().getMonth() && 
+              currentYear === new Date().getFullYear();
             
-            {/* 일기 액션 버튼들 */}
-            <div className={styles.diaryActions}>
-              <button className={styles.actionButton}>세밀 촬영</button>
-              <button className={styles.actionButton}>📸</button>
-              <button className={styles.actionButton}>급수</button>
-            </div>
-            <div className={styles.diaryActions}>
-              <button className={styles.actionButton}>햇빛 조절</button>
-            </div>
-          </div>
-        ) : (
-          <div className={styles.noDiary}>
-            <p>제목 제목 제목 제목 제목</p>
-            <button className={styles.addDiaryButton}>댓글 작성하기</button>
-          </div>
-        )}
-      </div>
+            // 월별 일기 데이터에서 해당 날짜에 일기가 있는지 확인
+            const hasContent = monthlyDiary?.diaryDates.includes(day) || false;
 
-      {/* 댓글 섹션 */}
-      <div className={styles.commentsSection}>
+            return (
+              <div
+                key={index}
+                className={`${styles.dayItem} ${isSelected ? styles.selected : ''} ${hasContent ? styles.hasContent : ''} ${isToday ? styles.today : ''}`}
+                onClick={() => handleDateClick(day)}
+              >
+                {day}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* 선택된 날짜 */}
+        <div className={styles.selectedDateHeader}>
+          <h3 className={styles.selectedDate}>{currentMonth + 1}월 {selectedDay}일</h3>
+        </div>
+
+        {/* 일기 내용 */}
+        <div className={styles.diarySection}>
+          {diaryData ? (
+            <div className={styles.diaryContent}>
+              <h4 className={styles.diaryTitle}>{diaryData.title}</h4>
+              {diaryData.photo && (
+                <div className={styles.imageContainer}>
+                  <Image
+                    src={diaryData.photo}
+                    alt="일기 사진"
+                    width={300}
+                    height={200}
+                    className={styles.diaryImage}
+                  />
+                </div>
+              )}
+              <p className={styles.diaryText}>{diaryData.content}</p>
+              
+              {/* 일기 액션 버튼들 */}
+              <div className={styles.diaryActions}>
+                <button className={styles.actionButton}>세밀 촬영ffffffffff</button>
+                <button className={styles.actionButton}>📸</button>
+                <button className={`${styles.actionButton} ${styles.plant}`}>급수</button>
+                <button className={`${styles.actionButton} ${styles.plant}`}>햇빛 조절</button>
+              </div>
+            </div>
+          ) : (
+            (() => {
+              // 선택된 날짜가 오늘 이후인지 확인
+              const today = new Date();
+              const selectedDateObj = new Date(currentYear, currentMonth, selectedDay);
+              
+              // 날짜만 비교 (시간 제외)
+              const isToday = selectedDateObj.toDateString() === today.toDateString();
+              const isPastDate = selectedDateObj < today;
+              const canWrite = isToday || isPastDate;
+              
+              return (
+                <div className={styles.noDiary}>
+                  <p>선택한 날짜에 작성된 일기가 없습니다.</p>
+                  {canWrite ? (
+                    <Link href="/diary/write" className={styles.addDiaryButton}>
+                      일기 작성하기
+                    </Link>
+                  ) : (
+                    <p className={styles.futureMessage}>미래 날짜에는 일기를 작성할 수 없습니다.</p>
+                  )}
+                </div>
+              );
+            })()
+          )}
+        </div>
+
+        {/* 댓글 섹션 */}
         <Comments
           comments={comments}
           onAddComment={handleAddComment}
@@ -305,6 +334,6 @@ export default function DiaryPage() {
           onRefresh={handleRefresh}
         />
       </div>
-    </div>
+    </main>
   );
 }
