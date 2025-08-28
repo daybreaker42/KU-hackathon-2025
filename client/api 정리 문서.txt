@@ -470,13 +470,280 @@ No links
 ## 🧑‍🤝‍🧑 Friends
 ```http
 GET /friends/search                       # 사용자 검색
+Parameters
+Try it out
+Name	Description
+search *
+string
+(query)
+검색할 사용자 이름 또는 이메일
+
+john
+Responses
+Code	Description	Links
+200	
+사용자 검색 성공
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "users": [
+    {
+      "id": 0,
+      "name": "string",
+      "email": "string",
+      "profile_img": "string"
+    }
+  ],
+  "total": 0,
+  "page": 0,
+  "limit": 0,
+  "totalPages": 0
+}
 POST /friends/request                     # 친구 요청 보내기
+Parameters
+Try it out
+No parameters
+
+Request body
+
+application/json
+Example Value
+Schema
+{
+  "friend_id": 2
+}
+Responses
+Code	Description	Links
+201	
+친구 요청 전송 성공
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "message": "친구 요청을 보냈습니다."
+}
+No links
+400	
+잘못된 요청 (자기 자신에게 요청, 이미 친구, 중복 요청 등)
+
+No links
+404	
+사용자를 찾을 수 없음
 GET /friends/requests                     # 친구 요청 목록 조회
+받은 친구 요청과 보낸 친구 요청 목록을 조회합니다.
+
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+친구 요청 목록 조회 성공
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "received": [
+    {
+      "id": 1,
+      "requester": {
+        "id": 1,
+        "name": "홍길동",
+        "profile_img": "https://example.com/profile.jpg"
+      },
+      "recipient": {
+        "id": 1,
+        "name": "홍길동",
+        "profile_img": "https://example.com/profile.jpg"
+      },
+      "status": "PENDING",
+      "createdAt": "2025-08-28T10:00:00Z"
+    }
+  ],
+  "sent": [
+    {
+      "id": 1,
+      "requester": {
+        "id": 1,
+        "name": "홍길동",
+        "profile_img": "https://example.com/profile.jpg"
+      },
+      "recipient": {
+        "id": 1,
+        "name": "홍길동",
+        "profile_img": "https://example.com/profile.jpg"
+      },
+      "status": "PENDING",
+      "createdAt": "2025-08-28T10:00:00Z"
+    }
+  ],
+  "totalReceived": 3,
+  "totalSent": 2
+}
 POST /friends/requests/{requestId}/accept # 친구 요청 수락
+Parameters
+Try it out
+Name	Description
+requestId *
+number
+(path)
+친구 요청 ID
+
+1
+Responses
+Code	Description	Links
+200	
+친구 요청 수락 성공
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "message": "친구 요청을 수락했습니다."
+}
+No links
+400	
+수락할 권한이 없거나 이미 처리된 요청
+
+No links
+404	
+친구 요청을 찾을 수 없음
 DELETE /friends/requests/{requestId}/reject # 친구 요청 거절
+Parameters
+Try it out
+Name	Description
+requestId *
+number
+(path)
+친구 요청 ID
+
+1
+Responses
+Code	Description	Links
+200	
+친구 요청 거절 성공
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "message": "친구 요청을 거절했습니다."
+}
+No links
+400	
+거절할 권한이 없거나 이미 처리된 요청
+
+No links
+404	
+친구 요청을 찾을 수 없음
 DELETE /friends/requests/{requestId}/cancel # 친구 요청 취소
+Parameters
+Try it out
+Name	Description
+requestId *
+number
+(path)
+친구 요청 ID
+
+1
+Responses
+Code	Description	Links
+200	
+친구 요청 취소 성공
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "message": "친구 요청을 취소했습니다."
+}
+No links
+400	
+취소할 권한이 없거나 이미 처리된 요청
+
+No links
+404	
+친구 요청을 찾을 수 없음
 GET /friends                              # 친구 목록 조회
+Parameters
+Try it out
+No parameters
+
+Responses
+Code	Description	Links
+200	
+친구 목록 조회 성공
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "friends": [
+    {
+      "id": 2,
+      "name": "김민준",
+      "profile_img": "https://example.com/profile.jpg",
+      "friendship_date": "2025-08-28T10:00:00Z"
+    }
+  ],
+  "total": 15,
+  "page": 1,
+  "limit": 10,
+  "totalPages": 2
+}
 DELETE /friends/{friendId}                # 친구 삭제
+Parameters
+Try it out
+Name	Description
+friendId *
+number
+(path)
+친구 사용자 ID
+
+2
+Responses
+Code	Description	Links
+200	
+친구 삭제 성공
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "message": "친구를 삭제했습니다."
+}
+No links
+404	
+친구 관계를 찾을 수 없음
 GET /friends/activities                   # 친구들의 최근 활동 조회
 ```
 

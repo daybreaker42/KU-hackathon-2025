@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import BackButton from '@/app/component/common/BackButton';
 import PostCard from '@/app/component/community/PostCard';
+import CommentCard from '@/app/component/community/CommentCard';
 import { CommunityPost } from '@/app/types/community/community';
 import { apiRequest, getCurrentUser } from '@/app/api/authController';
 
@@ -88,6 +89,16 @@ export default function UserActivitiesPage() {
     };
   };
 
+  // UserActivity를 CommentCard 형태로 변환하는 함수  
+  const convertActivityToComment = (activity: UserActivity) => {
+    return {
+      id: activity.id,
+      title: activity.title,
+      content: activity.content,
+      timeAgo: formatTimeAgo(activity.createdAt),
+    };
+  };
+
   // 시간을 "n일전" 형태로 변환하는 함수
   const formatTimeAgo = (dateString: string): string => {
     const now = new Date();
@@ -135,7 +146,15 @@ export default function UserActivitiesPage() {
           {/* 활동 통계 정보 */}
           <div className="p-4">
             <div className="flex justify-between items-center">
-              <span className="text-[#023735] font-semibold">총 {total}개의 글</span>
+              <div className="flex space-x-4">
+                <span className="text-[#023735] font-semibold">
+                  총 {total}개의 활동
+                </span>
+                <span className="text-gray-500 text-sm">
+                  (글: {userActivities.filter(a => a.type === 'post').length}개,
+                  댓글: {userActivities.filter(a => a.type === 'comment').length}개)
+                </span>
+              </div>
               <span className="text-gray-500 text-sm">페이지 {currentPage} / {totalPages}</span>
             </div>
           </div>
@@ -144,14 +163,22 @@ export default function UserActivitiesPage() {
           <div className="space-y-4">
             {userActivities.length > 0 ? (
               userActivities.map((activity) => (
-                <PostCard
-                  key={activity.id}
-                  post={convertActivityToPost(activity)}
-                  onClick={handlePostClick}
-                  variant="full"
-                  imagePosition="right"
-                  showAuthor={false}
-                />
+                <div key={activity.id}>
+                  {activity.type === 'post' ? (
+                    <PostCard
+                      post={convertActivityToPost(activity)}
+                      onClick={handlePostClick}
+                      variant="full"
+                      imagePosition="right"
+                      showAuthor={false}
+                    />
+                  ) : activity.type === 'comment' ? (
+                    <CommentCard
+                      comment={convertActivityToComment(activity)}
+                      variant="full"
+                    />
+                  ) : null}
+                </div>
               ))
             ) : (
               <div className="text-center py-12 bg-white rounded-lg shadow-sm">

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import BackButton from '@/app/component/common/BackButton';
 import { ChevronRight } from 'lucide-react';
 import PostCard from '@/app/component/community/PostCard';
+import CommentCard from '@/app/component/community/CommentCard';
 import { CommunityPost } from '@/app/types/community/community';
 import { useRouter } from 'next/navigation';
 import { removeAuthToken, removeCurrentUser, getCurrentUser, apiRequest } from '@/app/api/authController';
@@ -91,6 +92,16 @@ export default function UserProfilePage() {
       comments: activity.commentsCount,
       category: 'daily', // 기본 카테고리
       images: [], // API에서 이미지 정보가 없으므로 빈 배열
+    };
+  };
+
+  // UserActivity를 CommentCard 형태로 변환하는 함수  
+  const convertActivityToComment = (activity: UserActivity) => {
+    return {
+      id: activity.id,
+      title: activity.title,
+      content: activity.content,
+      timeAgo: formatTimeAgo(activity.createdAt),
     };
   };
 
@@ -209,14 +220,22 @@ export default function UserProfilePage() {
                     </div>
                   ) : userActivities.length > 0 ? (
                     userActivities.map((activity) => (
-                      <PostCard
-                        key={activity.id}
-                        post={convertActivityToPost(activity)}
-                        onClick={handlePostClick}
-                        variant="compact"
-                        imagePosition="left"
-                        showAuthor={false}
-                      />
+                      <div key={activity.id}>
+                        {activity.type === 'post' ? (
+                          <PostCard
+                            post={convertActivityToPost(activity)}
+                            onClick={handlePostClick}
+                            variant="compact"
+                            imagePosition="left"
+                            showAuthor={false}
+                          />
+                        ) : activity.type === 'comment' ? (
+                          <CommentCard
+                            comment={convertActivityToComment(activity)}
+                            variant="compact"
+                          />
+                        ) : null}
+                      </div>
                     ))
                   ) : (
                     <div className="text-center py-8 text-gray-500">
