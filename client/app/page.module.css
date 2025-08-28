@@ -134,6 +134,25 @@
     margin-bottom:7px;
 }
 
+.labelContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 7px;
+}
+
+.moreLink {
+    font-size: small;
+    color: #827D73;
+    text-decoration: none;
+    cursor: pointer;
+    margin-bottom:7px;
+}
+
+.moreLink:hover {
+    text-decoration: underline;
+}
+
 .weekContainer {
     display: flex;
     justify-content: space-between;
