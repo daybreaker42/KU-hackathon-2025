@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Heart } from 'lucide-react';
-import { getCommunityPostById, CommunityPost, getCommunityPostComments, Comment as APIComment, CommentsResponse, createCommunityComment, CreateCommentData, updateCommunityComment, UpdateCommentData, deleteCommunityComment, toggleCommunityPostLike, LikeResponse } from '@/app/api/communityController'; // API import
+import { getCommunityPostById, CommunityPost, getCommunityPostComments, Comment as APIComment, createCommunityComment, CreateCommentData, updateCommunityComment, UpdateCommentData, deleteCommunityComment, toggleCommunityPostLike, LikeResponse } from '@/app/api/communityController'; // API import
 import { getCurrentUser } from '@/app/api/authController'; // 사용자 정보 import
 import BackButton from '@/app/component/common/BackButton';
 import Comments from '@/app/component/community/Comments';
@@ -82,6 +82,11 @@ export default function PostDetailPage() {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<{ id: number; email: string; name: string } | null>(null);
 
+  // 댓글 페이지네이션 상태 추가
+  const [currentCommentsPage, setCurrentCommentsPage] = useState(1);
+  const [totalCommentsPages, setTotalCommentsPages] = useState(1);
+  const [commentsPerPage] = useState(10); // 페이지당 댓글 수
+
   // 현재 사용자 정보 가져오기
   useEffect(() => {
     const user = getCurrentUser();
@@ -100,9 +105,13 @@ export default function PostDetailPage() {
         setIsLiked(postData.isLiked);
         
         // 댓글 API 호출
-        const commentsResponse = await getCommunityPostComments(postId);
+        const commentsResponse = await getCommunityPostComments(postId, {
+          page: currentCommentsPage,
+          limit: commentsPerPage
+        });
         const localComments = convertAPICommentsToLocal(commentsResponse.comments);
         setComments(localComments);
+        setTotalCommentsPages(commentsResponse.totalPages); // 총 페이지 수 업데이트
 
       } catch (error) {
         console.error('Error fetching post detail:', error);
@@ -113,7 +122,7 @@ export default function PostDetailPage() {
     };
 
     fetchPostDetail();
-  }, [postId]);
+  }, [postId, currentCommentsPage, commentsPerPage]);
 
   // 좋아요 토글 핸들러
   const handleLikeToggle = async () => {
@@ -130,15 +139,10 @@ export default function PostDetailPage() {
     }
   };
 
-  // 댓글 새로고침 핸들러
-  const handleCommentsRefresh = async () => {
-    try {
-      const commentsResponse = await getCommunityPostComments(postId);
-      const localComments = convertAPICommentsToLocal(commentsResponse.comments);
-      setComments(localComments);
-    } catch (error) {
-      console.error('댓글 새로고침 중 오류 발생:', error);
-    }
+  // 댓글 페이지 변경 핸들러
+  const handleCommentsPageChange = (page: number) => {
+    setCurrentCommentsPage(page);
+  // useEffect가 실행되어 새로운 페이지의 댓글을 자동으로 로드합니다
   };
 
   if (loading) {
@@ -309,7 +313,6 @@ export default function PostDetailPage() {
               setComments(prevComments => [...prevComments, newReply]);
             }
           }}
-          onRefresh={handleCommentsRefresh}
           onEditComment={async (commentId: number, content: string) => {
             try {
               // API 호출
@@ -353,6 +356,9 @@ export default function PostDetailPage() {
             }
           }}
           currentUserId={currentUser?.id}
+          currentPage={currentCommentsPage}
+          totalPages={totalCommentsPages}
+          onPageChange={handleCommentsPageChange}
         />
       </div>
     </div>
