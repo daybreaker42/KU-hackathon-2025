@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `Diary` ADD COLUMN `sun` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `water` BOOLEAN NOT NULL DEFAULT false;
