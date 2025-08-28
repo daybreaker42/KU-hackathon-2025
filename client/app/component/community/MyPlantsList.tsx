@@ -2,14 +2,28 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation'; // Next.js 라우터 import 추가
-import { Plant } from '@/app/types/community/community';
+import { useRouter } from 'next/navigation';
+// API 및 타입 import
+import { autoLogin, isAuthenticated } from '@/app/api/authController';
+import { getMyPlants } from '@/app/api/communityController';
 
-// 식물 데이터 타입 정의
+/*
+=======================================
+=== 개발용 Mock 데이터 (주석 처리) ===
+=======================================
 
+아래는 개발 단계에서 사용했던 Mock 데이터입니다.
+실제 서버 연동 후 제거 예정입니다.
+
+// Mock Plant 타입 (기존)
+interface MockPlant {
+  id: number;
+  name: string;
+  imageUrl: string;
+}
 
 // Mock 데이터
-const mockPlants: Plant[] = [
+const mockPlants: MockPlant[] = [
   {
     id: 1,
     name: '몬스테라',
@@ -26,12 +40,22 @@ const mockPlants: Plant[] = [
     imageUrl: '/plant-sick.png'
   }
 ];
+*/
+
+// API로부터 받아오는 식물 데이터 타입 정의
+interface Plant {
+  id: number;
+  name: string;
+  variety: string;
+  img_url: string;
+  createdAt: string;
+}
 
 export default function MyPlantsList() {
   const [plants, setPlants] = useState<Plant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter(); // 라우터 인스턴스 생성
+  const router = useRouter();
 
   // 식물 클릭 핸들러 추가
   const handlePlantClick = (plantId: number) => {
@@ -40,25 +64,55 @@ export default function MyPlantsList() {
   };
 
   useEffect(() => {
-    // API에서 내 식물 리스트를 가져오는 함수
+    // 실제 서버에서 내 식물 리스트를 가져오는 함수
     const fetchMyPlants = async () => {
       try {
         setLoading(true);
-        
-        // 실제 API 호출 대신 mock 데이터 사용
-        // TODO - 내 식물 리스트 가져오는 api 구현
-        // const response = await fetch('/api/my-plants');
-        // const data = await response.json();
-        
-        // 네트워크 지연 시뮬레이션
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Mock 데이터 설정
-        setPlants(mockPlants);
         setError(null);
+
+        // 인증 확인 및 자동 로그인 (개발용)
+        if (!isAuthenticated()) {
+          autoLogin(); // 개발용 자동 로그인
+        }
+
+        // 실제 API 호출
+        const plantsData = await getMyPlants();
+        setPlants(plantsData);
+        console.log(`my plants data - ${JSON.stringify(plantsData)}`);
       } catch (err) {
+        console.error('식물 리스트 조회 중 오류:', err);
         setError('식물 리스트를 불러오는데 실패했습니다.');
-        console.error('Error fetching plants:', err);
+
+        /*
+        ===================================
+        === 개발용 Fallback (주석 처리) ===
+        ===================================
+        
+        실제 서버 연결 실패 시 Mock 데이터 사용하는 부분입니다.
+        프로덕션에서는 제거 예정입니다.
+        
+        // 서버 연결 실패 시 Mock 데이터로 fallback
+        console.log('Mock 데이터로 fallback');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setPlants(mockPlants.map(mock => ({
+          id: mock.id,
+          name: mock.name,
+          variety: mock.name,
+          img_url: mock.imageUrl,
+          cycle_type: 'WEEKLY',
+          cycle_value: '7',
+          cycle_unit: '일',
+          sunlight_needs: '간접광선',
+          purchase_date: new Date().toISOString(),
+          purchase_location: '화원',
+          memo: '',
+          author: { id: 1, name: '사용자', email: 'user@example.com' },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        })));
+        setError(null);
+        */
+
       } finally {
         setLoading(false);
       }
@@ -130,7 +184,7 @@ export default function MyPlantsList() {
           >
             <div className="relative">
               <Image 
-                src={plant.imageUrl} 
+                src={plant.img_url || '/plant-normal.png'} // img_url 사용 및 기본값 설정
                 alt={plant.name}
                 width={100}
                 height={100}
@@ -144,7 +198,7 @@ export default function MyPlantsList() {
             </div>
             <div className="mt-[10px] text-center">
               <p className="text-[14px] font-medium text-[#023735] truncate">
-                {plant.name}
+                {plant.variety || plant.name} {/* variety 필드 우선 사용, 없으면 name 사용 */}
               </p>
             </div>
           </button>

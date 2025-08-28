@@ -1,6 +1,41 @@
 // Community 관련 API 컨트롤러
 import { apiRequest } from './authController';
 
+// Plant API 타입 정의
+export interface Plant {
+  id: number;
+  name: string;
+  variety: string;
+  img_url: string;
+  cycle_type: string;
+  cycle_value: string;
+  cycle_unit: string;
+  sunlight_needs: string;
+  purchase_date: string;
+  purchase_location: string;
+  memo: string;
+  author: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PlantsResponse {
+  plants: Plant[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface PlantsQueryParams {
+  page?: number;
+  limit?: number;
+}
+
 // Community API 타입 정의
 export interface CommunityPost {
   id: number;
@@ -104,4 +139,40 @@ export const searchCommunityPosts = async (
   limit: number = 10
 ): Promise<CommunityResponse> => {
   return getCommunityPosts({ search, page, limit });
+};
+
+/**
+ * === Plants API 함수들 ===
+ */
+
+// 내가 키우는 식물 목록 가져오기 API
+/**
+ * === Plants API 함수들 ===
+ */
+
+// 내가 키우는 식물 목록 가져오기 API
+export const getMyPlants = async (): Promise<{ id: number; name: string; variety: string; img_url: string; createdAt: string; }[]> => {
+  try {
+    const endpoint = '/plants';
+
+    const response = await apiRequest(endpoint, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error(`식물 목록 조회 실패: ${response.status}`);
+    }
+
+    const data: { plants: Plant[] } = await response.json();
+    return data.plants.map(plant => ({
+      id: plant.id,
+      name: plant.name,
+      variety: plant.variety,
+      img_url: plant.img_url,
+      createdAt: plant.createdAt,
+    }));
+  } catch (error) {
+    console.error('식물 목록 조회 중 오류 발생:', error);
+    throw error;
+  }
 };
