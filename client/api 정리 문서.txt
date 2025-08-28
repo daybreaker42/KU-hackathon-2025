@@ -1,0 +1,89 @@
+물론이죠! 아래는 연리지 API 문서를 기반으로 정리한 **Markdown 형식의 API Endpoint 문서**입니다. 각 섹션은 기능별로 나누었고, 요청 방식과 경로를 명확히 표기했습니다.
+
+---
+
+# 🌿 Yeonriji API Documentation
+
+## 🔐 Authentication
+```http
+POST /auth/signup         # 회원가입
+POST /auth/login          # 로그인
+```
+
+## 🏠 Home
+```http
+GET /home/my-plants       # 내 식물 리스트 가져오기
+GET /home/today-tasks     # 오늘 할 일 가져오기
+GET /home/weekly-diaries  # 주간 일기 작성 현황
+GET /home/diaries/{date}  # 특정 날짜 일기 내용 가져오기
+GET /home/friend-feeds    # 친구 반응 가져오기
+```
+
+## 🌱 Plants
+```http
+POST /plants/image        # 식물 이미지 업로드
+POST /plants              # 식물 등록
+GET /plants               # 내 식물 목록 조회
+GET /plants/{id}          # 특정 식물 조회
+PATCH /plants/{id}        # 식물 정보 수정
+DELETE /plants/{id}       # 식물 삭제
+```
+
+## 🧑‍🤝‍🧑 Community
+```http
+POST /community/image                     # 커뮤니티 이미지 업로드
+GET /community                            # 게시글 목록 조회
+GET /community/{id}                       # 특정 게시글 조회
+POST /community/posts                     # 게시글 작성
+PATCH /community/posts/{id}              # 게시글 수정
+DELETE /community/posts/{id}             # 게시글 삭제
+POST /community/posts/{id}/like          # 게시글 좋아요/취소
+GET /community/posts/{id}/comments       # 게시글 댓글 목록 조회
+POST /community/posts/{id}/comments      # 댓글 작성
+PATCH /community/comments/{id}           # 댓글 수정
+DELETE /community/comments/{id}          # 댓글 삭제
+```
+
+## 📔 Diary
+```http
+POST /diary                               # 일기 작성
+GET /diary/{date}                         # 특정 날짜 일기 조회
+PATCH /diary/{id}                         # 일기 수정
+DELETE /diary/{id}                        # 일기 삭제
+POST /diary/{id}/comments                 # 일기 댓글 작성
+PATCH /diary/comments/{id}               # 일기 댓글 수정
+DELETE /diary/comments/{id}              # 일기 댓글 삭제
+```
+
+## 🧑‍🤝‍🧑 Friends
+```http
+GET /friends/search                       # 사용자 검색
+POST /friends/request                     # 친구 요청 보내기
+GET /friends/requests                     # 친구 요청 목록 조회
+POST /friends/requests/{requestId}/accept # 친구 요청 수락
+DELETE /friends/requests/{requestId}/reject # 친구 요청 거절
+DELETE /friends/requests/{requestId}/cancel # 친구 요청 취소
+GET /friends                              # 친구 목록 조회
+DELETE /friends/{friendId}                # 친구 삭제
+GET /friends/activities                   # 친구들의 최근 활동 조회
+```
+
+## 👤 Users
+```http
+GET /users/{id}                           # 사용자 프로필 조회
+GET /users/me/activities                  # 내 활동 조회
+PATCH /users/me/name                      # 이름 변경
+PATCH /users/me/profile-image             # 프로필 사진 변경
+DELETE /users/me/account                  # 회원탈퇴
+```
+
+## 🖼️ Image
+```http
+POST /image/upload/single                 # 단일 이미지 업로드
+POST /image/upload/multiple               # 다중 이미지 업로드 (최대 10개)
+DELETE /image/delete                      # 이미지 삭제
+```
+
+---
+
+필요하다면 각 API의 요청/응답 예시나 파라미터 설명도 추가해드릴 수 있어요. 어떤 방식으로 확장하고 싶으신가요?
