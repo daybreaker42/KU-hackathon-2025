@@ -21,12 +21,6 @@ export default function CommunityPage() {
             category="question"
           />
 
-          {/* 식물별 카테고리 섹션 */}
-          {/* <CommunitySection
-            title="식물별 카테고리"
-            category="plant"
-          /> */}
-
           {/* 일상 섹션 */}
           <CommunitySection
             title="일상"
