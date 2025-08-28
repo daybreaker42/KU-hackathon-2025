@@ -39,6 +39,56 @@ PATCH /community/posts/{id}              # 게시글 수정
 DELETE /community/posts/{id}             # 게시글 삭제
 POST /community/posts/{id}/like          # 게시글 좋아요/취소
 GET /community/posts/{id}/comments       # 게시글 댓글 목록 조회
+query params:
+id *
+number
+(path)
+게시글 ID
+
+page
+number
+(query)
+페이지 번호
+
+limit
+number
+(query)
+페이지당 항목 수
+
+response example:
+{
+  "comments": [
+    {
+      "id": 1,
+      "content": "몬스테라 정말 예쁘게 키우시네요!",
+      "author": {
+        "id": 1,
+        "name": "김민준"
+      },
+      "createdAt": "2025-08-28T14:10:06.320Z",
+      "updatedAt": "2025-08-28T14:10:06.320Z",
+      "parent_id": null,
+      "replies": []
+    },
+    {
+      "id": 2,
+      "content": "저도 몬스테라 키우고 싶어졌어요",
+      "author": {
+        "id": 1,
+        "name": "김민준"
+      },
+      "createdAt": "2025-08-28T14:10:06.320Z",
+      "updatedAt": "2025-08-28T14:10:06.320Z",
+      "parent_id": null,
+      "replies": []
+    }
+  ],
+  "total": 2,
+  "page": 1,
+  "limit": 10,
+  "totalPages": 1
+}
+
 POST /community/posts/{id}/comments      # 댓글 작성
 PATCH /community/comments/{id}           # 댓글 수정
 DELETE /community/comments/{id}          # 댓글 삭제
