@@ -46,9 +46,9 @@ export interface CommunityPost {
   likes_count: number;
   comments_count: number;
   author: {
-    id: number;
-    name: string;
-    email: string;
+    id?: number;
+    name?: string;
+    email?: string;
   };
   createdAt: string;
   updatedAt: string;
@@ -202,6 +202,29 @@ export const createCommunityPost = async (
     return data;
   } catch (error) {
     console.error('게시글 생성 중 오류 발생:', error);
+    throw error;
+  }
+};
+
+// 커뮤니티 게시글 상세 정보 가져오기 API
+export const getCommunityPostById = async (
+  id: string | number
+): Promise<CommunityPost> => {
+  try {
+    const endpoint = `/community/${id}`;
+    
+    const response = await apiRequest(endpoint, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error(`게시글 상세 정보 조회 실패: ${response.status}`);
+    }
+
+    const data: CommunityPost = await response.json();
+    return data;
+  } catch (error) {
+    console.error('게시글 상세 정보 조회 중 오류 발생:', error);
     throw error;
   }
 };

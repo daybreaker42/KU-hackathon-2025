@@ -1,25 +1,24 @@
 'use client';
 
-import { useParams } from 'next/navigation'; // useRouter 제거
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Heart } from 'lucide-react'; // ChevronLeft 제거 (BackButton에서 사용)
-import { CommunityPost, Comment } from '@/app/types/community/community';
-import BackButton from '@/app/component/common/BackButton'; // BackButton 컴포넌트 import 추가
-import Comments from '@/app/component/community/Comments'; // Comments 컴포넌트 import 추가
+import { Heart } from 'lucide-react';
+import { getCommunityPostById, CommunityPost } from '@/app/api/communityController'; // API import
+import BackButton from '@/app/component/common/BackButton';
+import Comments from '@/app/component/community/Comments';
 
-// Mock 데이터
-const mockPost: CommunityPost = {
-  id: 1,
-  title: "이거 어떻게 키워요?",
-  content: "제가 식물을 처음 기르는데 여기서 어떻게 이걸 해야할지 모르겠어요. 고수님들 어떻게 해야 하는지 알려주세요 이 귀여운 금전수가 불쌍하지 않으신가요?",
-  author: "성준 한",
-  timeAgo: "5월 28일",
-  likes: 13,
-  comments: 25,
-  category: 'question',
-  hasImage: true
-};
+// Comment 타입을 페이지 내에서 정의합니다.
+// TODO: API 응답에 맞게 수정하거나, 전역 타입으로 이동해야 할 수 있습니다.
+export interface Comment {
+  id: number;
+  author: string;
+  content: string;
+  timeAgo: string;
+  createdAt: string;
+  parentId?: number;
+}
 
+// Mock 데이터 - 댓글은 아직 API가 없으므로 유지합니다.
 const mockComments: Comment[] = [
   {
     id: 1,
@@ -39,29 +38,31 @@ const mockComments: Comment[] = [
 
 export default function PostDetailPage() {
   const params = useParams();
-  const postId = params.id as string; // router 제거
+  const postId = params.id as string;
   
   const [post, setPost] = useState<CommunityPost | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [isLiked, setIsLiked] = useState(false); // 좋아요 상태
-  const [likesCount, setLikesCount] = useState(0); // 좋아요 수
+  const [comments, setComments] = useState<Comment[]>([]); // 댓글은 아직 mock 사용
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!postId) return;
+
     const fetchPostDetail = async () => {
       try {
         setLoading(true);
+        const postData = await getCommunityPostById(postId);
+        setPost(postData);
+        setLikesCount(postData.likes_count);
+        setIsLiked(postData.isLiked);
         
-        // 네트워크 지연 시뮬레이션
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // TODO - 실제 API 호출로 대체
-        setPost(mockPost);
+        // TODO: 댓글 API가 구현되면 아래 줄을 교체해야 합니다.
         setComments(mockComments);
-        setLikesCount(mockPost.likes);
-        
+
       } catch (error) {
         console.error('Error fetching post detail:', error);
+        setPost(null); // 에러 발생 시 post를 null로 설정
       } finally {
         setLoading(false);
       }
@@ -72,21 +73,22 @@ export default function PostDetailPage() {
 
   // 좋아요 토글 핸들러
   const handleLikeToggle = () => {
+    // TODO: 좋아요 API 연동 필요
     setIsLiked(!isLiked);
     setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
   };
 
   // 대댓글 작성 핸들러
   const handleReplySubmit = (parentId: number, content: string) => {
+    // TODO: 댓글 생성 API 연동 필요
     const newReply: Comment = {
-      id: Date.now(), // 간단한 ID 생성
-      author: "현재 사용자", // TODO - 실제 사용자 정보로 대체
+      id: Date.now(),
+      author: "현재 사용자",
       content,
       timeAgo: "방금 전",
       parentId,
       createdAt: new Date().toISOString()
     };
-
     setComments(prevComments => [...prevComments, newReply]);
   };
 
@@ -98,24 +100,20 @@ export default function PostDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] w-[393px] mx-auto"> {/* 배경색을 #FAF6EC로 변경 */}
+      <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] w-[393px] mx-auto">
         <div className="flex-1 overflow-y-auto p-[18px]">
-          {/* 헤더 스켈레톤 */}
+          {/* 스켈레톤 UI */}
           <div className="flex items-center mb-[20px]">
-            <div className="w-[24px] h-[24px] bg-[#E6DFD1] rounded-full animate-pulse mr-[12px]"></div> {/* 스켈레톤 색상을 새 배경에 맞게 조정 */}
+            <div className="w-[24px] h-[24px] bg-[#E6DFD1] rounded-full animate-pulse mr-[12px]"></div>
             <div className="h-[24px] bg-[#E6DFD1] rounded w-[150px] animate-pulse"></div>
           </div>
-          
-          {/* 작성자 정보 스켈레톤 */}
           <div className="flex items-center mb-[20px]">
-            <div className="w-[40px] h-[40px] bg-[#E6DFD1] rounded-full animate-pulse mr-[12px]"></div> {/* 스켈레톤 색상을 새 배경에 맞게 조정 */}
+            <div className="w-[40px] h-[40px] bg-[#E6DFD1] rounded-full animate-pulse mr-[12px]"></div>
             <div>
               <div className="h-[16px] bg-[#E6DFD1] rounded w-[80px] animate-pulse mb-[4px]"></div>
               <div className="h-[14px] bg-[#E6DFD1] rounded w-[60px] animate-pulse"></div>
             </div>
           </div>
-          
-          {/* 내용 스켈레톤 */}
           <div className="space-y-[8px] mb-[20px]">
             <div className="h-[16px] bg-[#E6DFD1] rounded animate-pulse"></div>
             <div className="h-[16px] bg-[#E6DFD1] rounded w-[80%] animate-pulse"></div>
@@ -127,15 +125,14 @@ export default function PostDetailPage() {
   }
 
   if (!post) {
-    // post가 없는 경우
     return (
-      <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] w-[393px] mx-auto"> {/* 배경색을 #FAF6EC로 변경 */}
+      <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] w-[393px] mx-auto">
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-gray-500 mb-[16px]">게시글을 찾을 수 없습니다.</p>
+            <p className="text-gray-500 mb-[16px]">게시글을 불러오는 데 실패했거나 찾을 수 없습니다.</p>
             <BackButton
               className="mx-auto"
-              onClick={() => { }} // 빈 함수로 기본 router.back() 동작 사용
+              onClick={() => {}}
             />
             <p className="text-[#42CA71] mt-[8px] text-[14px]">목록으로 돌아가기</p>
           </div>
@@ -144,25 +141,31 @@ export default function PostDetailPage() {
     );
   }
 
+  // createdAt을 "X월 X일" 형식으로 변환하는 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return `${date.getMonth() + 1}월 ${date.getDate()}일`;
+  };
+
   return (
-    <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] w-[393px] mx-auto"> {/* 배경색을 #FAF6EC로 변경 */}
+    <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] w-[393px] mx-auto">
       <div className="flex-1 overflow-y-auto p-[18px] pb-[100px]">
         {/* 헤더 */}
         <div className="flex items-center mb-[20px]">
-          <BackButton className="mr-[12px]" /> {/* BackButton 컴포넌트 사용 */}
-          <h1 className="text-[#023735] font-medium text-[18px]">
+          <BackButton className="mr-[12px]" />
+          <h1 className="text-[#023735] font-medium text-[18px] truncate">
             {post.title}
           </h1>
         </div>
 
         {/* 작성자 정보 */}
         <div className="flex items-center mb-[20px]">
-          <div className="w-[40px] h-[40px] bg-[#EFEAD8] rounded-full flex items-center justify-center mr-[12px]"> {/* 프로필 배경을 새 배경에 맞게 조정 */}
+          <div className="w-[40px] h-[40px] bg-[#EFEAD8] rounded-full flex items-center justify-center mr-[12px]">
             <span className="text-[20px]">👤</span>
           </div>
           <div>
-            <p className="text-[#023735] font-medium text-[16px]">{post.author}</p>
-            <p className="text-[#6C757D] text-[14px]">{post.timeAgo}</p>
+            <p className="text-[#023735] font-medium text-[16px]">{post.author?.name || 'Anonymous'}</p>
+            <p className="text-[#6C757D] text-[14px]">{formatDate(post.createdAt)}</p>
           </div>
         </div>
 
@@ -174,14 +177,14 @@ export default function PostDetailPage() {
         </div>
 
         {/* 이미지 섹션 */}
-        {post.hasImage && (
+        {post.images && post.images.length > 0 && (
           <div className="flex gap-[8px] mb-[20px] overflow-x-auto">
-            {[1, 2, 3].map((index) => (
+            {post.images.map((imageUrl, index) => (
               <div
                 key={index}
-                className="w-[120px] h-[120px] bg-[#EFEAD8] rounded-lg flex-shrink-0 flex items-center justify-center" // 이미지 배경을 새 배경에 맞게 조정
+                className="w-[120px] h-[120px] bg-[#EFEAD8] rounded-lg flex-shrink-0"
               >
-                <span className="text-[#8B7355] text-[12px]">이미지 {index}</span> {/* 텍스트 색상도 조정 */}
+                <img src={imageUrl} alt={`post image ${index + 1}`} className="w-full h-full object-cover rounded-lg" />
               </div>
             ))}
           </div>
@@ -192,7 +195,7 @@ export default function PostDetailPage() {
           <button 
             onClick={handleLikeToggle}
             className={`flex items-center space-x-[8px] p-[8px] rounded-lg transition-colors ${
-              isLiked ? 'text-red-500 bg-red-50' : 'text-[#6C757D] hover:bg-[#F0ECE0]' // hover 색상을 새 배경에 맞게 조정
+              isLiked ? 'text-red-500 bg-red-50' : 'text-[#6C757D] hover:bg-[#F0ECE0]'
             }`}
           >
             <Heart 
