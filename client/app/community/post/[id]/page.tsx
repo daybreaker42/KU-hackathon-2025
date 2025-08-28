@@ -171,7 +171,7 @@ export default function PostDetailPage() {
   const isPostAuthor = currentUser && post && post.author?.id === currentUser.id;
 
   // 디버깅을 위한 콘솔 로그
-  // console.log('디버깅 정보:', {
+  // // console.log('디버깅 정보:', {
   //   currentUser,
   //   post: post ? {
   //     id: post.id,
@@ -256,8 +256,8 @@ export default function PostDetailPage() {
                 <div className="absolute right-0 top-[100%] mt-[4px] bg-white border border-[#D4CDB8] rounded-lg shadow-lg z-10 min-w-[100px]">
                   <button
                     onClick={(e) => {
-                      console.log('수정 버튼 클릭됨! 이벤트:', e);
-                      console.log('현재 상태:', { isPostAuthor, currentUser, post });
+                      // console.log('수정 버튼 클릭됨! 이벤트:', e);
+                      // console.log('현재 상태:', { isPostAuthor, currentUser, post });
                       e.preventDefault();
                       e.stopPropagation();
                       setShowOptions(false);
@@ -271,22 +271,22 @@ export default function PostDetailPage() {
                   </button>
                   <button
                     onClick={async (e) => {
-                      console.log('삭제 버튼 클릭됨! 이벤트:', e);
-                      console.log('현재 상태:', { isPostAuthor, currentUser, post });
+                      // console.log('삭제 버튼 클릭됨! 이벤트:', e);
+                      // console.log('현재 상태:', { isPostAuthor, currentUser, post });
                       e.preventDefault();
                       e.stopPropagation();
                       setShowOptions(false);
                       
                       const confirmed = window.confirm('정말로 이 게시글을 삭제하시겠습니까?\n삭제된 게시글은 복구할 수 없습니다.');
                       if (!confirmed) {
-                        console.log('삭제 취소됨');
+                        // console.log('삭제 취소됨');
                         return;
                       }
 
                       try {
-                        console.log('삭제 API 호출:', postId);
+                        // console.log('삭제 API 호출:', postId);
                         await deleteCommunityPost(postId);
-                        console.log('삭제 성공');
+                        // console.log('삭제 성공');
                         alert('게시글이 삭제되었습니다.');
                         router.push('/community'); // 커뮤니티 목록으로 이동
                       } catch (error) {

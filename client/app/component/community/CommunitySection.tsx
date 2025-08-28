@@ -106,7 +106,7 @@ export default function CommunitySection({ title, category, plantId, showMoreBut
         // 실제 API 호출 - 각 카테고리에서 최신 3개씩 가져오기
         const postsData = await getCommunityPostsByCategory(category, 1, 3);
 
-        console.log(JSON.stringify(postsData));
+        // console.log(JSON.stringify(postsData));
 
         // 서버 데이터를 UI 컴포넌트 형태로 변환
         const uiPosts = postsData.posts.map(mapApiPostToUiPost);
