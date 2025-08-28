@@ -278,11 +278,23 @@ export default function CategoryPostsPage() {
         )}
       </div>
 
-      {/* 무한 스크롤 또는 페이지네이션 영역 (추후 구현) */}
+      {/* 페이지네이션 */}
       {posts.length > 0 && (
-        <div className="mt-[40px] text-center">
-          <button className="text-[#42CA71] text-[14px] hover:text-[#369F5C] transition-colors">
-            더 많은 게시글 보기
+        <div className="flex justify-center items-center mt-[40px] space-x-[8px]">
+          <button className="text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+            &lt;
+          </button>
+          <button className="w-[24px] h-[24px] bg-[#42CA71] text-white text-[14px] rounded">
+            1
+          </button>
+          <button className="w-[24px] h-[24px] text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+            2
+          </button>
+          <button className="w-[24px] h-[24px] text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+            3
+          </button>
+          <button className="text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+            &gt;
           </button>
         </div>
       )}
