@@ -293,12 +293,11 @@
   padding: 18px;
   border: none;
   background-color: #43C970;
-  color: white;
-  border-radius: 12px;
+  color: #023735;
+  border-radius: 17px;
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
-  margin-top: 20px;
 }
 
 .saveButton:hover {
@@ -306,7 +305,7 @@
 }
 
 .saveButton:disabled {
-  background-color: #ccc;
+  background-color: #DED9CC;
   cursor: not-allowed;
 }
 
@@ -384,14 +383,12 @@
 
 /* 식물 카드 섹션 스타일 */
 .plantCardsSection {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .plantCardsContainer {
   display: flex;
-  gap: 15px;
   overflow-x: auto;
-  padding: 10px 0;
   scroll-behavior: smooth;
 }
 
@@ -409,27 +406,21 @@
 }
 
 .plantCard {
+  display: block;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 17px;
+  padding: 10px;
+  margin: 0 2px;
+  width: 120px;
   min-width: 120px;
   max-width: 120px;
-  padding: 15px;
-  background-color: #F0EBE0;
-  border: 2px solid #DED9CC;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-}
-
-.plantCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
 .plantCard.selectedCard {
-  border-color: #43C970;
-  background-color: #E8F5E8;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(67, 201, 112, 0.3);
+  border: 2px solid #DED9CC;
+  margin: none;
 }
 
 .plantImageContainer {
@@ -439,27 +430,29 @@
 }
 
 .plantCardImage {
-  border-radius: 8px;
+  border-radius: 7px;
+  width: 100px !important;
+  height: 100px !important;
+  min-width: 100px;
+  max-width: 100px;
   object-fit: cover;
+  display: block;
 }
 
 .plantCardName {
-  font-size: 14px;
+  font-size: medium;
   font-weight: bold;
   color: #023735;
   margin: 0;
   word-break: keep-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+  max-width: 100px;
 }
 
 /* 선택된 식물 관리 영역 */
-.selectedPlantManagement {
-  background-color: #F0EBE0;
-  border: 2px solid #43C970;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
 .managementTitle {
   font-size: 18px;
   font-weight: bold;
@@ -515,9 +508,44 @@
 .emptyMessage {
   text-align: center;
   padding: 40px 20px;
-  color: #666;
-  font-size: 16px;
-  background-color: white;
-  border-radius: 12px;
-  border: 2px solid #DED9CC;
+  
+}
+
+.plantContainer{
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom:15px;
+}
+
+.plantLabel {
+    font-size:medium;
+    color: #023735;
+    font-weight: bold;
+}
+
+.plantBox{
+    padding: 10px;
+    border: 1px solid #DED9CC;
+    border-radius: 8px;
+    background-color: #FAF6EC;
+}
+
+/* 토글 버튼 스타일 */
+.toggleButton {
+    padding: 10px 20px;
+    border: 2px solid #008261;
+    border-radius: 40px;
+    background-color: transparent;
+    color: #023735;
+    font-size: medium;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 80px;
+}
+
+.toggleButton.active {
+    background-color: #008261;
+    color: #FAF6EC;
 }

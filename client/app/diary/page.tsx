@@ -314,7 +314,7 @@ export default function DiaryPage() {
                 <div className={styles.noDiary}>
                   <p>선택한 날짜에 작성된 일기가 없습니다.</p>
                   {canWrite ? (
-                    <Link href="/diary/write" className={styles.addDiaryButton}>
+                    <Link href={`/diary/write?date=${currentYear}-${currentMonth + 1}-${selectedDay}`} className={styles.addDiaryButton}>
                       일기 작성하기
                     </Link>
                   ) : (
