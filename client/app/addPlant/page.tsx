@@ -6,7 +6,7 @@ import Image from 'next/image'; // next/image import
 import { Camera } from 'lucide-react';
 import BackButton from '@/app/component/common/BackButton';
 import CloseButton from '@/app/component/common/CloseButton';
-import { uploadPlantImage, createPlant, CreatePlantData } from '@/app/api/communityController'; // API 함수 import
+import { uploadPlantImage, createPlant, CreatePlantData, identifyPlant } from '@/app/api/communityController'; // identifyPlant API 추가
 
 const AddPlantPage: React.FC = () => {
   const router = useRouter();
@@ -24,7 +24,9 @@ const AddPlantPage: React.FC = () => {
   const [purchaseDate, setPurchaseDate] = useState('');
   const [purchasePlace, setPurchasePlace] = useState('');
   const [memo, setMemo] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false); // 이미지 업로드 로딩 상태
+  const [identificationLoading, setIdentificationLoading] = useState(false); // 식물 식별 로딩 상태
+  const [loading, setLoading] = useState(false); // 기타 로딩 상태 (식물 등록 등)
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
   // 사진 업로드 핸들러 - 실제 API 연동
@@ -39,37 +41,62 @@ const AddPlantPage: React.FC = () => {
       reader.readAsDataURL(file);
 
       setStep(2);
-      setLoading(true);
+      setUploadLoading(true); // 이미지 업로드 로딩 시작
 
       try {
         // 실제 이미지 업로드 API 호출
         const uploadResult = await uploadPlantImage(file);
         setUploadedImageUrl(uploadResult.imageUrl);
         console.log('이미지 업로드 성공:', uploadResult.imageUrl);
+        setUploadLoading(false); // 이미지 업로드 완료
 
-        // 식물 이름 추천은 현재 임시 데이터 사용 (추후 AI 분석 API 연동 가능)
-        getPlantSuggestions(file);
+        // Plant.ID API를 통한 식물 식별 (업로드된 이미지 URL 사용)
+        await getPlantSuggestions(uploadResult.imageUrl);
       } catch (error) {
         console.error('이미지 업로드 실패:', error);
         alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
         setStep(1);
         setImagePreview(null);
-      } finally {
-        setLoading(false);
+        setUploadLoading(false); // 오류 발생 시 업로드 로딩 해제
       }
     }
   };
 
-  // 식물 이름 추천 API 호출 (현재는 임시 데이터, 향후 AI 분석 API 연동 가능)
-  const getPlantSuggestions = async (file: File) => {
+  // 식물 이름 추천 API 호출 - Plant.ID API를 통한 실제 식물 식별
+  const getPlantSuggestions = async (imageUrl: string) => {
+    setIdentificationLoading(true); // 식물 식별 로딩 시작
+    
     try {
-      // 현재는 임시 데이터 사용
-      console.log('식물 사진 분석 중:', file.name);
-      setTimeout(() => {
-        setSuggestions(['몬스테라', '필로덴드론', '싱고니움', '호야']);
-      }, 1000);
+      console.log('Plant.ID API를 통한 식물 식별 시작:', imageUrl);
+
+      // Plant.ID API 호출
+      const identificationResult = await identifyPlant(imageUrl);
+
+      // 한글 이름에서 앞뒤 공백/개행 문자 제거
+      const koreanName = identificationResult.koreanName.trim();
+
+      console.log('식물 식별 결과:', {
+        original: identificationResult.name,
+        korean: koreanName,
+        probability: identificationResult.probability
+      });
+
+      // 한글 이름을 추천 목록에 추가 (확률이 높은 경우만)
+      if (identificationResult.probability > 0.3) {
+        setSuggestions([koreanName]);
+        // 첫 번째 추천을 자동으로 선택
+        setPlantName(koreanName);
+      } else {
+        setSuggestions([]);
+        console.log('식별 확률이 낮아 추천하지 않습니다.');
+      }
     } catch (error) {
-      console.error('식물 식별 실패:', error);
+      console.error('Plant.ID 식물 식별 실패:', error);
+      // 오류 발생 시 빈 추천 목록 설정
+      setSuggestions([]);
+    } finally {
+      // 식물 식별 완료 후 로딩 상태 해제
+      setIdentificationLoading(false);
     }
   };
 
@@ -182,9 +209,11 @@ const AddPlantPage: React.FC = () => {
             height={256}
             className="max-w-64 max-h-64 rounded-lg shadow-md border-4 border-[#4CAF50] object-cover"
           />
-          {loading && (
+          {(uploadLoading || identificationLoading) && (
             <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
-              <div className="text-white text-sm">업로드 중...</div>
+              <div className="text-white text-sm">
+                {uploadLoading ? '이미지 업로드 중...' : '식물 식별 중...'}
+              </div>
             </div>
           )}
         </div>
@@ -198,26 +227,35 @@ const AddPlantPage: React.FC = () => {
             onChange={(e) => setPlantName(e.target.value)}
             placeholder="식물 품종을 입력하세요"
             className="px-4 py-3 border-2 border-[#4CAF50] rounded-lg focus:outline-none focus:border-[#4CAF50]"
-            disabled={loading}
+            disabled={uploadLoading || identificationLoading} // 업로드나 식별 중일 때 비활성화
           />
         </div>
 
-        {loading && <div className="text-center text-gray-600 italic">식물 이름을 분석하는 중...</div>}
+        {identificationLoading && <div className="text-center text-gray-600 italic">🔍 Plant.ID를 통해 식물을 식별하는 중...</div>}
 
-        {!loading && suggestions.length > 0 && (
+        {!identificationLoading && suggestions.length > 0 && (
           <div className="w-full text-center">
-            <p className="mb-3 font-bold">추천 품종:</p>
+            <p className="mb-3 font-bold text-[#4CAF50]">🌿 식별된 식물:</p>
             <div className="flex flex-wrap gap-2 justify-center">
               {suggestions.map((suggestion, index) => (
                 <button
                   key={index}
-                  className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-full hover:bg-gray-200 transition-colors"
+                  className={`px-4 py-2 border rounded-full transition-colors ${plantName === suggestion
+                      ? 'bg-[#4CAF50] text-white border-[#4CAF50]'
+                      : 'bg-gray-100 border-gray-300 hover:bg-gray-200'
+                    }`}
                   onClick={() => selectSuggestion(suggestion)}
                 >
                   {suggestion}
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {!identificationLoading && suggestions.length === 0 && plantName === '' && (
+          <div className="w-full text-center">
+            <p className="text-gray-500 italic">식물을 식별할 수 없었습니다. 직접 입력해주세요.</p>
           </div>
         )}
 
@@ -229,14 +267,14 @@ const AddPlantPage: React.FC = () => {
             onChange={(e) => setNickname(e.target.value)}
             placeholder="식물의 애칭을 입력하세요"
             className="px-4 py-3 border-2 border-[#4CAF50] rounded-lg focus:outline-none focus:border-[#4CAF50]"
-            disabled={loading}
+            disabled={uploadLoading || identificationLoading} // 업로드나 식별 중일 때 비활성화
           />
         </div>
 
         <button
           className="px-6 py-3 bg-[#4CAF50] text-white rounded-lg hover:bg-[#45a049] transition-colors mt-4 disabled:bg-gray-400 disabled:cursor-not-allowed"
           onClick={nextStep}
-          disabled={loading}
+          disabled={uploadLoading || identificationLoading} // 업로드나 식별 중일 때 비활성화
         >
           다음으로
         </button>
