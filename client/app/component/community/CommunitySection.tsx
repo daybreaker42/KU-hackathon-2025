@@ -2,8 +2,9 @@
 
 import { CommunityPost, Plant } from '@/app/types/community/community'; // Plant 타입 import 추가
 import { useEffect, useState } from 'react';
-import { Heart, MessageCircle } from 'lucide-react'; // lucide-react 아이콘 import 추가
 import { useRouter } from 'next/navigation'; // Next.js 라우터 import 추가
+import PostCard from './PostCard'; // PostCard 컴포넌트 import 추가
+import Footer from '../common/footer';
 
 // Mock 식물 데이터 추가
 const mockPlants: Plant[] = [
@@ -93,6 +94,11 @@ export default function CommunitySection({ title, category, plantId, showMoreBut
     }
   };
 
+  // 게시글 클릭 핸들러 추가
+  const handlePostClick = (postId: number) => {
+    router.push(`/community/post/${postId}`);
+  };
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -132,14 +138,14 @@ export default function CommunitySection({ title, category, plantId, showMoreBut
         </div>
         <div className="space-y-[10px]">
           {[1, 2].map((item) => (
-            <div key={item} className="bg-gray-100 rounded-lg p-[15px] animate-pulse">
-              <div className="h-[20px] bg-gray-300 rounded mb-[8px] w-[60%]"></div>
-              <div className="h-[16px] bg-gray-300 rounded mb-[10px]"></div>
+            <div key={item} className="bg-[#F0ECE0] rounded-lg p-[15px] animate-pulse border border-[#E8E3D5]"> {/* 새 배경에 맞게 색상 조정 */}
+              <div className="h-[20px] bg-[#E6DFD1] rounded mb-[8px] w-[60%]"></div> {/* 스켈레톤 색상 조정 */}
+              <div className="h-[16px] bg-[#E6DFD1] rounded mb-[10px]"></div>
               <div className="flex justify-between items-center">
-                <div className="h-[14px] bg-gray-300 rounded w-[40px]"></div>
+                <div className="h-[14px] bg-[#E6DFD1] rounded w-[40px]"></div>
                 <div className="flex space-x-[10px]">
-                  <div className="h-[14px] bg-gray-300 rounded w-[30px]"></div>
-                  <div className="h-[14px] bg-gray-300 rounded w-[30px]"></div>
+                  <div className="h-[14px] bg-[#E6DFD1] rounded w-[30px]"></div>
+                  <div className="h-[14px] bg-[#E6DFD1] rounded w-[30px]"></div>
                 </div>
               </div>
             </div>
@@ -167,60 +173,12 @@ export default function CommunitySection({ title, category, plantId, showMoreBut
       {/* 게시글 리스트 */}
       <div className="space-y-[10px]">
         {posts.map((post) => (
-          <div key={post.id} className="bg-[#F8F9FA] rounded-lg p-[15px] border border-gray-100">
-            {/* 게시글 헤더 */}
-            <div className="flex justify-between items-start mb-[8px]">
-              <div className="flex-1 mr-[10px]">
-                <h3 className="text-[#023735] font-medium text-[16px]">
-                  {post.title}
-                </h3>
-                {/* 식물별 카테고리인 경우 식물 이름 표시 */}
-                {post.category === 'plant' && post.plant && (
-                  <span className="inline-block bg-[#42CA71] text-white text-[10px] px-[6px] py-[2px] rounded-full mt-[4px]">
-                    {post.plant.name}
-                  </span>
-                )}
-              </div>
-              <span className="text-[#6C757D] text-[12px] whitespace-nowrap">
-                {post.timeAgo}
-              </span>
-            </div>
-
-            {/* 게시글 내용 */}
-            <div className="flex items-start space-x-[10px]">
-              <div className="flex-1">
-                <p className="text-[#495057] text-[14px] leading-[1.4] line-clamp-2">
-                  {post.content}
-                </p>
-              </div>
-              
-              {/* 이미지 썸네일 (사진이 있는 경우) */}
-              {post.hasImage && (
-                <div className="w-[50px] h-[50px] bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-[20px]">🌱</span>
-                </div>
-              )}
-            </div>
-
-            {/* 게시글 푸터 (좋아요, 댓글) */}
-            <div className="flex justify-between items-center mt-[12px]">
-              <span className="text-[#6C757D] text-[12px]">
-                {post.author}
-              </span>
-              <div className="flex items-center space-x-[10px]">
-                {/* 좋아요 버튼 - lucide-react 아이콘 적용 및 테두리 추가 */}
-                <button className="flex items-center space-x-[4px] text-[#6C757D] text-[12px] hover:text-[#42CA71] hover:border-[#42CA71] transition-colors border border-gray-300 rounded-full px-[8px] py-[4px]">
-                  <Heart size={12} />
-                  <span>{post.likes}</span>
-                </button>
-                {/* 댓글 버튼 - lucide-react 아이콘 적용 및 테두리 추가 */}
-                <button className="flex items-center space-x-[4px] text-[#6C757D] text-[12px] hover:text-[#42CA71] hover:border-[#42CA71] transition-colors border border-gray-300 rounded-full px-[8px] py-[4px]">
-                  <MessageCircle size={12} />
-                  <span>{post.comments}</span>
-                </button>
-              </div>
-            </div>
-          </div>
+          <PostCard
+            key={post.id}
+            post={post}
+            onClick={handlePostClick}
+            variant="compact" // 컴팩트 모드로 표시
+          />
         ))}
       </div>
     </div>

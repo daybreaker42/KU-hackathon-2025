@@ -3,7 +3,11 @@
 import { CommunityPost, Plant } from '@/app/types/community/community';
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
-import { Heart, MessageCircle, ArrowLeft, Filter } from 'lucide-react';
+import { ArrowLeft, Filter } from 'lucide-react';
+import PostCard from '@/app/component/community/PostCard'; // PostCard 컴포넌트 import 추가
+import Footer from '@/app/component/common/footer';
+import CloseButton from '@/app/component/common/CloseButton';
+import WritePostButton from '@/app/component/community/WritePostButton';
 
 // Mock 데이터 (실제로는 API에서 가져올 데이터)
 const mockPlants: Plant[] = [
@@ -145,34 +149,39 @@ export default function CategoryPostsPage() {
     router.back();
   };
 
+  // 게시글 클릭 핸들러 추가
+  const handlePostClick = (postId: number) => {
+    router.push(`/community/post/${postId}`);
+  };
+
   // 로딩 상태
   if (loading) {
     return (
-      <div className="p-[18px] bg-white min-h-screen">
+      <div className="p-[18px] bg-[#FAF6EC] min-h-screen w-[393px] mx-auto"> {/* 배경색을 #FAF6EC로 변경 */}
         {/* 헤더 스켈레톤 */}
         <div className="flex items-center mb-[20px]">
-          <div className="w-[24px] h-[24px] bg-gray-300 rounded animate-pulse mr-[12px]"></div>
-          <div className="h-[24px] bg-gray-300 rounded w-[150px] animate-pulse"></div>
+          <div className="w-[24px] h-[24px] bg-[#E6DFD1] rounded animate-pulse mr-[12px]"></div> {/* 새 배경에 맞게 색상 조정 */}
+          <div className="h-[24px] bg-[#E6DFD1] rounded w-[150px] animate-pulse"></div>
         </div>
         
         {/* 필터 스켈레톤 */}
         <div className="flex justify-between items-center mb-[20px]">
-          <div className="h-[16px] bg-gray-300 rounded w-[80px] animate-pulse"></div>
-          <div className="h-[32px] bg-gray-300 rounded w-[100px] animate-pulse"></div>
+          <div className="h-[16px] bg-[#E6DFD1] rounded w-[80px] animate-pulse"></div>
+          <div className="h-[32px] bg-[#E6DFD1] rounded w-[100px] animate-pulse"></div>
         </div>
         
         {/* 게시글 리스트 스켈레톤 */}
         <div className="space-y-[15px]">
           {Array.from({ length: 5 }).map((_, index) => (
-            <div key={index} className="bg-gray-100 rounded-lg p-[15px] animate-pulse">
-              <div className="h-[20px] bg-gray-300 rounded mb-[8px] w-[70%]"></div>
-              <div className="h-[16px] bg-gray-300 rounded mb-[10px]"></div>
-              <div className="h-[16px] bg-gray-300 rounded mb-[12px] w-[90%]"></div>
+            <div key={index} className="bg-[#F0ECE0] rounded-lg p-[15px] animate-pulse border border-[#E8E3D5]"> {/* 새 배경에 맞게 색상 조정 */}
+              <div className="h-[20px] bg-[#E6DFD1] rounded mb-[8px] w-[70%]"></div> {/* 스켈레톤 색상 조정 */}
+              <div className="h-[16px] bg-[#E6DFD1] rounded mb-[10px]"></div>
+              <div className="h-[16px] bg-[#E6DFD1] rounded mb-[12px] w-[90%]"></div>
               <div className="flex justify-between items-center">
-                <div className="h-[14px] bg-gray-300 rounded w-[60px]"></div>
+                <div className="h-[14px] bg-[#E6DFD1] rounded w-[60px]"></div>
                 <div className="flex space-x-[10px]">
-                  <div className="h-[28px] bg-gray-300 rounded-full w-[50px]"></div>
-                  <div className="h-[28px] bg-gray-300 rounded-full w-[50px]"></div>
+                  <div className="h-[28px] bg-[#E6DFD1] rounded-full w-[50px]"></div>
+                  <div className="h-[28px] bg-[#E6DFD1] rounded-full w-[50px]"></div>
                 </div>
               </div>
             </div>
@@ -183,19 +192,11 @@ export default function CategoryPostsPage() {
   }
 
   return (
-    <div className="p-[18px] bg-white min-h-screen">
+    <div className="p-[18px] bg-[#FAF6EC] min-h-screen w-[393px] mx-auto"> {/* 배경색을 #FAF6EC로 변경 */}
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-[20px]">
-        <div className="flex items-center">
-          {/* 뒤로가기 버튼 */}
-          <button 
-            onClick={handleBack}
-            className="mr-[12px] p-[4px] hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ArrowLeft size={20} className="text-[#023735]" />
-          </button>
-          
-          {/* 페이지 제목 */}
+      <div className="flex flex-col mb-[20px]">
+        <div className='flex items-center justify-between item'>
+          <div className="flex items-center">
           <h1 className="text-[#023735] font-medium text-[20px]">
             {categoryNames[category]}
             {category === 'plant' && plantId && (
@@ -206,19 +207,24 @@ export default function CategoryPostsPage() {
           </h1>
         </div>
         
+          {/* 뒤로가기 버튼 */}
+          <CloseButton />
+        </div>
         {/* 필터 토글 버튼 */}
-        <button 
-          onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center space-x-[4px] text-[#42CA71] text-[14px] hover:text-[#369F5C] transition-colors"
-        >
-          <Filter size={16} />
-          <span>필터</span>
-        </button>
+        {/* <div className='flex justify-end mt-2'>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center space-x-[4px] text-[#42CA71] text-[14px] hover:text-[#369F5C] transition-colors"
+          >
+            <Filter size={16} />
+            <span>필터</span>
+          </button>
+        </div> */}
       </div>
 
       {/* 필터 및 정렬 옵션 */}
       {showFilters && (
-        <div className="bg-[#F8F9FA] rounded-lg p-[15px] mb-[20px] border border-gray-100">
+        <div className="bg-[#F5F2E8] rounded-lg p-[15px] mb-[20px] border border-[#E5E0D3]"> {/* 베이지 톤으로 배경색 변경 */}
           <div className="flex items-center justify-between">
             <span className="text-[#023735] font-medium text-[14px]">정렬</span>
             <div className="flex space-x-[8px]">
@@ -229,7 +235,7 @@ export default function CategoryPostsPage() {
                   className={`px-[12px] py-[6px] rounded-full text-[12px] transition-colors ${
                     sortBy === option.value
                       ? 'bg-[#42CA71] text-white'
-                      : 'bg-white text-[#6C757D] hover:bg-[#E9ECEF]'
+                    : 'bg-[#EFEBE0] text-[#6C757D] hover:bg-[#E8E4D6] border border-[#D0C9B8]' // 비선택 상태도 베이지 톤으로 조정
                   }`}
                 >
                   {option.label}
@@ -262,72 +268,38 @@ export default function CategoryPostsPage() {
           </div>
         ) : (
           posts.map((post) => (
-            <div key={post.id} className="bg-[#F8F9FA] rounded-lg p-[15px] border border-gray-100 hover:shadow-sm transition-shadow cursor-pointer">
-              {/* 게시글 헤더 */}
-              <div className="flex justify-between items-start mb-[8px]">
-                <div className="flex-1 mr-[10px]">
-                  <h3 className="text-[#023735] font-medium text-[16px] hover:text-[#42CA71] transition-colors">
-                    {post.title}
-                  </h3>
-                  {/* 식물별 카테고리인 경우 식물 이름 표시 */}
-                  {post.category === 'plant' && post.plant && (
-                    <span className="inline-block bg-[#42CA71] text-white text-[10px] px-[6px] py-[2px] rounded-full mt-[4px]">
-                      {post.plant.name}
-                    </span>
-                  )}
-                </div>
-                <span className="text-[#6C757D] text-[12px] whitespace-nowrap">
-                  {post.timeAgo}
-                </span>
-              </div>
-
-              {/* 게시글 내용 */}
-              <div className="flex items-start space-x-[10px] mb-[12px]">
-                <div className="flex-1">
-                  <p className="text-[#495057] text-[14px] leading-[1.5] line-clamp-3">
-                    {post.content}
-                  </p>
-                </div>
-                
-                {/* 이미지 썸네일 */}
-                {post.hasImage && (
-                  <div className="w-[60px] h-[60px] bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-[24px]">🌱</span>
-                  </div>
-                )}
-              </div>
-
-              {/* 게시글 푸터 */}
-              <div className="flex justify-between items-center">
-                <span className="text-[#6C757D] text-[12px]">
-                  {post.author}
-                </span>
-                <div className="flex items-center space-x-[10px]">
-                  {/* 좋아요 버튼 */}
-                  <button className="flex items-center space-x-[4px] text-[#6C757D] text-[12px] hover:text-[#42CA71] hover:border-[#42CA71] transition-colors border border-gray-300 rounded-full px-[8px] py-[4px]">
-                    <Heart size={12} />
-                    <span>{post.likes}</span>
-                  </button>
-                  {/* 댓글 버튼 */}
-                  <button className="flex items-center space-x-[4px] text-[#6C757D] text-[12px] hover:text-[#42CA71] hover:border-[#42CA71] transition-colors border border-gray-300 rounded-full px-[8px] py-[4px]">
-                    <MessageCircle size={12} />
-                    <span>{post.comments}</span>
-                  </button>
-                </div>
-              </div>
-            </div>
+            <PostCard
+              key={post.id}
+              post={post}
+              onClick={handlePostClick}
+              variant="full" // 풀 사이즈 모드로 표시
+            />
           ))
         )}
       </div>
 
-      {/* 무한 스크롤 또는 페이지네이션 영역 (추후 구현) */}
+      {/* 페이지네이션 */}
       {posts.length > 0 && (
-        <div className="mt-[40px] text-center">
-          <button className="text-[#42CA71] text-[14px] hover:text-[#369F5C] transition-colors">
-            더 많은 게시글 보기
+        <div className="flex justify-center items-center mt-[40px] space-x-[8px]">
+          <button className="text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+            &lt;
+          </button>
+          <button className="w-[24px] h-[24px] bg-[#42CA71] text-white text-[14px] rounded">
+            1
+          </button>
+          <button className="w-[24px] h-[24px] text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+            2
+          </button>
+          <button className="w-[24px] h-[24px] text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+            3
+          </button>
+          <button className="text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+            &gt;
           </button>
         </div>
       )}
+      <Footer url='community' />
+      <WritePostButton />
     </div>
   );
 }
