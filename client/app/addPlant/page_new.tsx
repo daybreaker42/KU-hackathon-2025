@@ -164,7 +164,7 @@ const AddPlantPage: React.FC = () => {
           <div className={styles.imageBox}>
             <div className={styles.textCenter}>
               <div className={styles.loadingSpinner}></div>
-              <div className={styles.loadingText}>이미지 업로드 중</div>
+              <div className={styles.loadingText}>이미지 업로드 중...</div>
             </div>
           </div>
         </div>
@@ -172,9 +172,10 @@ const AddPlantPage: React.FC = () => {
 
       {uploadSuccess && (
         <div className={styles.imageContainer}>
-          <div className={`${styles.imageBox}`}>
+          <div className={`${styles.imageBox} ${styles.imageBoxSuccess}`}>
             <div className={styles.textCenter}>
-              <div className={styles.successText}>이미지 업로드 성공</div>
+              <div className={styles.successIcon}>✅</div>
+              <div className={styles.successText}>이미지 업로드 성공!</div>
             </div>
           </div>
         </div>
@@ -199,20 +200,21 @@ const AddPlantPage: React.FC = () => {
       )}
 
       {identificationLoading && (
-        <div className={styles.expectation}>
+        <div className={styles.textCenter}>
           <div className={`${styles.loadingSpinner} ${styles.loadingSpinnerSmall}`}></div>
-          <div className={styles.identificationText}>식물 식별 중</div>
+          <div className={styles.identificationText}>🔍 식물 식별 중...</div>
         </div>
       )}
 
       {identificationSuccess && (
         <div className={styles.textCenter}>
+          <div className={styles.celebrationIcon}>🎉</div>
           <div className={styles.successText}>식물 식별 성공!</div>
         </div>
       )}
 
       {!uploadLoading && !uploadSuccess && (
-        <div className={styles.inputContainer}>
+        <div className={styles.formContainer}>
           <div className={styles.inputGroup}>
             <label className={styles.label}>품종</label>
             <input
@@ -228,19 +230,19 @@ const AddPlantPage: React.FC = () => {
           {identificationLoading && <div className={styles.identificationText}>식물을 찾아보는 중...</div>}
 
           {!identificationLoading && suggestions.length > 0 && (
-            <div className={styles.expectationSection}>
-              {suggestions.map((suggestion, index) => (
-                <>
+            <div className={styles.inputGroup}>
+              <p className={styles.successText}>혹시 이 식물인가요?</p>
+              <div className={styles.suggestionsList}>
+                {suggestions.map((suggestion, index) => (
                   <button
-                  key={index}
-                  className={styles.suggestionItem}
-                  onClick={() => selectSuggestion(suggestion)}
-                >
-                  {suggestion}
-                </button>
-                {index < suggestions.length - 1 && <hr className={styles.divider} />}
-                </>
-              ))}
+                    key={index}
+                    className={styles.suggestionItem}
+                    onClick={() => selectSuggestion(suggestion)}
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
@@ -280,7 +282,10 @@ const AddPlantPage: React.FC = () => {
         <Image 
           src={imagePreview} 
           alt="식물 사진" 
+          width={80} 
+          height={80} 
           className={styles.imagePreview} 
+          style={{width: '80px', height: '80px'}} 
         />
       )}
       
@@ -471,7 +476,7 @@ const AddPlantPage: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        {step !== 1 && <BackButton />}
+        <BackButton />
         <h1 className={styles.title}>식물 추가</h1>
         <CloseButton />
       </div>
