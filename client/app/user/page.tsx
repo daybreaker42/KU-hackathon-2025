@@ -71,7 +71,10 @@ export default function UserProfilePage() {
               height={120}
               className="rounded-full object-cover"
             />
-            <span className="font-bold text-lg text-[#023735]">@myuserid</span>
+            <div className="flex flex-col items-center">
+              <span className="font-bold text-xl text-[#023735]">사용자 이름</span>
+              <span className="text-md text-gray-500">@myuserid</span>
+            </div>
           </section>
 
           <nav>

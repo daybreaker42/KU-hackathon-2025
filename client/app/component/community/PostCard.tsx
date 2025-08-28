@@ -25,7 +25,7 @@ export default function PostCard({ post, onClick, variant = 'compact', imagePosi
   return (
     <button
       onClick={() => onClick(post.id)}
-      className="w-full bg-[#F5F1E7] rounded-lg p-[15px] border border-[#E8E3D5] hover:border-[#42CA71] hover:bg-[#F0ECE0] transition-all text-left shadow-sm" // 새 배경에 맞게 색상 조정
+      className="w-full bg-[#F5F1E7] rounded-lg p-[15px] border border-gray-300 hover:border-[#42CA71] hover:bg-[#F0ECE0] transition-all text-left" // 새 배경에 맞게 색상 조정
     >
       {/* 게시글 헤더 */}
       <div className="flex justify-between items-start mb-[8px]">
