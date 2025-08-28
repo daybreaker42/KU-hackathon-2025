@@ -1,0 +1,117 @@
+.container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+  font-family: sans-serif;
+}
+
+.appbar {
+  text-align: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 2rem;
+}
+
+.appbar h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.profileSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profileImage {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userId {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.tabNav {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tabLink {
+  display: block;
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #000;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.tabLink:hover {
+  background-color: #f0f0f0;
+}
+
+.tabGroup {
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.tabTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0 0 1rem 0;
+}
+
+.subTabs {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.subTabs li {
+  cursor: pointer;
+  padding: 0.5rem 0;
+}
+
+.postList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.postCard {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.postCard h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.postCard p {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0;
+}
