@@ -26,3 +26,5 @@ export interface Comment {
   parentId?: number; // 대댓글인 경우 부모 댓글 ID (없으면 일반 댓글)
   createdAt: string; // 정렬을 위한 생성 시간
 }
+
+export type CommunityCategory = 'question' | 'daily' | 'free' | 'plant';
