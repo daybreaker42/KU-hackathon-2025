@@ -5,11 +5,10 @@ import { useRouter } from 'next/navigation';
 import { Camera, ChevronDown, X } from 'lucide-react';
 import BackButton from '@/app/component/common/BackButton';
 import { createCommunityPost, uploadImages, getMyPlants } from '@/app/api/communityController';
+import type { CommunityCategory } from '@/app/types/community/community';
 
 // 카테고리 옵션
-type Category = 'question' | 'daily' | 'free' | 'plant';
-
-const categoryOptions: { value: Category; label: string }[] = [
+const categoryOptions: { value: CommunityCategory; label: string }[] = [
   { value: 'question', label: '이거 어떻게 키워요?' },
   { value: 'daily', label: '일상' },
   { value: 'free', label: '자유 주제' },
@@ -26,7 +25,7 @@ export default function WritePostPage() {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [category, setCategory] = useState<Category>('question');
+  const [category, setCategory] = useState<CommunityCategory>('question');
   const [images, setImages] = useState<string[]>([]);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [myPlants, setMyPlants] = useState<MyPlant[]>([]);
@@ -35,6 +34,7 @@ export default function WritePostPage() {
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
+    // 내 식물 목록을 API에서 가져오는 함수
     const fetchMyPlants = async () => {
       try {
         const plants = await getMyPlants();
@@ -46,6 +46,7 @@ export default function WritePostPage() {
     fetchMyPlants();
   }, []);
 
+  // 이미지 업로드 핸들러
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
@@ -77,10 +78,12 @@ export default function WritePostPage() {
     }
   };
 
+  // 이미지 삭제 핸들러
   const handleRemoveImage = (index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
 
+  // 게시글 업로드 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isUploading) {

@@ -33,7 +33,7 @@ const mapApiPostToUiPost = (apiPost: ApiCommunityPost): CommunityPost => {
     id: apiPost.id,
     title: apiPost.title,
     content: apiPost.content,
-    author: apiPost.author.name,
+    author: apiPost.author.name || '',
     timeAgo: getTimeAgo(apiPost.createdAt),
     likes: apiPost.likes_count,
     comments: apiPost.comments_count,
@@ -62,6 +62,7 @@ export default function CategoryPostsPage() {
   
   const category = params.category as 'question' | 'daily' | 'free' | 'plant';
   const plantId = searchParams.get('plantId');
+  const variety = searchParams.get('variety');
   
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,6 +73,8 @@ export default function CategoryPostsPage() {
   const [totalPosts, setTotalPosts] = useState(0);
   const itemsPerPage = 10; // 한 페이지당 표시되는 게시글 수 (10개 고정)
 
+
+  console.log(`category - ${category} / plantId - ${plantId} / variety - ${variety}`);
   // 페이지 변경 핸들러 (스크롤 상단 이동 포함)
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -97,11 +100,12 @@ export default function CategoryPostsPage() {
         // 실제 API 호출 - pagination 적용
         // page: 현재 페이지 번호 (1부터 시작)
         // limit: 한 페이지당 가져올 게시글 수 (10개)
+        // plant_name: 실제 식물 품종명으로 필터링 (category가 'plant'일 때만)
         const postsData = await getCommunityPosts({
           category: category,
           page: currentPage,
           limit: itemsPerPage,
-          plant_name: category === 'plant' && plantId ? `plant_${plantId}` : undefined
+          plant_name: category === 'plant' && variety ? variety : undefined
         });
         
         // 서버 데이터를 UI 컴포넌트 형태로 변환
@@ -122,7 +126,7 @@ export default function CategoryPostsPage() {
     };
 
     fetchPosts();
-  }, [category, plantId, currentPage]);
+  }, [category, plantId, currentPage, variety]);
 
   // 로딩 상태
   if (loading) {
@@ -163,9 +167,9 @@ export default function CategoryPostsPage() {
           <div className="flex items-center">
             <h1 className="text-[#023735] font-medium text-[20px]">
               {categoryNames[category]}
-              {category === 'plant' && plantId && (
+              {category === 'plant' && variety && (
                 <span className="text-[16px] text-[#6C757D] ml-[8px]">
-                  · 식물 #{plantId}
+                  · {variety}
                 </span>
               )}
             </h1>
