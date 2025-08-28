@@ -5,14 +5,22 @@ import { RefreshCw } from 'lucide-react';
 import { Comment } from '@/app/types/community/community';
 import CommentItem from './CommentItem';
 
+// 로컬 Comment 타입 (authorId 포함)
+interface LocalComment extends Comment {
+  authorId: number;
+}
+
 interface CommentsProps {
-  comments: Comment[];
+  comments: LocalComment[];
   onAddComment: (content: string) => void;
   onAddReply: (parentId: number, content: string) => void;
   onRefresh: () => void;
+  onEditComment?: (commentId: number, content: string) => void;
+  onDeleteComment?: (commentId: number) => void;
+  currentUserId?: number;
 }
 
-export default function Comments({ comments, onAddComment, onAddReply, onRefresh }: CommentsProps) {
+export default function Comments({ comments, onAddComment, onAddReply, onRefresh, onEditComment, onDeleteComment, currentUserId }: CommentsProps) {
   const [newComment, setNewComment] = useState('');
 
   const handleCommentSubmit = () => {
@@ -95,8 +103,11 @@ export default function Comments({ comments, onAddComment, onAddReply, onRefresh
             <div key={group.parent.id} className="space-y-[8px]">
               {/* 부모 댓글 */}
               <CommentItem
-                comment={group.parent}
+                comment={group.parent as LocalComment}
                 onReply={onAddReply}
+                onEdit={onEditComment}
+                onDelete={onDeleteComment}
+                currentUserId={currentUserId}
                 isReply={false}
               />
 
@@ -104,8 +115,11 @@ export default function Comments({ comments, onAddComment, onAddReply, onRefresh
               {group.replies.map((reply) => (
                 <CommentItem
                   key={reply.id}
-                  comment={reply}
+                  comment={reply as LocalComment}
                   onReply={onAddReply}
+                  onEdit={onEditComment}
+                  onDelete={onDeleteComment}
+                  currentUserId={currentUserId}
                   isReply={true}
                 />
               ))}

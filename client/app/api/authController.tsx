@@ -147,6 +147,43 @@ export const setAuthToken = (token: string): void => {
 };
 
 /**
+ * 현재 사용자 정보 저장 함수
+ * 
+ * @param user - 저장할 사용자 정보
+ * 
+ * 로그인 성공 시 사용자 정보를 localStorage에 저장
+ */
+export const setCurrentUser = (user: { id: number; email: string; name: string }): void => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('currentUser', JSON.stringify(user));
+  }
+};
+
+/**
+ * 현재 사용자 정보 조회 함수
+ * 
+ * @returns 저장된 현재 사용자 정보 또는 null
+ */
+export const getCurrentUser = (): { id: number; email: string; name: string } | null => {
+  if (typeof window !== 'undefined') {
+    const userStr = localStorage.getItem('currentUser');
+    return userStr ? JSON.parse(userStr) : null;
+  }
+  return null;
+};
+
+/**
+ * 현재 사용자 정보 제거 함수
+ * 
+ * 로그아웃 시 사용자 정보를 제거
+ */
+export const removeCurrentUser = (): void => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('currentUser');
+  }
+};
+
+/**
  * JWT 토큰 제거 함수
  * 
  * 로그아웃 시 사용하여 저장된 토큰을 안전하게 제거합니다.
@@ -281,6 +318,15 @@ interface SignupResponse {
 export const autoLogin = (): void => {
   console.log('개발용 자동 로그인 - 하드코딩된 토큰 사용');
   setAuthToken(TEMP_AUTH_TOKEN);
+  
+  // Mock 사용자 정보 저장
+  const mockUser = {
+    id: 1,
+    email: 'user@example.com',
+    name: '테스트 사용자'
+  };
+  setCurrentUser(mockUser);
+  
   console.log('자동 로그인 완료');
 };
 
@@ -325,6 +371,8 @@ export const login = async (loginData: LoginRequest): Promise<LoginResponse> => 
 
     // 로그인 성공 시 토큰을 보안 쿠키에 저장
     setAuthToken(mockResponse.token);
+    // 사용자 정보 저장
+    setCurrentUser(mockResponse.user);
     
     console.log('임시 로그인 성공:', mockResponse);
     return mockResponse;
@@ -376,6 +424,8 @@ export const signup = async (signupData: SignupRequest): Promise<SignupResponse>
 
     // 회원가입 성공 시 토큰을 보안 쿠키에 저장
     setAuthToken(mockResponse.token);
+    // 사용자 정보 저장
+    setCurrentUser(mockResponse.user);
     
     console.log('임시 회원가입 성공:', mockResponse);
     return mockResponse;
@@ -411,12 +461,15 @@ export const logout = async (): Promise<void> => {
     
     // 보안 쿠키에서 토큰 제거 (보안 개선)
     removeAuthToken();
+    // 사용자 정보 제거
+    removeCurrentUser();
     
     console.log('로그아웃 완료');
   } catch (error) {
     console.error('로그아웃 중 오류 발생:', error);
-    // 로그아웃은 실패해도 토큰을 제거해야 함
+    // 로그아웃은 실패해도 토큰과 사용자 정보를 제거해야 함
     removeAuthToken();
+    removeCurrentUser();
     throw error;
   }
 };
@@ -485,6 +538,8 @@ export const loginWithServer = async (loginData: LoginRequest): Promise<LoginRes
 
     // 로그인 성공 시 토큰을 보안 쿠키에 저장
     setAuthToken(data.token);
+    // 사용자 정보 저장
+    setCurrentUser(data.user);
 
     return data;
   } catch (error) {
@@ -531,6 +586,8 @@ export const signupWithServer = async (signupData: SignupRequest): Promise<Signu
 
     // 회원가입 성공 시 토큰을 보안 쿠키에 저장
     setAuthToken(data.token);
+    // 사용자 정보 저장
+    setCurrentUser(data.user);
 
     return data;
   } catch (error) {
