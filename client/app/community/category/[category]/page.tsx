@@ -7,6 +7,7 @@ import { ArrowLeft, Filter } from 'lucide-react';
 import PostCard from '@/app/component/community/PostCard'; // PostCard 컴포넌트 import 추가
 import Footer from '@/app/component/common/footer';
 import CloseButton from '@/app/component/common/CloseButton';
+import WritePostButton from '@/app/component/community/WritePostButton';
 
 // Mock 데이터 (실제로는 API에서 가져올 데이터)
 const mockPlants: Plant[] = [
@@ -286,6 +287,7 @@ export default function CategoryPostsPage() {
         </div>
       )}
       <Footer url='community' />
+      <WritePostButton />
     </div>
   );
 }
