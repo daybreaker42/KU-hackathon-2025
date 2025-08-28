@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Heart } from 'lucide-react';
 import { getCommunityPostById, CommunityPost, getCommunityPostComments, Comment as APIComment, CommentsResponse, createCommunityComment, CreateCommentData, updateCommunityComment, UpdateCommentData, deleteCommunityComment } from '@/app/api/communityController'; // API import
+import { getCurrentUser } from '@/app/api/authController'; // 사용자 정보 import
 import BackButton from '@/app/component/common/BackButton';
 import Comments from '@/app/component/community/Comments';
 
@@ -79,12 +80,13 @@ export default function PostDetailPage() {
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<{ id: number; email: string; name: string } | null>(null);
 
-  // 현재 사용자 정보 (TODO: 실제 사용자 정보 API로 교체)
-  const currentUser = {
-    id: 1, // mock 사용자 ID
-    name: "현재 사용자"
-  };
+  // 현재 사용자 정보 가져오기
+  useEffect(() => {
+    const user = getCurrentUser();
+    setCurrentUser(user);
+  }, []);
 
   useEffect(() => {
     if (!postId) return;
@@ -243,6 +245,11 @@ export default function PostDetailPage() {
         <Comments
           comments={comments}
           onAddComment={async (content) => {
+            if (!currentUser) {
+              console.error('사용자 정보가 없습니다. 로그인이 필요합니다.');
+              return;
+            }
+
             try {
               // API 호출
               const commentData: CreateCommentData = { content };
@@ -266,6 +273,11 @@ export default function PostDetailPage() {
             }
           }}
           onAddReply={async (parentId: number, content: string) => {
+            if (!currentUser) {
+              console.error('사용자 정보가 없습니다. 로그인이 필요합니다.');
+              return;
+            }
+
             try {
               // API 호출
               const commentData: CreateCommentData = { content, parent_id: parentId };
@@ -332,7 +344,7 @@ export default function PostDetailPage() {
               );
             }
           }}
-          currentUserId={currentUser.id}
+          currentUserId={currentUser?.id}
         />
       </div>
     </div>
