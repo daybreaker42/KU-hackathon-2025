@@ -1,0 +1,59 @@
+{
+    "access_token": "3xdNkpLRgdYRDwt",
+    "model_version": "plant_id:5.0.0",
+    "custom_id": null,
+    "input": {
+        "latitude": 49.207,
+        "longitude": 16.608,
+        "similar_images": true,
+        "images": [
+            "https://plant.id/media/imgs/6784f10eed47477aac883bb3e4505fa9.jpg"
+        ],
+        "datetime": "2025-08-27T17:45:32.517992+00:00"
+    },
+    "result": {
+        "is_plant": {
+            "probability": 0.9979227,
+            "threshold": 0.5,
+            "binary": true
+        },
+        "classification": {
+            "suggestions": [
+                {
+                    "id": "173fed7c3784f74b",
+                    "name": "Heptapleurum arboricola",
+                    "probability": 0.99,
+                    "similar_images": [
+                        {
+                            "id": "67596d04c1e3515655a143067832585d4edac0a5",
+                            "url": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/675/96d04c1e3515655a143067832585d4edac0a5.jpeg",
+                            "license_name": "CC BY-NC-SA 4.0",
+                            "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+                            "citation": "FlowerChecker s.r.o.",
+                            "similarity": 0.812,
+                            "url_small": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/675/96d04c1e3515655a143067832585d4edac0a5.small.jpeg"
+                        },
+                        {
+                            "id": "e3381c8ba32e94f4cc2c4528e2955286a54137b2",
+                            "url": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/e33/81c8ba32e94f4cc2c4528e2955286a54137b2.jpeg",
+                            "license_name": "CC BY-NC-SA 4.0",
+                            "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+                            "citation": "FlowerChecker s.r.o.",
+                            "similarity": 0.788,
+                            "url_small": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/e33/81c8ba32e94f4cc2c4528e2955286a54137b2.small.jpeg"
+                        }
+                    ],
+                    "details": {
+                        "language": "en",
+                        "entity_id": "173fed7c3784f74b"
+                    }
+                }
+            ]
+        }
+    },
+    "status": "COMPLETED",
+    "sla_compliant_client": true,
+    "sla_compliant_system": true,
+    "created": 1756316732.517992,
+    "completed": 1756316733.076283
+}

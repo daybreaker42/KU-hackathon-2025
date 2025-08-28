@@ -1,0 +1,169 @@
+{
+    "access_token": "KgaMOAptlUD7c4G",
+    "model_version": "plant_id:5.0.0",
+    "custom_id": null,
+    "input": {
+        "latitude": 49.207,
+        "longitude": 16.608,
+        "similar_images": true,
+        "images": [
+            "https://plant.id/media/imgs/fc3b5e6cae664ef78acc73dac761c965.jpg"
+        ],
+        "datetime": "2025-08-27T17:42:54.222402+00:00"
+    },
+    "result": {
+        "classification": {
+            "suggestions": [
+                {
+                    "id": "df87f3209cf3b699",
+                    "name": "Allium lusitanicum",
+                    "probability": 0.0188,
+                    "similar_images": [
+                        {
+                            "id": "273ad9faa6729711b023d6b31b154e01d0aa1e09",
+                            "url": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/273/ad9faa6729711b023d6b31b154e01d0aa1e09.jpeg",
+                            "license_name": "CC BY 4.0",
+                            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+                            "citation": "Francois Mansour",
+                            "similarity": 0.162,
+                            "url_small": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/273/ad9faa6729711b023d6b31b154e01d0aa1e09.small.jpeg"
+                        },
+                        {
+                            "id": "2d44cd27a108e4f354be7f5580dc1961c9cddf40",
+                            "url": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/2d4/4cd27a108e4f354be7f5580dc1961c9cddf40.jpg",
+                            "license_name": "CC BY 4.0",
+                            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+                            "citation": "Pavel Kacl",
+                            "similarity": 0.162,
+                            "url_small": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/2d4/4cd27a108e4f354be7f5580dc1961c9cddf40.small.jpg"
+                        }
+                    ],
+                    "details": {
+                        "language": "en",
+                        "entity_id": "df87f3209cf3b699"
+                    }
+                },
+                {
+                    "id": "ecc8f988a3236f62",
+                    "name": "Atriplex micrantha",
+                    "probability": 0.0138,
+                    "similar_images": [
+                        {
+                            "id": "ef544a91f24ef088889867c6fd5543e8ff768233",
+                            "url": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/ef5/44a91f24ef088889867c6fd5543e8ff768233.jpeg",
+                            "license_name": "CC BY 4.0",
+                            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+                            "citation": "Patrick Hacker",
+                            "similarity": 0.116,
+                            "url_small": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/ef5/44a91f24ef088889867c6fd5543e8ff768233.small.jpeg"
+                        },
+                        {
+                            "id": "9af405810e318f407b23b1d3d1493380d8c25a6b",
+                            "url": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/9af/405810e318f407b23b1d3d1493380d8c25a6b.jpg",
+                            "license_name": "CC BY 4.0",
+                            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+                            "citation": "Andre Hosper",
+                            "similarity": 0.113,
+                            "url_small": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/9af/405810e318f407b23b1d3d1493380d8c25a6b.small.jpg"
+                        }
+                    ],
+                    "details": {
+                        "language": "en",
+                        "entity_id": "ecc8f988a3236f62"
+                    }
+                },
+                {
+                    "id": "654c84dfb04d22ff",
+                    "name": "Polygonum arenastrum",
+                    "probability": 0.0125,
+                    "similar_images": [
+                        {
+                            "id": "7d0ce7c277e39b8b406dd3a64b8cd211a9049a9a",
+                            "url": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/7d0/ce7c277e39b8b406dd3a64b8cd211a9049a9a.jpeg",
+                            "license_name": "CC0",
+                            "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+                            "citation": "Alexey Yabs",
+                            "similarity": 0.152,
+                            "url_small": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/7d0/ce7c277e39b8b406dd3a64b8cd211a9049a9a.small.jpeg"
+                        },
+                        {
+                            "id": "14826566e7a904c5aec69690876677070029248c",
+                            "url": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/148/26566e7a904c5aec69690876677070029248c.jpg",
+                            "similarity": 0.123,
+                            "url_small": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/148/26566e7a904c5aec69690876677070029248c.small.jpg"
+                        }
+                    ],
+                    "details": {
+                        "language": "en",
+                        "entity_id": "654c84dfb04d22ff"
+                    }
+                },
+                {
+                    "id": "e3d0cdb2f8d7bd02",
+                    "name": "Hymenoscyphus",
+                    "probability": 0.0121,
+                    "similar_images": [
+                        {
+                            "id": "853d22f582d5b12a4e890a0f39fd5600a8c7134b",
+                            "url": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/853/d22f582d5b12a4e890a0f39fd5600a8c7134b.jpg",
+                            "license_name": "CC BY 4.0",
+                            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+                            "citation": "Kirsti Anne  Mandal",
+                            "similarity": 0.192,
+                            "url_small": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/853/d22f582d5b12a4e890a0f39fd5600a8c7134b.small.jpg"
+                        },
+                        {
+                            "id": "6c0a02958878b30e6e163f445f3ea552887be614",
+                            "url": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/6c0/a02958878b30e6e163f445f3ea552887be614.jpg",
+                            "license_name": "CC0",
+                            "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+                            "citation": "Jan  Svensson",
+                            "similarity": 0.176,
+                            "url_small": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/6c0/a02958878b30e6e163f445f3ea552887be614.small.jpg"
+                        }
+                    ],
+                    "details": {
+                        "language": "en",
+                        "entity_id": "e3d0cdb2f8d7bd02"
+                    }
+                },
+                {
+                    "id": "8cc155c91e8aa35a",
+                    "name": "Chenopodium",
+                    "probability": 0.0103,
+                    "similar_images": [
+                        {
+                            "id": "45e4e81ea1cf31a7a43f72b41e3477a58f9ae7db",
+                            "url": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/45e/4e81ea1cf31a7a43f72b41e3477a58f9ae7db.jpeg",
+                            "similarity": 0.125,
+                            "url_small": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/45e/4e81ea1cf31a7a43f72b41e3477a58f9ae7db.small.jpeg"
+                        },
+                        {
+                            "id": "13370c951935b12d8ee85246fcb2820e162c0a48",
+                            "url": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/133/70c951935b12d8ee85246fcb2820e162c0a48.jpeg",
+                            "license_name": "CC BY-SA 4.0",
+                            "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+                            "citation": "Fanette Cherki-Bedoret",
+                            "similarity": 0.123,
+                            "url_small": "https://plant-id.ams3.cdn.digitaloceanspaces.com/similar_images/5/133/70c951935b12d8ee85246fcb2820e162c0a48.small.jpeg"
+                        }
+                    ],
+                    "details": {
+                        "language": "en",
+                        "entity_id": "8cc155c91e8aa35a"
+                    }
+                }
+            ]
+        },
+        "is_plant": {
+            "probability": 0.006620609,
+            "threshold": 0.5,
+            "binary": false
+        }
+    },
+    "status": "COMPLETED",
+    "sla_compliant_client": true,
+    "sla_compliant_system": true,
+    "created": 1756316574.222402,
+    "completed": 1756316574.416588
+}
