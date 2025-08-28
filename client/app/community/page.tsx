@@ -2,13 +2,8 @@ import MyPlantsList from "@/app/component/community/MyPlantsList";
 import CommunitySection from "@/app/component/community/CommunitySection";
 import Footer from "@/app/component/common/footer";
 import WritePostButton from "@/app/component/community/WritePostButton";
-// Auth 및 Community API 컨트롤러 import
-import { signup, logout, isAuthenticated, autoLogin } from '@/app/api/authController';
-import { getCommunityPosts, type CommunityResponse } from '@/app/api/communityController';
 
 export default function CommunityPage() {
-
-
   return (
     <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] overflow-hidden"> {/* 배경색을 #FAF6EC로 변경 */}
       {/* 스크롤 가능한 컨텐츠 영역 */}
