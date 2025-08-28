@@ -75,12 +75,26 @@ function PlantCard({ plant }: { plant: Plant }) {
   );
 }
 
+function PlantCardSkeleton() {
+  return (
+    <div>
+      <div className="relative w-full aspect-square mb-[12px] overflow-hidden rounded-[16px] bg-[#E6DFD1] animate-pulse"></div>
+      <div className="space-y-[4px]">
+        <div className="h-[16px] bg-[#E6DFD1] rounded w-[70%] animate-pulse"></div>
+        <div className="h-[12px] bg-[#E6DFD1] rounded w-[50%] animate-pulse"></div>
+      </div>
+    </div>
+  );
+}
+
 export default function MyPlantsPage() {
   const [plants, setPlants] = useState<Plant[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPlants = async () => {
       try {
+        setLoading(true);
         const apiPlants: ApiPlantData[] = await getMyPlants();
         const mappedPlants: Plant[] = apiPlants.map(apiPlant => ({
           id: apiPlant.id,
@@ -94,11 +108,35 @@ export default function MyPlantsPage() {
       } catch (error) {
         console.error("Failed to fetch plants:", error);
         setPlants([]); // 에러 발생 시 빈 배열로 설정
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchPlants();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-[18px] pb-[20px]">
+          {/* 헤더 스켈레톤 */}
+          <div className="flex items-center mb-[24px]">
+            <div className="w-[24px] h-[24px] bg-[#E6DFD1] rounded-full animate-pulse mr-[12px]"></div>
+            <div className="h-[24px] bg-[#E6DFD1] rounded w-[150px] animate-pulse"></div>
+          </div>
+
+          {/* 식물 갤러리 스켈레톤 그리드 */}
+          <div className="grid grid-cols-2 gap-[16px]">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <PlantCardSkeleton key={index} />
+            ))}
+          </div>
+        </div>
+        <PlantManageButtons />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] overflow-hidden">
