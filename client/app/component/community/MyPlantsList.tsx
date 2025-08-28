@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
+// import Image from 'next/image'; // 임시로 주석 처리 - img 태그 테스트 중
 import Link from 'next/link'; // Link import 추가
 // API 및 타입 import
 import { autoLogin, isAuthenticated } from '@/app/api/authController';
@@ -51,10 +51,57 @@ interface Plant {
   createdAt: string;
 }
 
+// 기본 이미지 경로 상수
+const DEFAULT_PLANT_IMAGE = '/images/plant-normal.png';
+
+// 이미지 URL 검증 및 기본 이미지 반환 함수
+const getValidImageUrl = (imageUrl: string | null | undefined): string => {
+  // console.log('🖼️ 이미지 URL 검증 시작:', imageUrl);
+  
+  // 이미지 URL이 없거나 빈 문자열인 경우 기본 이미지 반환
+  if (!imageUrl || imageUrl.trim() === '') {
+    // console.log('❌ 이미지 URL이 없어 기본 이미지 사용:', DEFAULT_PLANT_IMAGE);
+    return DEFAULT_PLANT_IMAGE;
+  }
+
+  // 상대 경로인 경우 그대로 사용
+  if (imageUrl.startsWith('/')) {
+    // console.log('✅ 상대 경로 이미지 URL 사용:', imageUrl);
+    return imageUrl;
+  }
+
+  // HTTP/HTTPS URL인 경우 그대로 사용
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    // console.log('✅ 외부 URL 이미지 사용:', imageUrl);
+    return imageUrl;
+  }
+
+  // 기타 경우 기본 이미지 반환
+  // console.log('❌ 유효하지 않은 이미지 URL, 기본 이미지 사용:', imageUrl, '→', DEFAULT_PLANT_IMAGE);
+  return DEFAULT_PLANT_IMAGE;
+};
+
 export default function MyPlantsList() {
   const [plants, setPlants] = useState<Plant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [imageErrors, setImageErrors] = useState<Set<number>>(new Set()); // 이미지 에러 추적
+
+  // 이미지 에러 핸들러
+  const handleImageError = (plantId: number, originalUrl: string) => {
+    // console.log('❌ 이미지 로드 실패 처리:', { plantId, originalUrl });
+    setImageErrors(prev => new Set(prev).add(plantId));
+  };
+
+  // 이미지 로드 성공 핸들러  
+  const handleImageLoad = (plantId: number, url: string) => {
+    // console.log('✅ 이미지 로드 성공:', { plantId, url });
+    setImageErrors(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(plantId);
+      return newSet;
+    });
+  };
 
   useEffect(() => {
     // 실제 서버에서 내 식물 리스트를 가져오는 함수
@@ -70,8 +117,20 @@ export default function MyPlantsList() {
 
         // 실제 API 호출
         const plantsData = await getMyPlants();
+        // console.log('🌱 API에서 받아온 전체 응답:', plantsData);
+        // console.log('🌱 식물 개수:', plantsData.length);
+        // plantsData.forEach((plant, index) => {
+        //   console.log(`🌱 식물 ${index + 1}:`, {
+        //     id: plant.id,
+        //     name: plant.name,
+        //     variety: plant.variety,
+        //     img_url: plant.img_url,
+        //     img_url_type: typeof plant.img_url,
+        //     img_url_length: plant.img_url?.length || 0,
+        //     valid_url: getValidImageUrl(plant.img_url)
+        //   });
+        // });
         setPlants(plantsData);
-        console.log(`my plants data - ${JSON.stringify(plantsData)}`);
       } catch (err) {
         console.error('식물 리스트 조회 중 오류:', err);
         setError('식물 리스트를 불러오는데 실패했습니다.');
@@ -85,7 +144,7 @@ export default function MyPlantsList() {
         프로덕션에서는 제거 예정입니다.
         
         // 서버 연결 실패 시 Mock 데이터로 fallback
-        console.log('Mock 데이터로 fallback');
+        // console.log('Mock 데이터로 fallback');
         await new Promise(resolve => setTimeout(resolve, 1000));
         setPlants(mockPlants.map(mock => ({
           id: mock.id,
@@ -176,16 +235,15 @@ export default function MyPlantsList() {
             className="flex flex-col w-[100px] flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
           >
             <div className="relative">
-              <Image 
-                src={plant.img_url || '/plant-normal.png'}
+              {/* 이미지 에러가 발생한 경우 기본 이미지 표시 */}
+              <img 
+                src={imageErrors.has(plant.id) ? DEFAULT_PLANT_IMAGE : getValidImageUrl(plant.img_url)}
                 alt={plant.name}
                 width={100}
                 height={100}
                 className="w-[100px] h-[100px] object-cover rounded-lg"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
-                }}
+                onError={() => handleImageError(plant.id, plant.img_url)}
+                onLoad={() => handleImageLoad(plant.id, plant.img_url)}
               />
             </div>
             <div className="mt-[10px] text-center">

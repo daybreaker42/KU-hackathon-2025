@@ -19,7 +19,7 @@ const userPosts: CommunityPost[] = [
     likes: 5,
     comments: 2,
     category: 'daily',
-    hasImage: true,
+    images: ['/images/plant-happy.png'], // hasImage 대신 images 배열 사용
   },
   {
     id: 2,
@@ -30,7 +30,7 @@ const userPosts: CommunityPost[] = [
     likes: 10,
     comments: 4,
     category: 'daily',
-    hasImage: false,
+    images: [], // 빈 배열로 이미지 없음을 표현
   },
   {
     id: 3,
@@ -41,7 +41,7 @@ const userPosts: CommunityPost[] = [
     likes: 15,
     comments: 8,
     category: 'daily',
-    hasImage: true,
+    images: ['/images/plant-normal.png'], // hasImage 대신 images 배열 사용
   },
 ];
 
@@ -66,17 +66,20 @@ export default function UserProfilePage() {
           <h1 className="text-[#023735] font-bold text-[24px]">사용자 프로필</h1>
         </header>
 
-        <main>
-          <section className="flex flex-col items-center gap-4 my-8">
+        <main className='bg-transparent bg-none'>
+          <section className="flex flex-col items-center gap-4 my-8 p-6 rounded-lg shadow-sm">
+            {/* TODO: API 연동: 사용자 프로필 이미지 */}
             <Image
               src="/plant-happy.png" // Placeholder image
               alt="User profile picture"
               width={120}
               height={120}
-              className="rounded-full object-cover"
+              className="rounded-full object-cover border-2 border-[#4A6741]"
             />
             <div className="flex flex-col items-center">
+              {/* TODO: API 연동: 사용자 이름 */}
               <span className="font-bold text-xl text-[#023735]">사용자 이름</span>
+              {/* TODO: API 연동: 사용자 ID (이메일 또는 고유 ID) */}
               <span className="text-md text-gray-500">@myuserid</span>
             </div>
           </section>
@@ -93,9 +96,31 @@ export default function UserProfilePage() {
               <li className="py-5">
                 <h2 className="font-bold text-lg text-[#023735] mb-4">설정</h2>
                 <ul className="space-y-4 text-gray-800">
+                  {/* TODO: API 연동: 프로필 사진 업로드 (PATCH /users/me/profile-image) */}
                   <li className="cursor-pointer hover:font-semibold">프로필 사진 업로드하기</li>
+                  {/* TODO: API 연동: 사용자 이름 변경 (PATCH /users/me/name) */}
                   <li className="cursor-pointer hover:font-semibold">사용자 이름 바꾸기</li>
                 </ul>
+              </li>
+
+              <li className="py-5">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="font-bold text-lg text-[#023735]">내가 작성한 글</h2>
+                  {/* TODO: API 연동: 내가 작성한 글 목록 (GET /users/me/activities 또는 GET /community?authorId=me) */}
+                  <button className="text-[#42CA71] text-[14px] hover:text-[#369F5C] transition-colors">더보기</button>
+                </div>
+                <div className="space-y-3">
+                  {userPosts.map((post) => (
+                    <PostCard
+                      key={post.id}
+                      post={post}
+                      onClick={handlePostClick}
+                      variant="compact"
+                      imagePosition="left"
+                      showAuthor={false}
+                    />
+                  ))}
+                </div>
               </li>
 
               <li className="py-5">
