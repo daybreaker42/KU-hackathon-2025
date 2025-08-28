@@ -19,6 +19,7 @@ const categoryOptions: { value: Category; label: string }[] = [
 interface MyPlant {
   id: number;
   name: string;
+  variety: string;
 }
 
 export default function WritePostPage() {
@@ -29,7 +30,7 @@ export default function WritePostPage() {
   const [images, setImages] = useState<string[]>([]);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [myPlants, setMyPlants] = useState<MyPlant[]>([]);
-  const [selectedPlant, setSelectedPlant] = useState<string>('');
+  const [selectedPlant, setSelectedPlant] = useState<MyPlant | null>(null);
   const [isPlantDropdownOpen, setIsPlantDropdownOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -37,7 +38,7 @@ export default function WritePostPage() {
     const fetchMyPlants = async () => {
       try {
         const plants = await getMyPlants();
-        setMyPlants(plants.map(p => ({ id: p.id, name: p.name })));
+        setMyPlants(plants.map(p => ({ id: p.id, name: p.name, variety: p.variety })));
       } catch (error) {
         console.error('내 식물 목록을 가져오는 데 실패했습니다:', error);
       }
@@ -92,7 +93,7 @@ export default function WritePostPage() {
         title,
         content,
         category,
-        plant_name: category === 'plant' ? selectedPlant : undefined,
+        plant_name: category === 'plant' ? selectedPlant?.variety : undefined,
         images
       });
       alert('게시글이 성공적으로 등록되었습니다.');
@@ -160,7 +161,7 @@ export default function WritePostPage() {
                 onClick={() => setIsPlantDropdownOpen(!isPlantDropdownOpen)}
                 className="w-full flex justify-between items-center px-[15px] py-[10px] bg-white border border-[#E5E0D3] rounded-lg text-[#023735] text-[16px]"
               >
-                <span>{selectedPlant || '내 식물 선택'}</span>
+                <span>{selectedPlant ? `${selectedPlant.name} (${selectedPlant.variety})` : '내 식물 선택'}</span>
                 <ChevronDown size={20} className={`transition-transform ${isPlantDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {isPlantDropdownOpen && (
@@ -169,12 +170,12 @@ export default function WritePostPage() {
                     <li
                       key={plant.id}
                       onClick={() => {
-                        setSelectedPlant(plant.name);
+                        setSelectedPlant(plant);
                         setIsPlantDropdownOpen(false);
                       }}
                       className="px-[15px] py-[10px] hover:bg-[#F5F2E8] cursor-pointer"
                     >
-                      {plant.name}
+                      {`${plant.name} (${plant.variety})`}
                     </li>
                   ))}
                 </ul>
