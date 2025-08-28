@@ -1,6 +1,6 @@
 import MyPlantsList from "@/app/component/community/MyPlantsList";
 import CommunitySection from "@/app/component/community/CommunitySection";
-import Footer from "../component/common/footer";
+import Footer from "@/app/component/common/footer";
 import WritePostButton from "@/app/component/community/WritePostButton";
 
 export default function CommunityPage() {

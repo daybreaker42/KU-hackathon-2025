@@ -4,8 +4,8 @@ import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image'; // next/image import
 import { Camera } from 'lucide-react';
-import BackButton from '../component/common/BackButton';
-import CloseButton from '../component/common/CloseButton';
+import BackButton from '@/app/component/common/BackButton';
+import CloseButton from '@/app/component/common/CloseButton';
 
 interface PlantData {
   name: string;

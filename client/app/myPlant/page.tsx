@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import BackButton from "../component/common/BackButton"; // BackButton 컴포넌트 추가
-import PlantManageButtons from "../component/myPlant/PlantManageButtons"; // 식물 관리 버튼 컴포넌트 추가
+import BackButton from "@/app/component/common/BackButton"; // BackButton 컴포넌트 추가
+import PlantManageButtons from "@/app/component/myPlant/PlantManageButtons"; // 식물 관리 버튼 컴포넌트 추가
 
 // 식물 데이터 타입 정의
 interface Plant {

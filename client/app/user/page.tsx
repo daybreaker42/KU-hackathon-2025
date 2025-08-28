@@ -2,10 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import BackButton from '../component/common/BackButton';
+import BackButton from '@/app/component/common/BackButton';
 import { ChevronRight } from 'lucide-react';
-import PostCard from '../component/community/PostCard';
-import { CommunityPost } from '../types/community/community';
+import PostCard from '@/app/component/community/PostCard';
+import { CommunityPost } from '@/app/types/community/community';
 import { useRouter } from 'next/navigation';
 
 // Mock data for user's posts
