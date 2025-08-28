@@ -7,6 +7,7 @@ import { ArrowLeft, Filter } from 'lucide-react';
 import PostCard from '@/app/component/community/PostCard'; // PostCard 컴포넌트 import 추가
 import Footer from '@/app/component/common/footer';
 import CloseButton from '@/app/component/common/CloseButton';
+import WritePostButton from '@/app/component/community/WritePostButton';
 
 // Mock 데이터 (실제로는 API에서 가져올 데이터)
 const mockPlants: Plant[] = [
@@ -277,15 +278,28 @@ export default function CategoryPostsPage() {
         )}
       </div>
 
-      {/* 무한 스크롤 또는 페이지네이션 영역 (추후 구현) */}
+      {/* 페이지네이션 */}
       {posts.length > 0 && (
-        <div className="mt-[40px] text-center">
-          <button className="text-[#42CA71] text-[14px] hover:text-[#369F5C] transition-colors">
-            더 많은 게시글 보기
+        <div className="flex justify-center items-center mt-[40px] space-x-[8px]">
+          <button className="text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+            &lt;
+          </button>
+          <button className="w-[24px] h-[24px] bg-[#42CA71] text-white text-[14px] rounded">
+            1
+          </button>
+          <button className="w-[24px] h-[24px] text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+            2
+          </button>
+          <button className="w-[24px] h-[24px] text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+            3
+          </button>
+          <button className="text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+            &gt;
           </button>
         </div>
       )}
       <Footer url='community' />
+      <WritePostButton />
     </div>
   );
 }
