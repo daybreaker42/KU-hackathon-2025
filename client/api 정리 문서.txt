@@ -266,13 +266,205 @@ No links
 
 ## 📔 Diary
 ```http
+GET /diaries/memory                       # 중요한 성장일기 조회
+req:
+res:
+[
+  {
+    "id": 1,
+    "title": "몬이의 첫 새잎",
+    "content": "오늘 몬이에게 새로운 잎이 나왔어요! 정말 신기하고 기뻐요. 매일 물을 주고 관찰한 보람이 있네요.",
+    "water": false,
+    "sun": false,
+    "emotion": "happy",
+    "memory": "첫 새잎의 감동",
+    "author": {
+      "id": 1,
+      "name": "김철수"
+    },
+    "createdAt": "2025-08-28T14:10:06.306Z",
+    "updatedAt": "2025-08-28T20:46:39.024Z",
+    "images": [
+      "https://i.ytimg.com/vi/LOPw_hgNtP4/mqdefault.jpg"
+    ],
+    "comments_count": 1
+  },
+  {
+    "id": 2,
+    "title": "세베의 성장 기록",
+    "content": "산세베리아 세베가 한층 더 커진 것 같아요. 잎이 더 두꺼워지고 색깔도 진해졌어요.",
+    "water": false,
+    "sun": false,
+    "emotion": "satisfied",
+    "memory": "꾸준한 성장의 기쁨",
+    "author": {
+      "id": 1,
+      "name": "김철수"
+    },
+    "createdAt": "2025-08-27T14:10:06.306Z",
+    "updatedAt": "2025-08-28T20:46:39.024Z",
+    "images": [
+      "https://i.ytimg.com/vi/LOPw_hgNtP4/mqdefault.jpg"
+    ],
+    "comments_count": 1
+  },
+  {
+    "id": 3,
+    "title": "스킨이 물주기",
+    "content": "스킨답서스는 물을 좋아하는 것 같아요. 며칠 전에 물을 줬는데 벌써 흙이 말랐네요.",
+    "water": false,
+    "sun": false,
+    "emotion": "normal",
+    "memory": "물주기 패턴 파악",
+    "author": {
+      "id": 1,
+      "name": "김철수"
+    },
+    "createdAt": "2025-08-22T14:10:06.306Z",
+    "updatedAt": "2025-08-28T20:46:39.024Z",
+    "images": [
+      "https://i.ytimg.com/vi/LOPw_hgNtP4/mqdefault.jpg"
+    ],
+    "comments_count": 0
+  },
+  {
+    "id": 4,
+    "title": "오늘의 식물 관찰",
+    "content": "모든 식물들이 건강해 보여요. 특히 몬이는 잎이 더 커진 것 같고, 세베는 새로운 촉이 나올 것 같아요.",
+    "water": false,
+    "sun": false,
+    "emotion": "happy",
+    "memory": "전체적인 건강 체크",
+    "author": {
+      "id": 1,
+      "name": "김철수"
+    },
+    "createdAt": "2025-08-20T14:10:06.306Z",
+    "updatedAt": "2025-08-28T20:46:39.024Z",
+    "images": [
+      "https://i.ytimg.com/vi/LOPw_hgNtP4/mqdefault.jpg"
+    ],
+    "comments_count": 0
+  }
+]
 POST /diary                               # 일기 작성
 GET /diary/{date}                         # 특정 날짜 일기 조회
 PATCH /diary/{id}                         # 일기 수정
 DELETE /diary/{id}                        # 일기 삭제
+GET /diaries/{id}/comments                # 일기 댓글 목록 조회
+req:
+Name	Description
+id *
+number
+(path)
+일기 ID
+
+1
+page
+number
+(query)
+페이지 번호
+
+1
+limit
+number
+(query)
+페이지당 항목 수
+
+10
+
+res:
+{
+  "comments": [
+    {
+      "id": 1,
+      "content": "정말 아름다운 일기네요!",
+      "author": {},
+      "createdAt": "2025-08-28T10:00:00Z",
+      "updatedAt": "2025-08-28T10:00:00Z",
+      "parent_id": null,
+      "replies": [
+        null
+      ]
+    }
+  ],
+  "total": 15,
+  "page": 1,
+  "limit": 10,
+  "totalPages": 2
+}
+
 POST /diary/{id}/comments                 # 일기 댓글 작성
+req:
+{
+  "content": "정말 아름다운 일기네요!",
+  "parent_id": 1
+}
+res:
+{
+  "id": 1,
+  "content": "정말 아름다운 일기네요!",
+  "author": {},
+  "createdAt": "2025-08-28T10:00:00Z",
+  "updatedAt": "2025-08-28T10:00:00Z",
+  "parent_id": null,
+  "replies": [
+    null
+  ]
+}
+error - 404 : 일기를 찾을 수 없음
 PATCH /diary/comments/{id}               # 일기 댓글 수정
+req:
+{
+  "content": "수정된 댓글 내용입니다."
+}
+res:
+Responses
+Code	Description	Links
+200	
+댓글 수정 성공
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": 1,
+  "content": "정말 아름다운 일기네요!",
+  "author": {},
+  "createdAt": "2025-08-28T10:00:00Z",
+  "updatedAt": "2025-08-28T10:00:00Z",
+  "parent_id": null,
+  "replies": [
+    null
+  ]
+}
+No links
+403	
+수정 권한 없음
+
+No links
+404	
+댓글을 찾을 수 없음
+
 DELETE /diary/comments/{id}              # 일기 댓글 삭제
+req: id - diary id: number
+res:
+Code	Description	Links
+200	
+댓글 삭제 성공
+
+No links
+403	
+삭제 권한 없음
+
+No links
+404	
+댓글을 찾을 수 없음
+
+
 ```
 
 ## 🧑‍🤝‍🧑 Friends
@@ -293,13 +485,62 @@ GET /friends/activities                   # 친구들의 최근 활동 조회
 GET /users/{id}                           # 사용자 프로필 조회
 GET /users/me/activities                  # 내 활동 조회
 PATCH /users/me/name                      # 이름 변경
+req:
+{
+  "name": "김철수"
+}
+Code	Description	Links
+200	- 이름 변경 성공
+
+Media type
+
+application/json
+Controls Accept header.
+Example Value
+Schema
+{
+  "id": 1,
+  "name": "김민준",
+  "email": "minjun@example.com",
+  "profile_img": "https://s3.amazonaws.com/bucket/profile.jpg",
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "plantCount": 5,
+  "diaryCount": 23,
+  "postCount": 12,
+  "friendCount": 8
+}
+No links
+400	- 잘못된 요청 데이터
 PATCH /users/me/profile-image             # 프로필 사진 변경
+req:
+{
+  "profile_img": "https://s3.amazonaws.com/bucket/new-profile.jpg"
+}
+res:
+{
+  "id": 1,
+  "name": "김민준",
+  "email": "minjun@example.com",
+  "profile_img": "https://s3.amazonaws.com/bucket/profile.jpg",
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "plantCount": 5,
+  "diaryCount": 23,
+  "postCount": 12,
+  "friendCount": 8
+}
 DELETE /users/me/account                  # 회원탈퇴
 ```
 
 ## 🖼️ Image
 ```http
-POST /image/upload/single                 # 단일 이미지 업로드
+POST /image/upload/single?folder=plants                 # 단일 이미지 업로드
+req:
+formdata - key: file / body: image file data
+res:
+{
+  "imageUrl": "https://s3.amazonaws.com/bucket/plants/uuid-filename.jpg"
+}
+
 POST /image/upload/multiple               # 다중 이미지 업로드 (최대 10개)
 DELETE /image/delete                      # 이미지 삭제
 ```
