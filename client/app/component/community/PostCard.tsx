@@ -15,7 +15,7 @@ export default function PostCard({ post, onClick, variant = 'compact' }: PostCar
   return (
     <button
       onClick={() => onClick(post.id)}
-      className="w-full bg-[#F5F2E8] rounded-lg p-[15px] border border-[#E5E0D3] hover:border-[#42CA71] hover:bg-[#F0EDE0] transition-all text-left shadow-sm" // 배경색을 따뜻한 베이지 톤으로 변경
+      className="w-full bg-[#F5F1E7] rounded-lg p-[15px] border border-[#E8E3D5] hover:border-[#42CA71] hover:bg-[#F0ECE0] transition-all text-left shadow-sm" // 새 배경에 맞게 색상 조정
     >
       {/* 게시글 헤더 */}
       <div className="flex justify-between items-start mb-[8px]">
@@ -45,9 +45,9 @@ export default function PostCard({ post, onClick, variant = 'compact' }: PostCar
         
         {/* 이미지 썸네일 (사진이 있는 경우) */}
         {post.hasImage && (
-          <div className={`bg-[#E8E4D6] rounded-lg flex items-center justify-center flex-shrink-0 ${
+          <div className={`bg-[#EFEAD8] rounded-lg flex items-center justify-center flex-shrink-0 ${
             isCompact ? 'w-[50px] h-[50px]' : 'w-[60px] h-[60px]'
-            }`}> {/* 이미지 배경을 베이지 톤으로 변경 */}
+            }`}> {/* 이미지 배경을 새 배경에 맞게 조정 */}
             <span className={isCompact ? 'text-[20px]' : 'text-[24px]'}>🌱</span>
           </div>
         )}
@@ -60,12 +60,12 @@ export default function PostCard({ post, onClick, variant = 'compact' }: PostCar
         </span>
         <div className="flex items-center space-x-[10px]">
           {/* 좋아요 버튼 */}
-          <div className="flex items-center space-x-[4px] text-[#6C757D] text-[12px] border border-[#D0C9B8] bg-[#EFEBE0] rounded-full px-[8px] py-[4px]"> {/* 베이지 톤으로 색상 조정 */}
+          <div className="flex items-center space-x-[4px] text-[#6C757D] text-[12px] border border-[#D4CDB8] bg-[#F0ECE0] rounded-full px-[8px] py-[4px]"> {/* 새 배경에 맞게 색상 조정 */}
             <Heart size={12} />
             <span>{post.likes}</span>
           </div>
           {/* 댓글 버튼 */}
-          <div className="flex items-center space-x-[4px] text-[#6C757D] text-[12px] border border-[#D0C9B8] bg-[#EFEBE0] rounded-full px-[8px] py-[4px]"> {/* 베이지 톤으로 색상 조정 */}
+          <div className="flex items-center space-x-[4px] text-[#6C757D] text-[12px] border border-[#D4CDB8] bg-[#F0ECE0] rounded-full px-[8px] py-[4px]"> {/* 새 배경에 맞게 색상 조정 */}
             <MessageCircle size={12} />
             <span>{post.comments}</span>
           </div>

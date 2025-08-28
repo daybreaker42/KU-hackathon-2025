@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Filter } from 'lucide-react';
 import PostCard from '@/app/component/community/PostCard'; // PostCard 컴포넌트 import 추가
+import Footer from '@/app/component/common/footer';
 
 // Mock 데이터 (실제로는 API에서 가져올 데이터)
 const mockPlants: Plant[] = [
@@ -154,31 +155,31 @@ export default function CategoryPostsPage() {
   // 로딩 상태
   if (loading) {
     return (
-      <div className="p-[18px] bg-[#DED9CC] min-h-screen w-[393px] mx-auto"> {/* 배경색을 #DED9CC로 변경 */}
+      <div className="p-[18px] bg-[#FAF6EC] min-h-screen w-[393px] mx-auto"> {/* 배경색을 #FAF6EC로 변경 */}
         {/* 헤더 스켈레톤 */}
         <div className="flex items-center mb-[20px]">
-          <div className="w-[24px] h-[24px] bg-gray-300 rounded animate-pulse mr-[12px]"></div>
-          <div className="h-[24px] bg-gray-300 rounded w-[150px] animate-pulse"></div>
+          <div className="w-[24px] h-[24px] bg-[#E6DFD1] rounded animate-pulse mr-[12px]"></div> {/* 새 배경에 맞게 색상 조정 */}
+          <div className="h-[24px] bg-[#E6DFD1] rounded w-[150px] animate-pulse"></div>
         </div>
         
         {/* 필터 스켈레톤 */}
         <div className="flex justify-between items-center mb-[20px]">
-          <div className="h-[16px] bg-gray-300 rounded w-[80px] animate-pulse"></div>
-          <div className="h-[32px] bg-gray-300 rounded w-[100px] animate-pulse"></div>
+          <div className="h-[16px] bg-[#E6DFD1] rounded w-[80px] animate-pulse"></div>
+          <div className="h-[32px] bg-[#E6DFD1] rounded w-[100px] animate-pulse"></div>
         </div>
         
         {/* 게시글 리스트 스켈레톤 */}
         <div className="space-y-[15px]">
           {Array.from({ length: 5 }).map((_, index) => (
-            <div key={index} className="bg-[#F0EDE0] rounded-lg p-[15px] animate-pulse border border-[#E5E0D3]"> {/* 베이지 톤으로 조정 */}
-              <div className="h-[20px] bg-[#E0D9C7] rounded mb-[8px] w-[70%]"></div> {/* 스켈레톤 색상 조정 */}
-              <div className="h-[16px] bg-[#E0D9C7] rounded mb-[10px]"></div>
-              <div className="h-[16px] bg-[#E0D9C7] rounded mb-[12px] w-[90%]"></div>
+            <div key={index} className="bg-[#F0ECE0] rounded-lg p-[15px] animate-pulse border border-[#E8E3D5]"> {/* 새 배경에 맞게 색상 조정 */}
+              <div className="h-[20px] bg-[#E6DFD1] rounded mb-[8px] w-[70%]"></div> {/* 스켈레톤 색상 조정 */}
+              <div className="h-[16px] bg-[#E6DFD1] rounded mb-[10px]"></div>
+              <div className="h-[16px] bg-[#E6DFD1] rounded mb-[12px] w-[90%]"></div>
               <div className="flex justify-between items-center">
-                <div className="h-[14px] bg-[#E0D9C7] rounded w-[60px]"></div>
+                <div className="h-[14px] bg-[#E6DFD1] rounded w-[60px]"></div>
                 <div className="flex space-x-[10px]">
-                  <div className="h-[28px] bg-[#E0D9C7] rounded-full w-[50px]"></div>
-                  <div className="h-[28px] bg-[#E0D9C7] rounded-full w-[50px]"></div>
+                  <div className="h-[28px] bg-[#E6DFD1] rounded-full w-[50px]"></div>
+                  <div className="h-[28px] bg-[#E6DFD1] rounded-full w-[50px]"></div>
                 </div>
               </div>
             </div>
@@ -189,14 +190,14 @@ export default function CategoryPostsPage() {
   }
 
   return (
-    <div className="p-[18px] bg-[#DED9CC] min-h-screen w-[393px] mx-auto"> {/* 배경색을 #DED9CC로 변경 */}
+    <div className="p-[18px] bg-[#FAF6EC] min-h-screen w-[393px] mx-auto"> {/* 배경색을 #FAF6EC로 변경 */}
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-[20px]">
         <div className="flex items-center">
           {/* 뒤로가기 버튼 */}
           <button
             onClick={handleBack}
-            className="mr-[12px] p-[4px] hover:bg-[#F0EDE0] rounded-full transition-colors" // hover 색상을 베이지 톤으로 변경
+            className="mr-[12px] p-[4px] hover:bg-[#F0ECE0] rounded-full transition-colors" // hover 색상을 새 배경에 맞게 조정
           >
             <ArrowLeft size={20} className="text-[#023735]" />
           </button>          {/* 페이지 제목 */}
@@ -284,6 +285,7 @@ export default function CategoryPostsPage() {
           </button>
         </div>
       )}
+      <Footer url='community' />
     </div>
   );
 }

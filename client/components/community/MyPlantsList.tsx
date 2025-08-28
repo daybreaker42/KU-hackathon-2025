@@ -77,8 +77,8 @@ export default function MyPlantsList() {
         <div className="flex gap-[15px] overflow-x-auto">
           {[1, 2, 3].map((item) => (
             <div key={item} className="flex flex-col w-[100px] animate-pulse">
-              <div className="w-[100px] h-[100px] bg-[#F0EDE0] rounded-lg border border-[#E5E0D3]"></div> {/* CommunitySection과 동일한 스타일 적용 */}
-              <div className="mt-[10px] h-[20px] bg-[#E0D9C7] rounded w-[80%] mx-auto"></div> {/* 더 세밀한 스켈레톤 디자인 */}
+              <div className="w-[100px] h-[100px] bg-[#F0ECE0] rounded-lg border border-[#E8E3D5]"></div> {/* 새 배경에 맞게 색상 조정 */}
+              <div className="mt-[10px] h-[20px] bg-[#E6DFD1] rounded w-[80%] mx-auto"></div> {/* 더 세밀한 스켈레톤 디자인 */}
             </div>
           ))}
         </div>

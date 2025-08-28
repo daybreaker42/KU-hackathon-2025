@@ -4,6 +4,7 @@ import { CommunityPost, Plant } from '@/app/types/community/community'; // Plant
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // Next.js 라우터 import 추가
 import PostCard from './PostCard'; // PostCard 컴포넌트 import 추가
+import Footer from '../common/footer';
 
 // Mock 식물 데이터 추가
 const mockPlants: Plant[] = [
@@ -137,14 +138,14 @@ export default function CommunitySection({ title, category, plantId, showMoreBut
         </div>
         <div className="space-y-[10px]">
           {[1, 2].map((item) => (
-            <div key={item} className="bg-[#F0EDE0] rounded-lg p-[15px] animate-pulse border border-[#E5E0D3]"> {/* 베이지 톤으로 조정 */}
-              <div className="h-[20px] bg-[#E0D9C7] rounded mb-[8px] w-[60%]"></div> {/* 스켈레톤 색상 조정 */}
-              <div className="h-[16px] bg-[#E0D9C7] rounded mb-[10px]"></div>
+            <div key={item} className="bg-[#F0ECE0] rounded-lg p-[15px] animate-pulse border border-[#E8E3D5]"> {/* 새 배경에 맞게 색상 조정 */}
+              <div className="h-[20px] bg-[#E6DFD1] rounded mb-[8px] w-[60%]"></div> {/* 스켈레톤 색상 조정 */}
+              <div className="h-[16px] bg-[#E6DFD1] rounded mb-[10px]"></div>
               <div className="flex justify-between items-center">
-                <div className="h-[14px] bg-[#E0D9C7] rounded w-[40px]"></div>
+                <div className="h-[14px] bg-[#E6DFD1] rounded w-[40px]"></div>
                 <div className="flex space-x-[10px]">
-                  <div className="h-[14px] bg-[#E0D9C7] rounded w-[30px]"></div>
-                  <div className="h-[14px] bg-[#E0D9C7] rounded w-[30px]"></div>
+                  <div className="h-[14px] bg-[#E6DFD1] rounded w-[30px]"></div>
+                  <div className="h-[14px] bg-[#E6DFD1] rounded w-[30px]"></div>
                 </div>
               </div>
             </div>

@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Heart, RefreshCw } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, Heart, RefreshCw } from 'lucide-react';
 import { CommunityPost } from '@/app/types/community/community';
 
 // Mock 댓글 데이터 타입
@@ -18,7 +18,7 @@ interface Comment {
 const mockPost: CommunityPost = {
   id: 1,
   title: "이거 어떻게 키워요?",
-  content: "제가 식물을 처음 기르는데 여기서 어떻게 이걸 해야할지 모르겠어요. 고수님들 어떻게 해야 하는지 알려주세요 이 귀여운 급전수가 불쌍하지 않으신가요?",
+  content: "제가 식물을 처음 기르는데 여기서 어떻게 이걸 해야할지 모르겠어요. 고수님들 어떻게 해야 하는지 알려주세요 이 귀여운 금전수가 불쌍하지 않으신가요?",
   author: "성준 한",
   timeAgo: "5월 28일",
   likes: 13,
@@ -110,28 +110,28 @@ export default function PostDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen max-h-screen flex flex-col bg-[#DED9CC] w-[393px] mx-auto"> {/* 배경색을 #DED9CC로 변경 */}
+      <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] w-[393px] mx-auto"> {/* 배경색을 #FAF6EC로 변경 */}
         <div className="flex-1 overflow-y-auto p-[18px]">
           {/* 헤더 스켈레톤 */}
           <div className="flex items-center mb-[20px]">
-            <div className="w-[24px] h-[24px] bg-[#E0D9C7] rounded-full animate-pulse mr-[12px]"></div> {/* 스켈레톤 색상을 베이지 톤으로 변경 */}
-            <div className="h-[24px] bg-[#E0D9C7] rounded w-[150px] animate-pulse"></div>
+            <div className="w-[24px] h-[24px] bg-[#E6DFD1] rounded-full animate-pulse mr-[12px]"></div> {/* 스켈레톤 색상을 새 배경에 맞게 조정 */}
+            <div className="h-[24px] bg-[#E6DFD1] rounded w-[150px] animate-pulse"></div>
           </div>
           
           {/* 작성자 정보 스켈레톤 */}
           <div className="flex items-center mb-[20px]">
-            <div className="w-[40px] h-[40px] bg-[#E0D9C7] rounded-full animate-pulse mr-[12px]"></div> {/* 스켈레톤 색상을 베이지 톤으로 변경 */}
+            <div className="w-[40px] h-[40px] bg-[#E6DFD1] rounded-full animate-pulse mr-[12px]"></div> {/* 스켈레톤 색상을 새 배경에 맞게 조정 */}
             <div>
-              <div className="h-[16px] bg-[#E0D9C7] rounded w-[80px] animate-pulse mb-[4px]"></div>
-              <div className="h-[14px] bg-[#E0D9C7] rounded w-[60px] animate-pulse"></div>
+              <div className="h-[16px] bg-[#E6DFD1] rounded w-[80px] animate-pulse mb-[4px]"></div>
+              <div className="h-[14px] bg-[#E6DFD1] rounded w-[60px] animate-pulse"></div>
             </div>
           </div>
           
           {/* 내용 스켈레톤 */}
           <div className="space-y-[8px] mb-[20px]">
-            <div className="h-[16px] bg-[#E0D9C7] rounded animate-pulse"></div>
-            <div className="h-[16px] bg-[#E0D9C7] rounded w-[80%] animate-pulse"></div>
-            <div className="h-[16px] bg-[#E0D9C7] rounded w-[60%] animate-pulse"></div>
+            <div className="h-[16px] bg-[#E6DFD1] rounded animate-pulse"></div>
+            <div className="h-[16px] bg-[#E6DFD1] rounded w-[80%] animate-pulse"></div>
+            <div className="h-[16px] bg-[#E6DFD1] rounded w-[60%] animate-pulse"></div>
           </div>
         </div>
       </div>
@@ -139,8 +139,9 @@ export default function PostDetailPage() {
   }
 
   if (!post) {
+    // post가 없는 경우
     return (
-      <div className="min-h-screen max-h-screen flex flex-col bg-[#DED9CC] w-[393px] mx-auto"> {/* 배경색을 #DED9CC로 변경 */}
+      <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] w-[393px] mx-auto"> {/* 배경색을 #FAF6EC로 변경 */}
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <p className="text-gray-500 mb-[16px]">게시글을 찾을 수 없습니다.</p>
@@ -157,15 +158,15 @@ export default function PostDetailPage() {
   }
 
   return (
-    <div className="min-h-screen max-h-screen flex flex-col bg-[#DED9CC] w-[393px] mx-auto"> {/* 배경색을 #DED9CC로 변경 */}
+    <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] w-[393px] mx-auto"> {/* 배경색을 #FAF6EC로 변경 */}
       <div className="flex-1 overflow-y-auto p-[18px] pb-[100px]">
         {/* 헤더 */}
         <div className="flex items-center mb-[20px]">
           <button 
             onClick={handleBack}
-            className="mr-[12px] p-[4px] hover:bg-[#F0EDE0] rounded-full transition-colors" // hover 색상을 베이지 톤으로 변경
+            className="mr-[12px] w-[54px] h-[54px] border border-[#E6DFD1] rounded-full flex items-center justify-center hover:bg-[#F0ECE0] transition-colors bg-transparent" // 새 배경에 맞게 색상 조정
           >
-            <ArrowLeft size={20} className="text-[#023735]" />
+            <ChevronLeft size={20} className="text-[#023735]" />{/* 뒤로가기 아이콘 변경 */}
           </button>
           <h1 className="text-[#023735] font-medium text-[18px]">
             {post.title}
@@ -174,7 +175,7 @@ export default function PostDetailPage() {
 
         {/* 작성자 정보 */}
         <div className="flex items-center mb-[20px]">
-          <div className="w-[40px] h-[40px] bg-[#E8E4D6] rounded-full flex items-center justify-center mr-[12px]"> {/* 프로필 배경을 베이지 톤으로 변경 */}
+          <div className="w-[40px] h-[40px] bg-[#EFEAD8] rounded-full flex items-center justify-center mr-[12px]"> {/* 프로필 배경을 새 배경에 맞게 조정 */}
             <span className="text-[20px]">👤</span>
           </div>
           <div>
@@ -196,7 +197,7 @@ export default function PostDetailPage() {
             {[1, 2, 3].map((index) => (
               <div
                 key={index}
-                className="w-[120px] h-[120px] bg-[#E8E4D6] rounded-lg flex-shrink-0 flex items-center justify-center" // 이미지 배경을 베이지 톤으로 변경
+                className="w-[120px] h-[120px] bg-[#EFEAD8] rounded-lg flex-shrink-0 flex items-center justify-center" // 이미지 배경을 새 배경에 맞게 조정
               >
                 <span className="text-[#8B7355] text-[12px]">이미지 {index}</span> {/* 텍스트 색상도 조정 */}
               </div>
@@ -209,7 +210,7 @@ export default function PostDetailPage() {
           <button 
             onClick={handleLikeToggle}
             className={`flex items-center space-x-[8px] p-[8px] rounded-lg transition-colors ${
-              isLiked ? 'text-red-500 bg-red-50' : 'text-[#6C757D] hover:bg-[#F0EDE0]' // hover 색상을 베이지 톤으로 변경
+              isLiked ? 'text-red-500 bg-red-50' : 'text-[#6C757D] hover:bg-[#F0ECE0]' // hover 색상을 새 배경에 맞게 조정
             }`}
           >
             <Heart 
@@ -228,7 +229,7 @@ export default function PostDetailPage() {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="댓글을 입력하세요..."
-              className="w-full p-[12px] border border-[#D0C9B8] bg-[#F5F2E8] rounded-lg resize-none h-[80px] text-[14px] focus:outline-none focus:border-[#42CA71] transition-colors" // 베이지 톤으로 색상 변경
+              className="w-full p-[12px] border border-[#D4CDB8] bg-[#F5F1E7] rounded-lg resize-none h-[80px] text-[14px] focus:outline-none focus:border-[#42CA71] transition-colors" // 새 배경에 맞게 색상 변경
             />
             <div className="flex justify-end">
               <button
@@ -261,10 +262,10 @@ export default function PostDetailPage() {
           {/* 댓글 목록 */}
           <div className="space-y-[16px]">
             {comments.map((comment) => (
-              <div key={comment.id} className="border-b border-[#E5E0D3] pb-[16px] last:border-b-0"> {/* 테두리 색상을 베이지 톤으로 변경 */}
+              <div key={comment.id} className="border-b border-[#E8E3D5] pb-[16px] last:border-b-0"> {/* 테두리 색상을 새 배경에 맞게 조정 */}
                 <div className="flex items-start space-x-[12px]">
                   {/* 프로필 이미지 */}
-                  <div className="w-[32px] h-[32px] bg-[#E8E4D6] rounded-full flex items-center justify-center flex-shrink-0"> {/* 프로필 배경을 베이지 톤으로 변경 */}
+                  <div className="w-[32px] h-[32px] bg-[#EFEAD8] rounded-full flex items-center justify-center flex-shrink-0"> {/* 프로필 배경을 새 배경에 맞게 조정 */}
                     <span className="text-[16px]">👤</span>
                   </div>
                   
