@@ -38,7 +38,7 @@ const mapApiPostToUiPost = (apiPost: ApiCommunityPost): CommunityPost => {
     likes: apiPost.likes_count,
     comments: apiPost.comments_count,
     category: apiPost.category as 'question' | 'daily' | 'free' | 'plant',
-    hasImage: apiPost.images && apiPost.images.length > 0,
+    images: apiPost.images, // 이미지 배열 직접 매핑
     plant: apiPost.plant_name ? {
       id: 0,
       name: apiPost.plant_name,
