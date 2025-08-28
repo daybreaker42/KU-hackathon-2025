@@ -7,6 +7,7 @@ import { ChevronRight } from 'lucide-react';
 import PostCard from '@/app/component/community/PostCard';
 import { CommunityPost } from '@/app/types/community/community';
 import { useRouter } from 'next/navigation';
+import { removeAuthToken, removeCurrentUser } from '@/app/api/authController';
 
 // Mock data for user's posts
 const userPosts: CommunityPost[] = [
@@ -53,7 +54,14 @@ export default function UserProfilePage() {
   };
 
   const handleLogout = () => {
+    // 쿠키에서 토큰 삭제
+    removeAuthToken();
     
+    // 로컬 스토리지에서 사용자 정보 삭제
+    removeCurrentUser();
+    
+    // 로그인 페이지로 리다이렉트
+    router.push('/login');
   }
 
   return (

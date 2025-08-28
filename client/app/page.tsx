@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import Footer from "./component/common/footer";
 import Link from "next/link";
-import { getDayDiary, getLastUploaded, getWeeklyDiary } from "./api/homeController";
+import { getDayDiary, getLastUploaded, getWeeklyDiary, getRecentDiaryComments, SimpleDiaryData } from "./api/homeController";
 
 // 타입 정의
 interface NavProps {
@@ -91,7 +91,7 @@ function Todo({ today, todoList }: TodoProps) {
 interface DiaryProps {
   dayIndex: number;
   onClick: (day: number) => void;
-  diaryData?: {title: string; content: string; photo: string | null} | null;
+  diaryData?: SimpleDiaryData | null;
   weeklyDiaryIndexes?: number[];
 }
 
@@ -143,9 +143,9 @@ function Diary({ dayIndex, onClick, diaryData, weeklyDiaryIndexes = [] }: DiaryP
           <div>
             <h3 className={styles.diaryTitle}>{diaryData.title}</h3>
             <div className={styles.diaryContent}>
-                {diaryData.photo && (
+                {diaryData.images && diaryData.images.length > 0 && (
                   <Image 
-                    src={diaryData.photo} 
+                    src={diaryData.images[0]} 
                     alt="Diary Photo" 
                     width={300} 
                     height={200} 
@@ -168,7 +168,7 @@ interface Reaction {
   comment: string;
 }
 
-interface ReactionList {
+export interface ReactionList {
   day: Date;
   title: string;
   list: Reaction[];
@@ -182,7 +182,11 @@ function Reaction({ reactionData }: ReactionProps) {
   return (
     <div className={styles.reactionList}>
       {reactionData.map((reactionList, index) => (
-        <div key={`reaction-list-${index}`} className={styles.reactionDayItem}>
+        <Link 
+          key={`reaction-list-${index}`} 
+          href={`/diary?date=${reactionList.day.getFullYear()}-${String(reactionList.day.getMonth() + 1).padStart(2, '0')}-${String(reactionList.day.getDate()).padStart(2, '0')}`}
+          className={styles.reactionDayItem}
+        >
           <div className={styles.reactionDayHeader}>
             <div className={styles.reactionDay}>{reactionList.day.getDate()}</div>
             <div className={styles.reactionTitle}>{reactionList.title}</div>
@@ -198,7 +202,7 @@ function Reaction({ reactionData }: ReactionProps) {
               )}
             </div>
           ))}
-        </div>
+        </Link>
       ))}
     </div>
   )
@@ -212,7 +216,7 @@ export default function Home() {
   const [today, setToday] = useState<string>("");
   const [todoList, setTodoList] = useState<string[]>([]);
   const [dayIndex, setDayIndex] = useState<number>(0);
-  const [diaryData, setDiaryData] = useState<{title: string; content: string; photo: string | null} | null>(null);
+  const [diaryData, setDiaryData] = useState<SimpleDiaryData | null>(null);
   const [reactionData, setReactionData] = useState<ReactionList[]>([]);
   const [weeklyDiaryIndexes, setWeeklyDiaryIndexes] = useState<number[]>([]);
 
@@ -272,32 +276,16 @@ export default function Home() {
     ];
   }
 
-  const getReactionData = (): ReactionList[] => {
-    return [
-      {
-        day: new Date("2025-08-25"), // 일요일
-        title: "일요일 식물 일기",
-        list: [
-          { user: "엄마", comment: "주말에도 식물을 잘 돌보는구나!" },
-          { user: "할머니", comment: "식물이 더 싱싱해 보이네" }
-        ]
-      },
-      {
-        day: new Date("2025-08-26"), // 월요일
-        title: "월요일 식물 일기",
-        list: [
-          { user: "아빠", comment: "새로운 한 주 시작이네" }
-        ]
-      },
-      {
-        day: new Date("2025-08-27"), // 화요일
-        title: "화요일 식물 일기",
-        list: [
-          { user: "엄마", comment: "잎이 더 많아진 것 같아" },
-          { user: "할머니", comment: "물을 적당히 주는 게 중요해" }
-        ]
-      }
-    ];
+  const getReactionData = async (): Promise<ReactionList[]> => {
+    try {
+      const recentComments = await getRecentDiaryComments();
+      // getRecentDiaryComments 결과를 ReactionList[] 타입으로 변환
+      return recentComments as ReactionList[];
+    } catch (error) {
+      console.error('Error fetching reaction data:', error);
+      // 에러시 기본 데이터 반환
+      return [];
+    }
   }
 
   // 오늘 날짜의 주간 인덱스를 구하는 함수
@@ -310,8 +298,14 @@ export default function Home() {
     setNavText(getNavText());
     setToday(getToday());
     setTodoList(getTodoList());
-    setReactionData(getReactionData()); // 반응 데이터 설정
     setDayIndex(getTodayIndex()); // 오늘 날짜의 인덱스로 초기화
+
+    // 반응 데이터 비동기 로딩
+    const loadReactionData = async () => {
+      const reactionData = await getReactionData();
+      setReactionData(reactionData);
+    };
+    loadReactionData();
 
     // 오늘 일기 가져오기
     const getDiary = async () => {
@@ -414,10 +408,10 @@ export default function Home() {
                 </div>
                 <Diary dayIndex={dayIndex} onClick={handleDayClick} diaryData={diaryData} weeklyDiaryIndexes={weeklyDiaryIndexes}/>
               </div>
-              <div>
+              {reactionData.length !== 0 &&<div>
                 <div className={styles.label}>친구들 반응</div>
                 <Reaction reactionData={reactionData}/>
-              </div>
+              </div>}
           </>}
         </div>
       </div>

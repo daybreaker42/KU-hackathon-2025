@@ -338,132 +338,130 @@ export const autoLogin = (): void => {
 
 /**
  * Mock 로그인 함수 (개발/테스트용)
- * 
- * @param loginData - 로그인 요청 데이터 (이메일, 비밀번호)
- * @returns 로그인 응답 데이터 (토큰, 사용자 정보)
- * 
- * 실제 서버 요청 없이 Mock 데이터로 로그인을 시뮬레이션합니다.
- * UI 테스트와 개발 단계에서 사용하세요.
- * 
- * @example
- * ```typescript
- * const result = await login({ 
- *   email: 'test@example.com', 
- *   password: 'password123' 
- * });
- * console.log(result.user.name); // 사용자 이름 출력
- * ```
- */
-export const login = async (loginData: LoginRequest): Promise<LoginResponse> => {
-  try {
-    // 임시로 서버 요청 없이 하드코딩된 토큰 사용
-    console.log('임시 로그인 - 하드코딩된 토큰 사용:', loginData);
+//  * 
+//  * @param loginData - 로그인 요청 데이터 (이메일, 비밀번호)
+//  * @returns 로그인 응답 데이터 (토큰, 사용자 정보)
+//  * 
+//  * 실제 서버 요청 없이 Mock 데이터로 로그인을 시뮬레이션합니다.
+//  * UI 테스트와 개발 단계에서 사용하세요.
+//  * 
+//  * @example
+//  * ```typescript
+//  * const result = await login({ 
+//  *   email: 'test@example.com', 
+//  *   password: 'password123' 
+//  * });
+//  * console.log(result.user.name); // 사용자 이름 출력
+//  * ```
+//  */
+// export const login = async (loginData: LoginRequest): Promise<LoginResponse> => {
+//   try {
+//     // 임시로 서버 요청 없이 하드코딩된 토큰 사용
+//     console.log('임시 로그인 - 하드코딩된 토큰 사용:', loginData);
 
-    // 실제 서버 요청은 나중에 구현
-    // const response = await apiRequest('/auth/login', {
-    //   method: 'POST',
-    //   body: JSON.stringify(loginData),
-    // }, false);
+//     // 실제 서버 요청은 나중에 구현
+//     // const response = await apiRequest('/auth/login', {
+//     //   method: 'POST',
+//     //   body: JSON.stringify(loginData),
+//     // }, false);
 
-    // 임시 응답 데이터 생성
-    const mockResponse: LoginResponse = {
-      token: TEMP_AUTH_TOKEN, // 하드코딩된 토큰 사용
-      user: {
-        id: 1,
-        email: loginData.email,
-        name: loginData.email === 'user@example.com' ? '테스트 사용자' : '김민준'
-      }
-    };
+//     // 임시 응답 데이터 생성
+//     const mockResponse: LoginResponse = {
+//       token: TEMP_AUTH_TOKEN, // 하드코딩된 토큰 사용
+//       user: {
+//         id: 1,
+//         email: loginData.email,
+//         name: loginData.email === 'user@example.com' ? '테스트 사용자' : '김민준'
+//       }
+//     };
 
-    // 로그인 성공 시 토큰을 보안 쿠키에 저장
-    setAuthToken(mockResponse.token);
-    // 사용자 정보 저장
-    setCurrentUser(mockResponse.user);
+//     // 로그인 성공 시 토큰을 보안 쿠키에 저장
+//     setAuthToken(mockResponse.token);
+//     // 사용자 정보 저장
+//     setCurrentUser(mockResponse.user);
     
-    console.log('임시 로그인 성공:', mockResponse);
-    return mockResponse;
-  } catch (error) {
-    console.error('로그인 중 오류 발생:', error);
-    throw error;
-  }
-};
+//     console.log('임시 로그인 성공:', mockResponse);
+//     return mockResponse;
+//   } catch (error) {
+//     console.error('로그인 중 오류 발생:', error);
+//     throw error;
+//   }
+// };
 
-/**
- * Mock 회원가입 함수 (개발/테스트용)
- * 
- * @param signupData - 회원가입 요청 데이터 (이름, 이메일, 비밀번호)
- * @returns 회원가입 응답 데이터 (토큰, 사용자 정보)
- * 
- * 실제 서버 요청 없이 Mock 데이터로 회원가입을 시뮬레이션합니다.
- * UI 테스트와 개발 단계에서 사용하세요.
- * 
- * @example
- * ```typescript
- * const result = await signup({ 
- *   name: '김민준',
- *   email: 'test@example.com', 
- *   password: 'password123' 
- * });
- * console.log(result.user.name); // '김민준'
- * ```
- */
-export const signup = async (signupData: SignupRequest): Promise<SignupResponse> => {
-  try {
-    // 임시로 서버 요청 없이 하드코딩된 토큰 사용
-    console.log('임시 회원가입 - 하드코딩된 토큰 사용:', signupData);
+// /**
+//  * Mock 회원가입 함수 (개발/테스트용)
+//  * 
+//  * @param signupData - 회원가입 요청 데이터 (이름, 이메일, 비밀번호)
+//  * @returns 회원가입 응답 데이터 (토큰, 사용자 정보)
+//  * 
+//  * 실제 서버 요청 없이 Mock 데이터로 회원가입을 시뮬레이션합니다.
+//  * UI 테스트와 개발 단계에서 사용하세요.
+//  * 
+//  * @example
+//  * ```typescript
+//  * const result = await signup({ 
+//  *   name: '김민준',
+//  *   email: 'test@example.com', 
+//  *   password: 'password123' 
+//  * });
+//  * console.log(result.user.name); // '김민준'
+//  * ```
+//  */
+// export const signup = async (signupData: SignupRequest): Promise<SignupResponse> => {
+//   try {
+//     // 임시로 서버 요청 없이 하드코딩된 토큰 사용
+//     console.log('임시 회원가입 - 하드코딩된 토큰 사용:', signupData);
 
-    // 실제 서버 요청은 나중에 구현
-    // const response = await apiRequest('/auth/signup', {
-    //   method: 'POST',
-    //   body: JSON.stringify(signupData),
-    // }, false);
+//     // 실제 서버 요청은 나중에 구현
+//     // const response = await apiRequest('/auth/signup', {
+//     //   method: 'POST',
+//     //   body: JSON.stringify(signupData),
+//     // }, false);
 
-    // 임시 응답 데이터 생성
-    const mockResponse: SignupResponse = {
-      token: TEMP_AUTH_TOKEN, // 하드코딩된 토큰 사용
-      user: {
-        id: Math.floor(Math.random() * 1000) + 1, // 임시 랜덤 ID
-        email: signupData.email,
-        name: signupData.name
-      }
-    };
+//     // 임시 응답 데이터 생성
+//     const mockResponse: SignupResponse = {
+//       token: TEMP_AUTH_TOKEN, // 하드코딩된 토큰 사용
+//       user: {
+//         id: Math.floor(Math.random() * 1000) + 1, // 임시 랜덤 ID
+//         email: signupData.email,
+//         name: signupData.name
+//       }
+//     };
 
-    // 회원가입 성공 시 토큰을 보안 쿠키에 저장
-    setAuthToken(mockResponse.token);
-    // 사용자 정보 저장
-    setCurrentUser(mockResponse.user);
+//     // 회원가입 성공 시 토큰을 보안 쿠키에 저장
+//     setAuthToken(mockResponse.token);
+//     // 사용자 정보 저장
+//     setCurrentUser(mockResponse.user);
     
-    console.log('임시 회원가입 성공:', mockResponse);
-    return mockResponse;
-  } catch (error) {
-    console.error('회원가입 중 오류 발생:', error);
-    throw error;
-  }
-};
+//     console.log('임시 회원가입 성공:', mockResponse);
+//     return mockResponse;
+//   } catch (error) {
+//     console.error('회원가입 중 오류 발생:', error);
+//     throw error;
+//   }
+// };
 
-/**
- * 로그아웃 함수
- * 
- * @returns Promise<void>
- * 
- * 저장된 인증 토큰을 제거하고 로그아웃 상태로 만듭니다.
- * 선택적으로 서버에 로그아웃 요청을 보낼 수 있습니다.
- * 
- * @example
- * ```typescript
- * try {
- *   await logout();
- *   console.log('로그아웃 완료');
- *   console.log(isAuthenticated()); // false
- * } catch (error) {
- *   console.error('로그아웃 오류:', error);
- * }
- * ```
- */
+// /**
+//  * 로그아웃 함수
+//  * 
+//  * @returns Promise<void>
+//  * 
+//  * 저장된 인증 토큰을 제거하고 로그아웃 상태로 만듭니다.
+//  * 선택적으로 서버에 로그아웃 요청을 보낼 수 있습니다.
+//  * 
+//  * @example
+//  * ```typescript
+//  * try {
+//  *   await logout();
+//  *   console.log('로그아웃 완료');
+//  *   console.log(isAuthenticated()); // false
+//  * } catch (error) {
+//  *   console.error('로그아웃 오류:', error);
+//  * }
+//  * ```
+
 export const logout = async (): Promise<void> => {
   try {
-    // 서버에 로그아웃 요청 (선택사항 - 서버에서 토큰 무효화)
-    // await apiRequest('/auth/logout', { method: 'POST' });
     
     // 보안 쿠키에서 토큰 제거 (보안 개선)
     removeAuthToken();

@@ -1,18 +1,67 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./page.module.css";
 import { getDayDiary, SimpleDiaryData, getMonthlyDiary, MonthlyDiaryData } from "../api/homeController";
 import Comments from "../component/community/Comments";
 import { Comment } from "../types/community/community";
+import { deleteDiary } from "../api/diaryController";
+
+// 로컬 Comment 타입 (authorId 포함)
+interface LocalComment extends Comment {
+  authorId: number;
+}
+
+// 감정 라벨을 이모티콘으로 변환하는 함수
+const getEmotionEmoji = (emotionLabel: string): string => {
+  const emotionMap: { [key: string]: string } = {
+    '기쁨': '😊',
+    '슬픔': '😢',
+    '화남': '😡',
+    '걱정': '😰',
+    '짜증': '😤',
+    '피곤': '😪'
+  };
+  
+  return emotionMap[emotionLabel] || emotionLabel;
+};
 
 export default function DiaryPage() {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [selectedDay, setSelectedDay] = useState<number>(new Date().getDate());
-  const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth());
-  const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
+  const searchParams = useSearchParams();
+  
+  // URL 파라미터에서 날짜 가져오기
+  const getInitialDateFromParams = () => {
+    const dateParam = searchParams.get('date');
+    if (dateParam) {
+      const date = new Date(dateParam);
+      if (!isNaN(date.getTime())) {
+        return {
+          selectedDate: date,
+          selectedDay: date.getDate(),
+          currentMonth: date.getMonth(),
+          currentYear: date.getFullYear()
+        };
+      }
+    }
+    // 기본값은 오늘 날짜
+    const today = new Date();
+    return {
+      selectedDate: today,
+      selectedDay: today.getDate(),
+      currentMonth: today.getMonth(),
+      currentYear: today.getFullYear()
+    };
+  };
+
+  const initialDate = getInitialDateFromParams();
+  
+  const [selectedDate, setSelectedDate] = useState<Date>(initialDate.selectedDate);
+  const [selectedDay, setSelectedDay] = useState<number>(initialDate.selectedDay);
+  const [currentMonth, setCurrentMonth] = useState<number>(initialDate.currentMonth);
+  const [currentYear, setCurrentYear] = useState<number>(initialDate.currentYear);
   const [diaryData, setDiaryData] = useState<SimpleDiaryData | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [isEmotion, setIsEmotion] = useState<boolean>(false);
@@ -177,10 +226,24 @@ export default function DiaryPage() {
   };
 
   useEffect(() => {
-    // 초기 로딩 시 오늘 날짜의 일기 가져오기
-    const today = new Date();
-    handleDateClick(today.getDate());
+    // URL 파라미터에서 지정된 날짜 또는 오늘 날짜의 일기 가져오기
+    handleDateClick(initialDate.selectedDay);
   }, []);
+
+  // URL 파라미터가 변경될 때 날짜 업데이트
+  useEffect(() => {
+    const dateParam = searchParams.get('date');
+    if (dateParam) {
+      const date = new Date(dateParam);
+      if (!isNaN(date.getTime())) {
+        setSelectedDate(date);
+        setSelectedDay(date.getDate());
+        setCurrentMonth(date.getMonth());
+        setCurrentYear(date.getFullYear());
+        handleDateClick(date.getDate());
+      }
+    }
+  }, [searchParams]);
 
   // 월별 일기 데이터 로드
   useEffect(() => {
@@ -197,6 +260,10 @@ export default function DiaryPage() {
     "1월", "2월", "3월", "4월", "5월", "6월",
     "7월", "8월", "9월", "10월", "11월", "12월"
   ];
+
+  const handleDiaryDelete = async () => {
+    await deleteDiary(diaryData?.id || 0);
+  }
 
   return (
     <main>
@@ -278,10 +345,10 @@ export default function DiaryPage() {
           {diaryData ? (
             <div className={styles.diaryContent}>
               <h4 className={styles.diaryTitle}>{diaryData.title}</h4>
-              {diaryData.photo && (
+              {diaryData.images && diaryData.images.length > 0 && (
                 <div className={styles.imageContainer}>
                   <Image
-                    src={diaryData.photo}
+                    src={diaryData.images[0]}
                     alt="일기 사진"
                     width={300}
                     height={200}
@@ -293,11 +360,12 @@ export default function DiaryPage() {
               
               {/* 일기 액션 버튼들 */}
               <div className={styles.diaryActions}>
-                <button className={styles.actionButton}>세밀 촬영ffffffffff</button>
-                <button className={styles.actionButton}>📸</button>
-                <button className={`${styles.actionButton} ${styles.plant}`}>급수</button>
-                <button className={`${styles.actionButton} ${styles.plant}`}>햇빛 조절</button>
+                <button className={styles.actionButton}>{getEmotionEmoji(diaryData.emotion)}</button>
+                {diaryData.memory !== '' && <button className={styles.actionButton}>{diaryData.memory}</button>}
+                {diaryData.water && <button className={`${styles.actionButton} ${styles.plant}`}>급수</button>}
+                {diaryData.sun && <button className={`${styles.actionButton} ${styles.plant}`}>햇빛 조절</button>}
               </div>
+              <div onClick={handleDiaryDelete}>삭제하기</div>
             </div>
           ) : (
             (() => {
@@ -328,7 +396,7 @@ export default function DiaryPage() {
 
         {/* 댓글 섹션 */}
         <Comments
-          comments={comments}
+          comments={comments.map(comment => ({ ...comment, authorId: comment.id }))}
           onAddComment={handleAddComment}
           onAddReply={handleAddReply}
           onRefresh={handleRefresh}

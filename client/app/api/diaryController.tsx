@@ -88,3 +88,22 @@ export async function postDiary(data: {
     throw error;
   }
 }
+
+export async function deleteDiary(diaryId: number) {
+  try {
+    const response = await apiRequest(`/diaries/${diaryId}`, {
+      method: "DELETE"
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error deleting diary:", errorData);
+      throw new Error(errorData.message || "Unknown error");
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error deleting diary:", error);
+    throw error;
+  }
+}

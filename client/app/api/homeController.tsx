@@ -1,12 +1,18 @@
+import { apiRequest } from "./authController";
 
 // 일기 데이터 타입 정의
 interface DiaryData {
     id: number;
     title: string;
     content: string;
-    emotion: string | null;
-    memory: string | null;
-    author: object;
+    emotion: string;
+    memory: string;
+    water: boolean;
+    sun: boolean;
+    author: {
+      id: number;
+      name: string;
+    };
     plant: object | null;
     createdAt: string;
     updatedAt: string;
@@ -16,9 +22,21 @@ interface DiaryData {
 
 // 페이지에서 사용할 간소화된 일기 데이터
 export interface SimpleDiaryData {
+    id: number;
     title: string;
     content: string;
-    photo: string | null;
+    emotion: string;
+    memory: string;
+    water: boolean;
+    sun: boolean;
+    author: {
+      id: number;
+      name: string;
+    };
+    createdAt: string;
+    updatedAt: string;
+    images: string[];
+    comments_count: number;
 }
 
 // 월별 일기 데이터 타입 정의
@@ -58,7 +76,6 @@ export async function getDayDiary(date: Date): Promise<SimpleDiaryData | null> {
       try {
         const data: DiaryData[] = await response.json();
         
-        console.log(data);
         // 배열이 비어있거나 일기가 없는 경우
         if (!data || data.length === 0) {
           return null;
@@ -68,9 +85,18 @@ export async function getDayDiary(date: Date): Promise<SimpleDiaryData | null> {
         const diary = data[0];
         
         return {
+          id: diary.id,
           title: diary.title,
           content: diary.content,
-          photo: diary.images && diary.images.length > 0 ? diary.images[0] : null
+          emotion: diary.emotion,
+          memory: diary.memory,
+          water: diary.water || false,
+          sun: diary.sun || false,
+          author: diary.author,
+          createdAt: diary.createdAt,
+          updatedAt: diary.updatedAt,
+          images: diary.images || [],
+          comments_count: diary.comments_count || 0
         };
       } catch (parseError) {
         console.error('JSON parse error:', parseError);
@@ -90,19 +116,8 @@ export async function getDayDiary(date: Date): Promise<SimpleDiaryData | null> {
   } catch (error) {
     console.error('Network error while fetching diary:', error);
   }
-  
-  // 서버 호출 실패 시 임시 데이터 또는 null 반환
-  const day = date.getDate();
-  
-  // 수요일(3)에는 일기가 없다고 가정
-  if (date.getDay() === 3) return null;
-  
-  // 임시 데이터 반환
-  return {
-    title: `${date.getMonth() + 1}월 ${day}일 일기`,
-    content: `${date.getDay()}번째 요일입니다. 오늘은 땡땡이 한테 물을 줬다. 오늘은 손자가 왔다 등등 왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등왔다 등일기 작성 내용 등 내용 내용 내용 내`,
-    photo: date.getDay() === 2 ? null : `/test/Group 17.png`
-  };
+
+  return null;
 }
 
 /* MONTHLY DIARY */
@@ -203,7 +218,6 @@ export async function getLastUploaded(): Promise<number | null> {
       try {
         const data = await response.json();
 
-        console.log('Last uploaded response data:', data);
         // 새로운 응답 구조에 맞춘 처리: {lastUploadedAt: string, daysSinceLastUpload: number}
         if (typeof data.daysSinceLastUpload === 'number') {
           return data.daysSinceLastUpload;
@@ -225,6 +239,91 @@ export async function getLastUploaded(): Promise<number | null> {
   } catch (error) {
     console.error('Network error while fetching last uploaded days:', error);
   }
+  return null;
+}
+
+// 댓글 데이터 타입 정의
+export interface CommentData {
+  id: number;
+  content: string;
+  author: {
+    id: number;
+    name: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+// 일기별 댓글 조회
+export async function getDiaryComments(diaryId: number): Promise<CommentData[]> {
+  try {
+    const response = await apiRequest(`/diaries/${diaryId}/comments?page=1&limit=3`, {
+      method: 'GET',
+      headers: header,
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      return result.comments;
+    } else {
+      console.error('Failed to fetch diary comments:', response.status, response.statusText);
+    }
+  } catch (error) {
+    console.error('Network error while fetching diary comments:', error);
+  }
+  return [];
+}
+
+// 이번달 최근 3일치 일기의 댓글 조회
+export async function getRecentDiaryComments(): Promise<any[] | null> {
+  try {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1;
+    
+    // 이번달 일기 목록 조회
+    const response = await apiRequest(`/diaries/monthly/${currentYear}/${currentMonth}`, {
+      method: 'GET',
+      headers: header,
+    });
+
+    if (response.ok) {
+      const monthlyData = await response.json();
+      
+      // 일기가 있는 날짜들을 최신순으로 정렬하고 중복 제거 후 최근 3일만 선택
+      const recentDates = monthlyData.diaryDates
+        .filter((date: number, index: number, array: number[]) => array.indexOf(date) === index) // 중복 제거
+        .sort((a: number, b: number) => b - a)
+        .slice(0, 3);
+      
+      const reactionData = [];
+      
+      // 각 날짜의 일기와 댓글 조회
+      for (const date of recentDates) {
+        const diaryDate = new Date(currentYear, currentMonth - 1, date);
+        const diary = await getDayDiary(diaryDate);
+        
+        if (diary) {
+          const comments = await getDiaryComments(diary.id);
+          
+          if (comments.length === 0) continue;
+          reactionData.push({
+            day: diaryDate,
+            title: diary.title,
+            list: comments.map(comment => ({
+              user: comment.author.name,
+              comment: comment.content
+            }))
+          });
+        }
+      }
+      
+      return reactionData;
+    }
+  } catch (error) {
+    console.error('Network error while fetching recent diary comments:', error);
+  }
+  
   return null;
 }
 
