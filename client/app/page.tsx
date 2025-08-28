@@ -3,16 +3,12 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import styles from "./page.module.css";
+import { get } from "http";
 
 // 타입 정의
 interface NavProps {
   text: string;
   img?: string;
-}
-
-interface TimeCategory {
-  text: string;
-  img: string;
 }
 
 function Nav({ text, img }: NavProps) {
@@ -29,16 +25,22 @@ function Nav({ text, img }: NavProps) {
   )
 }
 
-function Plant() {
+interface PlantProps {
+  text: string;
+  img: string;
+}
+
+function Plant({ text, img }: PlantProps) {
   return (
     <div>
-      <h2>식물 컴포넌트</h2>
-      {/* <Image src={currentImg} alt={currentText} width={100} height={100} /> */}
+      <h2>{text}</h2>
+      <Image src={img} alt={text} width={100} height={100} />
     </div>
   )
 }
 
 function Todo() {
+  
   return (
     <div>
       <span>할 일 컴포넌트</span>
@@ -46,30 +48,38 @@ function Todo() {
   );
 }
 
-export default function Home() {
-  const [currentText, setCurrentText] = useState<string>("");
-  const [currentImg, setCurrentImg] = useState<string>("/plant-normal.png");
+function Dairy() {
+  return (
+    <div>
+      작성한  일기
+    </div>
+  )
+}
 
-  const timeCategories: TimeCategory[] = [
-    {
-      text: "좋은 아침 입니다.",
-      img: "/plant-happy.png"
-    },
-    {
-      text: "좋은 점심 입니다.", 
-      img: "/plant-normal.png"
-    },
-    {
-      text: "좋은 저녁 입니다.",
-      img: "/plant-normal.png"
-    },
-    {
-      text: "오늘 하루는 어땠나요?",
-      img: "/plant-sick.png"
-    }
+function Reaction() {
+  return (
+    <div style={{height: '500px'}}>반응</div>
+  )
+}
+
+function Footer() {
+  return (
+    <div className = {styles.footer}>푸터</div>
+  )
+}
+
+export default function Home() {
+  const [navText, setNavText] = useState<string>("");
+  const [plantContent, setPlantContent] = useState<PlantProps>({text: "", img: "/plant-normal.png"});
+
+  const timeCategories: string[] = [
+    "좋은 아침 입니다.",
+    "좋은 점심 입니다.",
+    "좋은 저녁 입니다.",
+    "오늘 하루는 어땠나요?"
   ];
 
-  const getTimeBasedContent = (): TimeCategory => {
+  const getNavText= (): string => {
     const now = new Date();
     const hour: number = now.getHours();
     
@@ -87,18 +97,40 @@ export default function Home() {
     return timeCategories[timeIndex];
   };
 
+  const getPlantContent = (): PlantProps => {
+    return {
+      text: "(식물 애칭)은 기분이 좋아요.",
+      img: "/plant-normal.png"
+    };
+  }
+
   useEffect(() => {
-    const content: TimeCategory = getTimeBasedContent();
-    setCurrentText(content.text);
-    setCurrentImg(content.img);
+    setNavText(getNavText());
+    setPlantContent(getPlantContent());
   }, []);
 
   return (
     <main className={styles.main}>
       <div className={styles.container}>
-        <Nav text={currentText} img={""} />
-        <Plant/>
+        <div className={styles.content}>
+          <Nav text={navText} img={""} />
+          <Plant text={plantContent.text} img={plantContent.img} />
+          <Todo />
+          <Dairy />
+          <Reaction />
+          {/* 추가 컨텐츠 - 스크롤 테스트용 */}
+          <div style={{height: '200px', backgroundColor: '#f3f4f6', margin: '10px 0'}}>
+            추가 컨텐츠 1
+          </div>
+          <div style={{height: '200px', backgroundColor: '#e5e7eb', margin: '10px 0'}}>
+            추가 컨텐츠 2
+          </div>
+          <div style={{height: '200px', backgroundColor: '#d1d5db', margin: '10px 0'}}>
+            추가 컨텐츠 3
+          </div>
+        </div>
       </div>
+      <Footer />
     </main>
   );
 }
