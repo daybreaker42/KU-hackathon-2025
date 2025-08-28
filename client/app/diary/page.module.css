@@ -92,7 +92,7 @@
 .calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  gap: 5px;
   margin-bottom: 30px;
   cursor: grab;
   touch-action: pan-x; /* 수평 터치만 허용 */

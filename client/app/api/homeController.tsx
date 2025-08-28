@@ -23,13 +23,14 @@ export interface SimpleDiaryData {
 
 const header = {
   'Content-Type': 'application/json',
-  'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOjEsImlhdCI6MTc1NjM4OTY4OCwiZXhwIjoxNzU2NDc2MDg4fQ.hJ9Ki7FYZsErWkwpubq03cxZbw4v9SUt5nJASqTXccU`
+  'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOjEsImlhdCI6MTc1NjM4OTY4OCwiZXhwIjoxNzU2NDc2MDg4fQ.hJ9Ki7FYZsErWkwpubq03cxZbw4v9SUt5nJASqTXccU`,
+  'ngrok-skip-browser-warning': 'true', // ngrok 브라우저 경고 스킵
 };
 const url = 'https://0350e7e6e842.ngrok-free.app';
 
+/* DIARY */
 export async function getDayDiary(date: Date): Promise<SimpleDiaryData | null> {
   const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
-  
   try {
     // 실제 서버 API 호출
     const response = await fetch(`${url}/diaries/date/${dateString}`, {
@@ -38,26 +39,44 @@ export async function getDayDiary(date: Date): Promise<SimpleDiaryData | null> {
     });
 
     if (response.ok) {
-      const data: DiaryData[] = await response.json();
-      
-      // 배열이 비어있거나 일기가 없는 경우
-      if (!data || data.length === 0) {
+      // Content-Type 확인
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('Response is not JSON:', contentType);
         return null;
       }
-      
-      // 첫 번째 일기 데이터 사용 (같은 날짜에 여러 일기가 있을 수 있음)
-      const diary = data[0];
-      
-      return {
-        title: diary.title,
-        content: diary.content,
-        photo: diary.images && diary.images.length > 0 ? diary.images[0] : null
-      };
+
+      try {
+        const data: DiaryData[] = await response.json();
+        
+        console.log(data);
+        // 배열이 비어있거나 일기가 없는 경우
+        if (!data || data.length === 0) {
+          return null;
+        }
+        
+        // 첫 번째 일기 데이터 사용 (같은 날짜에 여러 일기가 있을 수 있음)
+        const diary = data[0];
+        
+        return {
+          title: diary.title,
+          content: diary.content,
+          photo: diary.images && diary.images.length > 0 ? diary.images[0] : null
+        };
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        const text = await response.text();
+        console.error('Response text:', text.substring(0, 200));
+        return null;
+      }
     } else if (response.status === 404) {
+      console.log('No diary found for this date (404)');
       // 일기가 없는 경우
       return null;
     } else {
-      console.error('Failed to fetch diary:', response.statusText);
+      console.error('Failed to fetch diary:', response.status, response.statusText);
+      const text = await response.text();
+      console.error('Error response:', text.substring(0, 200));
     }
   } catch (error) {
     console.error('Network error while fetching diary:', error);
@@ -81,28 +100,50 @@ export async function getDayDiary(date: Date): Promise<SimpleDiaryData | null> {
 export async function getLastUploaded(): Promise<number | null> {
   try {
     // 실제 서버 API 호출
-    const response = await fetch(`${url}/diary/lastUpload`, {
+    const response = await fetch(`${url}/diaries/lastUploaded`, {
       method: 'GET',
       headers: header,
     });
 
     if (response.ok) {
-      const data = await response.json();
-      
-      // 서버에서 일수를 반환받는 경우
-      if (typeof data.days === 'number') {
-        return data.days;
+      // Content-Type 확인
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('Response is not JSON:', contentType);
+        return null;
       }
-      
-      // 다른 형태로 데이터가 오는 경우 처리
-      if (typeof data === 'number') {
-        return data;
+
+      try {
+        const data = await response.json();
+        console.log(data);
+        
+        // 새로운 응답 구조에 맞춘 처리: {lastUploadedAt: string, daysSinceLastUpload: number}
+        if (typeof data.daysSinceLastUpload === 'number') {
+          return data.daysSinceLastUpload;
+        }
+        
+        // 이전 구조 지원: {days: number}
+        if (typeof data.days === 'number') {
+          return data.days;
+        }
+        
+        // 숫자만 직접 반환하는 경우
+        if (typeof data === 'number') {
+          return data;
+        }
+        
+        console.error('Unexpected response format:', data);
+        return null;
+      } catch (parseError) {
+        console.error('JSON parse error in getLastUploaded:', parseError);
+        const text = await response.text();
+        console.error('Response text:', text.substring(0, 200));
+        return null;
       }
-      
-      console.error('Unexpected response format:', data);
-      return null;
     } else {
-      console.error('Failed to fetch last uploaded days:', response.statusText);
+      console.error('Failed to fetch last uploaded days:', response.status, response.statusText);
+      const text = await response.text();
+      console.error('Error response:', text.substring(0, 200));
     }
   } catch (error) {
     console.error('Network error while fetching last uploaded days:', error);
