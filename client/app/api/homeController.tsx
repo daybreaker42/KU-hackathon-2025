@@ -1,4 +1,45 @@
 
+export interface ApiPlantData {
+  id: number;
+  name: string;
+  variety: string;
+  img_url: string;
+  status: string;
+  daysUntilWatering: number;
+  lastWatered: string;
+  wateringCycle: string;
+  sunlightNeeds: string;
+  recentEmotion: string;
+}
+
+/* HOME - 성준 추가 */
+export async function getMyPlants(): Promise<ApiPlantData[]> {
+  try {
+    const response = await fetch(`${url}/home/my-plants`, {
+      method: 'GET',
+      headers: getHeaders(),
+    });
+
+    if (response.ok) {
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('Response is not JSON:', contentType);
+        return [];
+      }
+      const data: ApiPlantData[] = await response.json();
+      return data;
+    } else {
+      console.error('Failed to fetch my plants:', response.status, response.statusText);
+      const text = await response.text();
+      console.error('Error response:', text.substring(0, 200));
+      return [];
+    }
+  } catch (error) {
+    console.error('Network error while fetching my plants:', error);
+    return [];
+  }
+}
+
 // 일기 데이터 타입 정의
 interface DiaryData {
     id: number;
@@ -29,11 +70,18 @@ export interface MonthlyDiaryData {
     emotions: { [key: string]: string };
 }
 
-const header = {
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOjEsImlhdCI6MTc1NjM4OTY4OCwiZXhwIjoxNzU2NDc2MDg4fQ.hJ9Ki7FYZsErWkwpubq03cxZbw4v9SUt5nJASqTXccU`,
-  'ngrok-skip-browser-warning': 'true', // ngrok 브라우저 경고 스킵
+import { getAuthToken } from '@/app/api/authController';
+
+const getHeaders = () => {
+  const token = getAuthToken();
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': token ? `Bearer ${token}` : '',
+    'ngrok-skip-browser-warning': 'true', // ngrok 브라우저 경고 스킵
+  };
 };
+const header = getHeaders();
+
 // 환경변수에서 BASE_URL 가져오기 (.env.local에서 관리)
 const url = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
 
