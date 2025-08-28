@@ -26,7 +26,8 @@ const header = {
   'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJzdWIiOjEsImlhdCI6MTc1NjM4OTY4OCwiZXhwIjoxNzU2NDc2MDg4fQ.hJ9Ki7FYZsErWkwpubq03cxZbw4v9SUt5nJASqTXccU`,
   'ngrok-skip-browser-warning': 'true', // ngrok 브라우저 경고 스킵
 };
-const url = 'https://0350e7e6e842.ngrok-free.app';
+// 환경변수에서 BASE_URL 가져오기 (.env.local에서 관리)
+const url = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
 
 /* DIARY */
 export async function getDayDiary(date: Date): Promise<SimpleDiaryData | null> {
