@@ -71,7 +71,6 @@ export default function MyPlantsList() {
         // 실제 API 호출
         const plantsData = await getMyPlants();
         setPlants(plantsData);
-        console.log(`my plants data - ${JSON.stringify(plantsData)}`);
       } catch (err) {
         console.error('식물 리스트 조회 중 오류:', err);
         setError('식물 리스트를 불러오는데 실패했습니다.');
