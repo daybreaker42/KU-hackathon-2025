@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import Footer from "../component/common/footer";
+import BackButton from "../component/common/BackButton"; // BackButton 컴포넌트 추가
 import PlantManageButtons from "../component/myPlant/PlantManageButtons"; // 식물 관리 버튼 컴포넌트 추가
 
 // 식물 데이터 타입 정의
@@ -127,10 +127,11 @@ export default function MyPlantsPage() {
   return (
     <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] overflow-hidden">
       {/* 스크롤 가능한 컨텐츠 영역 */}
-      <div className="flex-1 overflow-y-auto p-[18px] pb-[100px]">
-        {/* 헤더 */}
-        <div className="mb-[24px]">
-          <h1 className="pl-[7px] text-[#023735] font-bold text-[24px]">
+      <div className="flex-1 overflow-y-auto p-[18px] pb-[20px]"> {/* Footer 삭제로 인한 padding 조정 */}
+        {/* 헤더 - BackButton과 제목 */}
+        <div className="flex items-center mb-[24px]">
+          <BackButton className="mr-[12px]" />
+          <h1 className="text-[#023735] font-bold text-[24px]">
             My Plants
           </h1>
         </div>
@@ -170,9 +171,6 @@ export default function MyPlantsPage() {
 
       {/* 식물 관리 버튼들 (추가/삭제) */}
       <PlantManageButtons />
-
-      {/* Footer는 고정 위치 */}
-      <Footer url="myPlant" /> {/* Footer url도 myPlant로 수정 */}
     </div>
   );
 }

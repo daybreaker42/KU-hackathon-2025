@@ -1,16 +1,57 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import BackButton from '../component/common/BackButton';
 import { ChevronRight } from 'lucide-react';
+import PostCard from '../component/community/PostCard';
+import { CommunityPost } from '../types/community/community';
+import { useRouter } from 'next/navigation';
 
 // Mock data for user's posts
-const userPosts = [
-  { id: 1, title: '첫 번째 게시물', content: '이것은 첫 번째 게시물의 내용입니다.' },
-  { id: 2, title: '두 번째 게시물', content: '이것은 두 번째 게시물의 내용입니다.' },
-  { id: 3, title: '세 번째 게시물', content: '이것은 세 번째 게시물의 내용입니다.' },
+const userPosts: CommunityPost[] = [
+  {
+    id: 1,
+    title: '첫 번째 게시물',
+    content: '이것은 첫 번째 게시물의 내용입니다. 사진이 있는 게시물입니다.',
+    author: '@myuserid',
+    timeAgo: '1일전',
+    likes: 5,
+    comments: 2,
+    category: 'daily',
+    hasImage: true,
+  },
+  {
+    id: 2,
+    title: '두 번째 게시물',
+    content: '이것은 두 번째 게시물의 내용입니다. 사진이 없는 게시물입니다.',
+    author: '@myuserid',
+    timeAgo: '2일전',
+    likes: 10,
+    comments: 4,
+    category: 'daily',
+    hasImage: false,
+  },
+  {
+    id: 3,
+    title: '세 번째 게시물',
+    content: '이것은 세 번째 게시물의 내용입니다. 이것도 사진이 있습니다.',
+    author: '@myuserid',
+    timeAgo: '3일전',
+    likes: 15,
+    comments: 8,
+    category: 'daily',
+    hasImage: true,
+  },
 ];
 
 export default function UserProfilePage() {
+  const router = useRouter();
+
+  const handlePostClick = (postId: number) => {
+    router.push(`/community/post/${postId}`);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF6EC]">
       <div className="flex-1 overflow-y-auto p-[18px]">
@@ -22,12 +63,12 @@ export default function UserProfilePage() {
         </header>
 
         <main>
-          <section className="flex items-center gap-4 my-8">
+          <section className="flex flex-col items-center gap-4 my-8">
             <Image
               src="/plant-happy.png" // Placeholder image
               alt="User profile picture"
-              width={80}
-              height={80}
+              width={120}
+              height={120}
               className="rounded-full object-cover"
             />
             <span className="font-bold text-lg text-[#023735]">@myuserid</span>
@@ -54,10 +95,14 @@ export default function UserProfilePage() {
                 <h2 className="font-bold text-lg text-[#023735] mb-4">내가 작성한 글</h2>
                 <div className="space-y-3">
                   {userPosts.map((post) => (
-                    <div key={post.id} className="p-4 bg-white/60 rounded-lg shadow-sm">
-                      <h3 className="font-semibold text-md text-[#023735]">{post.title}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{post.content}</p>
-                    </div>
+                    <PostCard
+                      key={post.id}
+                      post={post}
+                      onClick={handlePostClick}
+                      variant="compact"
+                      imagePosition="left"
+                      showAuthor={false}
+                    />
                   ))}
                 </div>
               </li>
