@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import Footer from "./component/common/footer";
 import Link from "next/link";
-import { getDayDiary } from "./controller";
+import { getDayDiary, getLastUploaded } from "./controller";
 
 // 타입 정의
 interface NavProps {
@@ -44,6 +44,23 @@ function Plant({ text, img }: PlantProps) {
     <div className={styles.plant}>
       <Image className={styles.plantImg} src={img} alt={text} width={100} height={100} />
       <h2 className={styles.plantTitle}>{text}</h2>
+    </div>
+  )
+}
+
+function AddPlantButton() {
+  
+  return (
+    <div className={styles.addPlantContainer}>
+      <Link href="/addPlant" className={styles.addPlantButton}>
+        <div className={styles.addPlantIcon}>
+          <span className="material_symbols_outlined">add</span>
+        </div>
+        <div className={styles.addPlantText}>
+          <span>사진을 찍어서</span>
+          <span>식물을 추가하세요</span>
+        </div>
+      </Link>
     </div>
   )
 }
@@ -188,6 +205,7 @@ function Reaction({ reactionData }: ReactionProps) {
 
 
 export default function Home() {
+  const [condition, setCondition] = useState<number | null>(null);
   const [navText, setNavText] = useState<string>("");
   const [plantContent, setPlantContent] = useState<PlantProps>({text: "", img: "/images/plant-normal.png"});
   const [today, setToday] = useState<string>("");
@@ -195,6 +213,25 @@ export default function Home() {
   const [dayIndex, setDayIndex] = useState<number>(0);
   const [diaryData, setDiaryData] = useState<{title: string; content: string; photo: string | null} | null>(null);
   const [reactionData, setReactionData] = useState<ReactionList[]>([]);
+
+  const plantContentDict = {
+    "happy": {
+      text: "와! 식물이 아주 기분 좋아 보여요! 당신 덕분인걸요?",
+      img: "/images/plant-happy.png"
+    },
+    "normal": {
+      text: `싱그러운 하루, 식물과 함께 조용히 시작해볼까요?`,
+      img: "/images/plant-normal.png"
+    },
+    "sad": {
+      text: `식물이 조금 우울해 보여요. 따뜻한 관심으로 마음을 어루만져 주세요.`,
+      img: "/images/plant-sad.png"
+    },
+    "sick": {
+      text: `식물이 아파하고 있어요. 빠르게 대처하여 건강을 되찾도록 도와주세요.`,
+      img: "/images/plant-sick.png"
+    }
+  }
 
   const timeCategories: string[] = [
     "좋은 아침 입니다.",
@@ -220,13 +257,6 @@ export default function Home() {
     
     return timeCategories[timeIndex];
   };
-
-  const getPlantContent = (): PlantProps => {
-    return {
-      text: "(식물 애칭)은 기분이 좋아요.",
-      img: "/images/plant-normal.png"
-    };
-  }
 
   const getToday = (): string => {
     const now = new Date();
@@ -276,7 +306,6 @@ export default function Home() {
 
   useEffect(() => {
     setNavText(getNavText());
-    setPlantContent(getPlantContent());
     setToday(getToday());
     setTodoList(getTodoList());
     setReactionData(getReactionData()); // 반응 데이터 설정
@@ -288,8 +317,29 @@ export default function Home() {
       setDiaryData(diary);
     };
 
+    const getCondition = async () => {
+      const condition = await getLastUploaded();
+      setCondition(condition);
+    }
+
     getDiary();
+    getCondition();
   }, []);
+
+  useEffect(() => {
+    if (condition !== null) {
+      // 0: happy, 1: normal, 3: sad, 7: sick
+      if (condition === 0) {
+        setPlantContent(plantContentDict["happy"]);
+      } else if (condition === 1) {
+        setPlantContent(plantContentDict["normal"]);
+      } else if (condition < 7) {
+        setPlantContent(plantContentDict["sad"]);
+      } else {
+        setPlantContent(plantContentDict["sick"]);
+      }
+    }
+  }, [condition])
 
   const handleDayClick = async (dayIndex: number) => {
     // 선택된 인덱스에 해당하는 실제 날짜를 계산
@@ -324,16 +374,20 @@ export default function Home() {
       <div className={styles.container}>
         <div className={styles.content}>
           <Nav text={navText} img={""} />
-          <Plant text={plantContent.text} img={plantContent.img} />
-          <Todo today={today} todoList={todoList} />
-          <div>
-            <div className={styles.label}>작성한 일기</div>
-            <Diary dayIndex={dayIndex} onClick={handleDayClick} diaryData={diaryData}/>
-          </div>
-          <div>
-            <div className={styles.label}>친구들 반응</div>
-            <Reaction reactionData={reactionData}/>
-          </div>
+          {condition === null
+          ? <AddPlantButton />
+          : <>
+            <Plant text={plantContent.text} img={plantContent.img} />
+              <Todo today={today} todoList={todoList} />
+              <div>
+                <div className={styles.label}>작성한 일기</div>
+                <Diary dayIndex={dayIndex} onClick={handleDayClick} diaryData={diaryData}/>
+              </div>
+              <div>
+                <div className={styles.label}>친구들 반응</div>
+                <Reaction reactionData={reactionData}/>
+              </div>
+          </>}
         </div>
       </div>
       <Footer url=""/>
