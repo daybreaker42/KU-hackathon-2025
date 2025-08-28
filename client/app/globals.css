@@ -4,7 +4,14 @@
   --background: #ffffff;
   --foreground: #171717;
 
+  /* font color들 */
   --dark-green: #023735;
+  /* 기본 color들 */
+  --fresh-grove: #43C970;
+  --deep-fern: #008261;
+  --forest-night: #003835;
+  --snow-white: #F9F6ED;
+  --solar-bloom: #F9D033;
 }
 
 @theme inline {
