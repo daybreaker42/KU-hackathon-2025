@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import BackButton from "@/app/component/common/BackButton";
-import { getPlantById, PlantDetailData } from "@/app/api/plantController";
+import { getPlantById } from "@/app/api/plantController";
 
 // 식물 데이터 타입 정의 (API 응답과 일치하도록 업데이트)
 interface Plant {
@@ -87,9 +87,9 @@ export default function PlantDetailPage() {
     { id: "4", url: "/images/plant-normal.png", date: "2024-08-10", caption: "건강한 모습" },
   ];
 
-  const [records, setRecords] = useState<PlantRecord[]>(mockRecords);
-  const [memories, setMemories] = useState<Memory[]>(mockMemories);
-  const [gallery, setGallery] = useState<GalleryImage[]>(mockGallery);
+  const [records] = useState<PlantRecord[]>(mockRecords);
+  const [memories] = useState<Memory[]>(mockMemories);
+  const [gallery] = useState<GalleryImage[]>(mockGallery);
 
   useEffect(() => {
     const fetchPlantDetails = async () => {
@@ -132,22 +132,63 @@ export default function PlantDetailPage() {
     fetchPlantDetails();
   }, [plantId]);
 
-  // 다음 급수일 계산
+  // 다음 급수일 계산 함수 개선
   const getNextWateringDate = (): string => {
-    if (!plant) return "";
-    // API 응답에 lastWatered가 없으므로, cycle_value와 cycle_unit을 사용하여 계산해야 합니다.
-    // 현재는 mock 데이터의 lastWatered를 사용하던 로직이므로, API 연동 후 수정 필요
-    // 임시로 purchase_date를 기준으로 계산하거나, 별도의 API가 필요합니다.
-    return "정보 없음";
+    if (!plant) return "정보 없음";
+    
+    try {
+      // purchase_date를 기준으로 cycle_value만큼 더한 날짜 계산
+      const purchaseDate = new Date(plant.purchase_date);
+      const cycleValue = parseInt(plant.cycle_value);
+      
+      if (isNaN(cycleValue)) return "정보 없음";
+      
+      // cycle_unit에 따라 다르게 계산 (일, 주, 월 등)
+      const nextWateringDate = new Date(purchaseDate);
+      
+      if (plant.cycle_unit === "일" || plant.cycle_unit === "days") {
+        nextWateringDate.setDate(purchaseDate.getDate() + cycleValue);
+      } else if (plant.cycle_unit === "주" || plant.cycle_unit === "weeks") {
+        nextWateringDate.setDate(purchaseDate.getDate() + (cycleValue * 7));
+      } else if (plant.cycle_unit === "월" || plant.cycle_unit === "months") {
+        nextWateringDate.setMonth(purchaseDate.getMonth() + cycleValue);
+      } else {
+        return "정보 없음";
+      }
+      
+      return nextWateringDate.toLocaleDateString('ko-KR');
+    } catch (error) {
+      console.error('급수일 계산 오류:', error);
+      return "정보 없음";
+    }
   };
 
-  // 다음 햇빛 쬐기일 계산
+  // 다음 햇빛 쬐기일 계산 함수 개선
   const getNextSunlightDate = (): string => {
-    if (!plant) return "";
-    // API 응답에 lastSunlight가 없으므로, cycle_value와 cycle_unit을 사용하여 계산해야 합니다.
-    // 현재는 mock 데이터의 lastSunlight를 사용하던 로직이므로, API 연동 후 수정 필요
-    // 임시로 purchase_date를 기준으로 계산하거나, 별도의 API가 필요합니다.
-    return "정보 없음";
+    if (!plant) return "정보 없음";
+    
+    // 햇빛은 보통 매일 또는 주기적으로 필요하므로, 
+    // 급수 주기와 다를 수 있지만 현재 API에서는 별도 정보가 없으므로
+    // 임시로 햇빛 요구량에 따라 추천 메시지 반환
+    switch (plant.sunlight_needs) {
+      case "직사광선":
+        return "매일 권장";
+      case "간접광선":
+        return "2-3일마다 권장";
+      case "반그늘":
+        return "일주일에 2-3회 권장";
+      default:
+        return "정보 없음";
+    }
+  };
+
+  // 날짜 포맷팅 함수 추가 (현재 사용되지 않지만 추후 확장 가능)
+  const formatDate = (dateString: string): string => {
+    try {
+      return new Date(dateString).toLocaleDateString('ko-KR');
+    } catch {
+      return "정보 없음";
+    }
   };
 
   // 기록 타입별 아이콘 및 색상
@@ -239,7 +280,7 @@ export default function PlantDetailPage() {
                   <div className="flex justify-between items-center">
                     <span className="text-[#4A6741] text-[14px]">입양일</span>
                     <span className="text-[#023735] text-[14px] font-medium">
-                      {new Date(plant.purchase_date).toLocaleDateString('ko-KR')}
+                      {formatDate(plant.purchase_date)}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
@@ -425,27 +466,24 @@ export default function PlantDetailPage() {
                 </div>
               </div>
 
-              {/* 마지막 활동 정보 */}
+              {/* 식물 기본 정보 요약 */}
               <div className="rounded-[16px] p-[16px] border-2 border-[#E0F2FE] bg-[#F0F9FF]">
                 <h4 className="text-[#023735] font-medium text-[14px] mb-[8px]">
-                  최근 활동
+                  식물 요약 정보
                 </h4>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-[#4A6741] text-[12px]">
-                      {/* API에 lastWatered가 없으므로, 임시로 표시하지 않거나 다른 방식으로 처리 */}
-                      마지막 급수: 정보 없음
+                      등록일: {formatDate(plant.purchase_date)}
                     </p>
                     <p className="text-[#4A6741] text-[12px]">
-                      {/* API에 lastSunlight가 없으므로, 임시로 표시하지 않거나 다른 방식으로 처리 */}
-                      마지막 햇빛: 정보 없음
+                      급수 주기: {plant.cycle_value} {plant.cycle_unit}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[#6B7280] text-[10px]">최근 활동</p>
+                    <p className="text-[#6B7280] text-[10px]">햇빛 요구량</p>
                     <p className="text-[#023735] text-[12px] font-medium">
-                      {/* API에 lastActivity가 없으므로, 임시로 표시하지 않거나 다른 방식으로 처리 */}
-                      정보 없음
+                      {plant.sunlight_needs}
                     </p>
                   </div>
                 </div>
