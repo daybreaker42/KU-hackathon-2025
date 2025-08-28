@@ -181,7 +181,7 @@ export default function CategoryPostsPage() {
       {/* 게시글 수 정보 - 총 개수와 현재 페이지 표시 */}
       <div className="mb-[20px]">
         <span className="text-[#6C757D] text-[14px]">
-          총 {totalPosts}개의 게시글 (페이지 {currentPage}/{totalPages})
+          총 {totalPosts}개의 게시글
           {/* 한 페이지당 최대 {itemsPerPage}개씩 표시 */}
         </span>
       </div>
