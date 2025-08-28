@@ -185,9 +185,9 @@ export default function PlantDetailPage() {
 
   return (
     <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] overflow-hidden">
-      {/* 헤더 */}
-      <div className="flex items-center p-[18px] pb-[8px]">
-        <BackButton className="mr-[12px]" />
+      {/* 헤더 - 중앙정렬 */}
+      <div className="relative flex items-center justify-center p-[18px] pb-[8px]">
+        <BackButton className="absolute left-[18px]" />
         <h1 className="text-[#023735] font-bold text-[20px]">
           {plant.name}
         </h1>
@@ -195,84 +195,79 @@ export default function PlantDetailPage() {
 
       {/* 스크롤 가능한 컨텐츠 영역 */}
       <div className="flex-1 overflow-y-auto">
-        {/* 식물 정보 섹션 */}
-        <div className="px-[18px] pb-[20px]">
-          <div className="bg-white rounded-[20px] p-[20px] shadow-sm">
-            <div className="flex items-center space-x-[16px]">
-              {/* 식물 이미지 */}
-              <div className="relative w-[80px] h-[80px] rounded-[16px] overflow-hidden">
-                <Image
-                  src={plant.image}
-                  alt={plant.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              
-              {/* 식물 기본 정보 */}
-              <div className="flex-1">
-                <h2 className="text-[#023735] font-bold text-[18px] mb-[4px]">
-                  {plant.name}
-                </h2>
-                <p className="text-[#4A6741] text-[14px] mb-[8px]">
-                  {plant.species}
-                </p>
-                <p className="text-[#6B7280] text-[12px]">
-                  입양일: {new Date(plant.adoptionDate).toLocaleDateString('ko-KR')}
-                </p>
-              </div>
-            </div>
-            
+        {/* 식물 프로필 섹션 - 원형 이미지와 세로 배치 */}
+        <div className="px-[18px] pb-[24px] flex flex-col items-center">
+          {/* 원형 식물 이미지 */}
+          <div className="relative w-[120px] h-[120px] rounded-full overflow-hidden mb-[16px] border-4 border-[#E5E7EB]">
+            <Image
+              src={plant.image}
+              alt={plant.name}
+              fill
+              className="object-cover"
+            />
+          </div>
+
+          {/* 식물 정보 - 세로 배치 */}
+          <div className="text-center">
+            <h2 className="text-[#023735] font-bold text-[24px] mb-[8px]">
+              {plant.name}
+            </h2>
+            <p className="text-[#4A6741] text-[16px] mb-[12px]">
+              {plant.species}
+            </p>
+            <p className="text-[#6B7280] text-[14px] mb-[16px]">
+              입양일: {new Date(plant.adoptionDate).toLocaleDateString('ko-KR')}
+            </p>
             {/* 식물 설명 */}
-            <p className="text-[#4A6741] text-[14px] mt-[16px] leading-[1.5]">
+            <p className="text-[#4A6741] text-[14px] leading-[1.6] max-w-[280px]">
               {plant.description}
             </p>
           </div>
         </div>
 
-        {/* 탭 네비게이션 */}
-        <div className="px-[18px] mb-[20px]">
-          <div className="bg-white rounded-[16px] p-[4px] shadow-sm">
-            <div className="grid grid-cols-4 gap-[4px]">
+        {/* 탭 네비게이션 - 스크롤 방식 */}
+        <div className="px-[18px] mb-[24px]">
+          <div className="overflow-x-auto">
+            <div className="flex space-x-[12px] pb-[4px] min-w-max">
               <button
                 onClick={() => setActiveTab("records")}
-                className={`py-[8px] px-[8px] rounded-[12px] text-[12px] font-medium transition-colors ${
+                className={`py-[12px] px-[20px] rounded-[20px] text-[14px] font-medium transition-colors border-2 whitespace-nowrap ${
                   activeTab === "records"
-                    ? "bg-[#4A6741] text-white"
-                    : "text-[#4A6741] hover:bg-[#F3F4F6]"
+                  ? "bg-[#4A6741] text-white border-[#4A6741]"
+                  : "text-[#4A6741] border-[#E5E7EB] hover:border-[#4A6741]"
                 }`}
               >
                 식물 기록
               </button>
               <button
                 onClick={() => setActiveTab("memories")}
-                className={`py-[8px] px-[8px] rounded-[12px] text-[12px] font-medium transition-colors ${
+                className={`py-[12px] px-[20px] rounded-[20px] text-[14px] font-medium transition-colors border-2 whitespace-nowrap ${
                   activeTab === "memories"
-                    ? "bg-[#4A6741] text-white"
-                    : "text-[#4A6741] hover:bg-[#F3F4F6]"
+                  ? "bg-[#4A6741] text-white border-[#4A6741]"
+                  : "text-[#4A6741] border-[#E5E7EB] hover:border-[#4A6741]"
                 }`}
               >
                 Memories
               </button>
               <button
                 onClick={() => setActiveTab("gallery")}
-                className={`py-[8px] px-[8px] rounded-[12px] text-[12px] font-medium transition-colors ${
+                className={`py-[12px] px-[20px] rounded-[20px] text-[14px] font-medium transition-colors border-2 whitespace-nowrap ${
                   activeTab === "gallery"
-                    ? "bg-[#4A6741] text-white"
-                    : "text-[#4A6741] hover:bg-[#F3F4F6]"
+                  ? "bg-[#4A6741] text-white border-[#4A6741]"
+                  : "text-[#4A6741] border-[#E5E7EB] hover:border-[#4A6741]"
                 }`}
               >
                 Gallery
               </button>
               <button
                 onClick={() => setActiveTab("care")}
-                className={`py-[8px] px-[8px] rounded-[12px] text-[12px] font-medium transition-colors ${
+                className={`py-[12px] px-[20px] rounded-[20px] text-[14px] font-medium transition-colors border-2 whitespace-nowrap ${
                   activeTab === "care"
-                    ? "bg-[#4A6741] text-white"
-                    : "text-[#4A6741] hover:bg-[#F3F4F6]"
+                  ? "bg-[#4A6741] text-white border-[#4A6741]"
+                  : "text-[#4A6741] border-[#E5E7EB] hover:border-[#4A6741]"
                 }`}
               >
-                Care
+                Upcoming Care
               </button>
             </div>
           </div>
@@ -283,13 +278,13 @@ export default function PlantDetailPage() {
           {/* 식물 기록 탭 */}
           {activeTab === "records" && (
             <div className="space-y-[12px]">
-              <h3 className="text-[#023735] font-bold text-[16px] mb-[16px]">
+              <h3 className="text-[#023735] font-bold text-[18px] mb-[20px] text-center">
                 최근 활동 기록
               </h3>
               {records.map((record) => {
                 const typeInfo = getRecordTypeInfo(record.type);
                 return (
-                  <div key={record.id} className="bg-white rounded-[16px] p-[16px] shadow-sm">
+                  <div key={record.id} className="rounded-[16px] p-[16px] border border-[#E5E7EB]">
                     <div className="flex items-start space-x-[12px]">
                       <div className={`w-[36px] h-[36px] rounded-[10px] flex items-center justify-center text-[18px] ${typeInfo.color}`}>
                         {typeInfo.icon}
@@ -319,11 +314,11 @@ export default function PlantDetailPage() {
           {/* Memories 탭 */}
           {activeTab === "memories" && (
             <div className="space-y-[12px]">
-              <h3 className="text-[#023735] font-bold text-[16px] mb-[16px]">
+              <h3 className="text-[#023735] font-bold text-[18px] mb-[20px] text-center">
                 소중한 추억들
               </h3>
               {memories.map((memory) => (
-                <div key={memory.id} className="bg-white rounded-[16px] p-[16px] shadow-sm">
+                <div key={memory.id} className="rounded-[16px] p-[16px] border border-[#E5E7EB]">
                   <div className="flex items-start space-x-[12px]">
                     {memory.image && (
                       <div className="relative w-[60px] h-[60px] rounded-[12px] overflow-hidden flex-shrink-0">
@@ -357,14 +352,14 @@ export default function PlantDetailPage() {
           {/* Gallery 탭 */}
           {activeTab === "gallery" && (
             <div>
-              <h3 className="text-[#023735] font-bold text-[16px] mb-[16px]">
+              <h3 className="text-[#023735] font-bold text-[18px] mb-[20px] text-center">
                 성장 갤러리
               </h3>
               <div className="overflow-x-auto">
                 <div className="flex space-x-[12px] pb-[4px]">
                   {gallery.map((image) => (
                     <div key={image.id} className="flex-shrink-0 w-[120px]">
-                      <div className="relative w-[120px] h-[120px] rounded-[12px] overflow-hidden bg-gray-100">
+                      <div className="relative w-[120px] h-[120px] rounded-[12px] overflow-hidden border border-[#E5E7EB]">
                         <Image
                           src={image.url}
                           alt={image.caption || "식물 사진"}
@@ -392,12 +387,12 @@ export default function PlantDetailPage() {
           {/* Upcoming Care 탭 */}
           {activeTab === "care" && (
             <div className="space-y-[12px]">
-              <h3 className="text-[#023735] font-bold text-[16px] mb-[16px]">
+              <h3 className="text-[#023735] font-bold text-[18px] mb-[20px] text-center">
                 다가오는 돌봄 일정
               </h3>
               
               {/* 다음 급수일 */}
-              <div className="bg-white rounded-[16px] p-[16px] shadow-sm">
+              <div className="rounded-[16px] p-[16px] border border-[#E5E7EB]">
                 <div className="flex items-center space-x-[12px]">
                   <div className="w-[40px] h-[40px] rounded-[12px] bg-blue-100 flex items-center justify-center">
                     <span className="text-[20px]">💧</span>
@@ -420,7 +415,7 @@ export default function PlantDetailPage() {
               </div>
 
               {/* 다음 햇빛 쬐기일 */}
-              <div className="bg-white rounded-[16px] p-[16px] shadow-sm">
+              <div className="rounded-[16px] p-[16px] border border-[#E5E7EB]">
                 <div className="flex items-center space-x-[12px]">
                   <div className="w-[40px] h-[40px] rounded-[12px] bg-yellow-100 flex items-center justify-center">
                     <span className="text-[20px]">☀️</span>
@@ -443,7 +438,7 @@ export default function PlantDetailPage() {
               </div>
 
               {/* 마지막 활동 정보 */}
-              <div className="bg-[#F0F9FF] rounded-[16px] p-[16px] border border-[#E0F2FE]">
+              <div className="rounded-[16px] p-[16px] border-2 border-[#E0F2FE] bg-[#F0F9FF]">
                 <h4 className="text-[#023735] font-medium text-[14px] mb-[8px]">
                   최근 활동
                 </h4>
