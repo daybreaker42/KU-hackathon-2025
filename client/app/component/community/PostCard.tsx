@@ -14,7 +14,7 @@ interface PostCardProps {
 export default function PostCard({ post, onClick, variant = 'compact', imagePosition = 'right', showAuthor = true }: PostCardProps) {
   const isCompact = variant === 'compact';
 
-  const imageThumbnail = post.hasImage && (
+  const imageThumbnail = (post.images && post.images.length > 0) && (
     <div className={`bg-[#EFEAD8] rounded-lg flex items-center justify-center flex-shrink-0 ${
       isCompact ? 'w-[50px] h-[50px]' : 'w-[60px] h-[60px]'
       }`}> {/* 이미지 배경을 새 배경에 맞게 조정 */}
