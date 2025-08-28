@@ -484,6 +484,120 @@ GET /friends/activities                   # 친구들의 최근 활동 조회
 ```http
 GET /users/{id}                           # 사용자 프로필 조회
 GET /users/me/activities                  # 내 활동 조회
+res:
+Name	Description
+page
+number
+(query)
+페이지 번호
+
+1
+limit
+number
+(query)
+페이지당 항목 수
+
+10
+
+req:
+{
+  "activities": [
+    {
+      "type": "post",
+      "id": 42,
+      "title": "다들 건강하세요~",
+      "content": "다들 건강하세요~",
+      "createdAt": "2025-08-28T21:03:41.665Z",
+      "likesCount": 0,
+      "commentsCount": 0
+    },
+    {
+      "type": "post",
+      "id": 41,
+      "title": "몬스테라 키우기 팁",
+      "content": "몬스테라를 키우면서 알게 된 유용한 팁들을 공유합니다.",
+      "createdAt": "2025-08-28T21:01:07.164Z",
+      "likesCount": 0,
+      "commentsCount": 0
+    },
+    {
+      "type": "post",
+      "id": 40,
+      "title": "몬스테라 키우기 팁",
+      "content": "몬스테라를 키우면서 알게 된 유용한 팁들을 공유합니다.",
+      "createdAt": "2025-08-28T21:01:06.745Z",
+      "likesCount": 0,
+      "commentsCount": 0
+    },
+    {
+      "type": "post",
+      "id": 39,
+      "title": "몬스테라 키우기 팁",
+      "content": "몬스테라를 키우면서 알게 된 유용한 팁들을 공유합니다.",
+      "createdAt": "2025-08-28T21:01:06.256Z",
+      "likesCount": 0,
+      "commentsCount": 0
+    },
+    {
+      "type": "post",
+      "id": 38,
+      "title": "몬스테라 키우기 팁",
+      "content": "몬스테라를 키우면서 알게 된 유용한 팁들을 공유합니다.",
+      "createdAt": "2025-08-28T21:01:05.618Z",
+      "likesCount": 0,
+      "commentsCount": 0
+    },
+    {
+      "type": "post",
+      "id": 37,
+      "title": "몬스테라 키우기 팁",
+      "content": "몬스테라를 키우면서 알게 된 유용한 팁들을 공유합니다.",
+      "createdAt": "2025-08-28T21:00:59.723Z",
+      "likesCount": 0,
+      "commentsCount": 0
+    },
+    {
+      "type": "post",
+      "id": 36,
+      "title": "몬스테라 키우기 팁",
+      "content": "몬스테라를 키우면서 알게 된 유용한 팁들을 공유합니다.",
+      "createdAt": "2025-08-28T21:00:59.000Z",
+      "likesCount": 0,
+      "commentsCount": 0
+    },
+    {
+      "type": "post",
+      "id": 35,
+      "title": "몬스테라 키우기 팁",
+      "content": "몬스테라를 키우면서 알게 된 유용한 팁들을 공유합니다.",
+      "createdAt": "2025-08-28T21:00:58.512Z",
+      "likesCount": 0,
+      "commentsCount": 0
+    },
+    {
+      "type": "post",
+      "id": 34,
+      "title": "몬스테라 키우기 팁",
+      "content": "몬스테라를 키우면서 알게 된 유용한 팁들을 공유합니다.",
+      "createdAt": "2025-08-28T21:00:58.050Z",
+      "likesCount": 0,
+      "commentsCount": 0
+    },
+    {
+      "type": "post",
+      "id": 33,
+      "title": "몬스테라 키우기 팁",
+      "content": "몬스테라를 키우면서 알게 된 유용한 팁들을 공유합니다.",
+      "createdAt": "2025-08-28T21:00:57.585Z",
+      "likesCount": 0,
+      "commentsCount": 0
+    }
+  ],
+  "total": 68,
+  "page": 1,
+  "limit": 10,
+  "totalPages": 7
+}
 PATCH /users/me/name                      # 이름 변경
 req:
 {
