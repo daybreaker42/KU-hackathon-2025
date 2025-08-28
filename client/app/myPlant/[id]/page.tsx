@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import BackButton from "@/app/component/common/BackButton";
-import { getPlantById } from "@/app/api/plantController";
+import { getPlantById, getPlantImages } from "@/app/api/plantController"; // getPlantImages 추가
 import { getDiaryMemories } from "@/app/api/diaryController"; // 일기 메모리 API 추가
 
 // 식물 데이터 타입 정의 (API 응답과 일치하도록 업데이트)
@@ -63,12 +63,10 @@ interface Memory {
   comments_count: number;
 }
 
-// 갤러리 이미지 타입 (API에 따라 업데이트 필요)
+// 갤러리 이미지 타입 (API 응답 기반으로 수정)
 interface GalleryImage {
-  id: string;
   url: string;
-  date: string;
-  caption?: string;
+  id: string; // URL 기반으로 생성할 고유 ID
 }
 
 export default function PlantDetailPage() {
@@ -82,7 +80,7 @@ export default function PlantDetailPage() {
   // API 연동 - 실제 데이터 사용
   const [records, setRecords] = useState<PlantRecord[]>([]);
   const [memories, setMemories] = useState<Memory[]>([]);
-  const [gallery] = useState<GalleryImage[]>([]);
+  const [gallery, setGallery] = useState<GalleryImage[]>([]); // API에서 갤러리 데이터 로드
 
   useEffect(() => {
     const fetchPlantDetails = async () => {
@@ -137,8 +135,26 @@ export default function PlantDetailPage() {
       }
     };
 
+    const fetchPlantGallery = async () => {
+      try {
+        const galleryData = await getPlantImages();
+        if (galleryData && Array.isArray(galleryData)) {
+          // URL 배열을 GalleryImage 객체 배열로 변환
+          const galleryImages: GalleryImage[] = galleryData.map((url, index) => ({
+            id: `gallery-${index}`, // 인덱스 기반 고유 ID 생성
+            url: url
+          }));
+          setGallery(galleryImages);
+        }
+      } catch (err) {
+        console.error("Failed to fetch plant gallery:", err);
+        // 에러가 나도 다른 정보는 표시되도록 함
+      }
+    };
+
     fetchPlantDetails();
     fetchDiaryMemories();
+    fetchPlantGallery(); // 갤러리 API 호출 추가
   }, [plantId]);
 
   // 다음 급수일 계산 함수 개선
@@ -428,7 +444,7 @@ export default function PlantDetailPage() {
             </div>
           )}
 
-          {/* Gallery 섹션 - API 연동 대기 중 */}
+          {/* Gallery 섹션 - API 연동 완료 */}
           {gallery.length > 0 ? (
             <div>
               <h3 className="text-[#023735] font-bold text-[18px] mb-[16px]">
@@ -441,20 +457,10 @@ export default function PlantDetailPage() {
                       <div className="relative w-[120px] h-[120px] rounded-[12px] overflow-hidden border border-[#E5E7EB]">
                         <Image
                           src={image.url}
-                          alt={image.caption || "식물 사진"}
+                          alt="식물 사진"
                           fill
                           className="object-cover"
                         />
-                      </div>
-                      <div className="mt-[8px]">
-                        <p className="text-[#6B7280] text-[10px]">
-                          {new Date(image.date).toLocaleDateString('ko-KR')}
-                        </p>
-                        {image.caption && (
-                          <p className="text-[#4A6741] text-[11px] mt-[2px] truncate">
-                            {image.caption}
-                          </p>
-                        )}
                       </div>
                     </div>
                   ))}
