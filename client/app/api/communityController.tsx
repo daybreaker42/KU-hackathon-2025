@@ -72,6 +72,10 @@ export interface CommunityQueryParams {
   search?: string;
 }
 
+/**
+ * === Community API 함수들 ===
+ */
+
 // 커뮤니티 게시글 목록 가져오기 API
 export const getCommunityPosts = async (
   params: CommunityQueryParams = {}
@@ -110,6 +114,31 @@ export const getCommunityPosts = async (
     return data;
   } catch (error) {
     console.error('커뮤니티 게시글 조회 중 오류 발생:', error);
+    throw error;
+  }
+};
+
+// 초기 피드 데이터 로드 함수 - question, daily, free 카테고리에서 각각 최신 3개씩
+export const getInitialFeedData = async (): Promise<{
+  question: CommunityPost[];
+  daily: CommunityPost[];
+  free: CommunityPost[];
+}> => {
+  try {
+    // 병렬로 3개 카테고리 데이터 요청
+    const [questionData, dailyData, freeData] = await Promise.all([
+      getCommunityPosts({ category: 'question', page: 1, limit: 3 }),
+      getCommunityPosts({ category: 'daily', page: 1, limit: 3 }),
+      getCommunityPosts({ category: 'free', page: 1, limit: 3 })
+    ]);
+
+    return {
+      question: questionData.posts,
+      daily: dailyData.posts,
+      free: freeData.posts
+    };
+  } catch (error) {
+    console.error('초기 피드 데이터 로드 중 오류 발생:', error);
     throw error;
   }
 };
