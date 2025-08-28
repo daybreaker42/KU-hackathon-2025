@@ -167,9 +167,9 @@ export const removeAuthToken = (): void => {
  * - ngrok-skip-browser-warning: ngrok 경고 스킵
  * - Authorization: Bearer {token} (includeAuth가 true인 경우)
  */
-export const createAuthHeaders = (includeAuth: boolean = true): HeadersInit => {
+export const createAuthHeaders = (includeAuth: boolean = true, isFormData: boolean = false): HeadersInit => {
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
+    'Content-Type': isFormData ? 'multipart/form-data' : 'application/json',
     'ngrok-skip-browser-warning': 'true', // ngrok 브라우저 경고 스킵
   };
 
@@ -198,10 +198,11 @@ export const createAuthHeaders = (includeAuth: boolean = true): HeadersInit => {
 export const apiRequest = async (
   endpoint: string,
   options: RequestInit = {},
-  requireAuth: boolean = true
+  requireAuth: boolean = true,
+  isFormData: boolean = false
 ): Promise<Response> => {
   const url = `${BASE_URL}${endpoint}`;
-  const headers = createAuthHeaders(requireAuth);
+  const headers = createAuthHeaders(requireAuth, isFormData);
 
   const response = await fetch(url, {
     ...options,
