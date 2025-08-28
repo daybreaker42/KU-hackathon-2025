@@ -17,11 +17,11 @@ export default function CommunityPage() {
           category="question"
         />
 
-        {/* 사진 예시 섹션 */}
-        <CommunitySection
-          title="사진 예시"
-          category="photo"
-        />
+        {/* 식물별 카테고리 섹션 */}
+        {/* <CommunitySection
+          title="식물별 카테고리"
+          category="plant"
+        /> */}
 
         {/* 일상 섹션 */}
         <CommunitySection
