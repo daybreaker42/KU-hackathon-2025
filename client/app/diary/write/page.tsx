@@ -52,7 +52,8 @@ export default function DiaryWritePage() {
   });
   
   const [title, setTitle] = useState('');
-  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [content, setContent] = useState('');
   const [selectedMood, setSelectedMood] = useState<string>('😊');
   const [isLoading, setIsLoading] = useState(false);
@@ -151,14 +152,17 @@ export default function DiaryWritePage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      const newImages: string[] = [];
-      Array.from(files).forEach(file => {
+      const newFiles = Array.from(files).slice(0, 3 - selectedImages.length); // 최대 3개까지만
+      const newFileUrls: string[] = [];
+      
+      newFiles.forEach(file => {
         const reader = new FileReader();
         reader.onload = (event) => {
           if (event.target?.result) {
-            newImages.push(event.target.result as string);
-            if (newImages.length === files.length) {
-              setSelectedImages(prev => [...prev, ...newImages].slice(0, 3)); // 최대 3개
+            newFileUrls.push(event.target.result as string);
+            if (newFileUrls.length === newFiles.length) {
+              setSelectedImages(prev => [...prev, ...newFiles]);
+              setImagePreviewUrls(prev => [...prev, ...newFileUrls]);
             }
           }
         };
@@ -170,6 +174,7 @@ export default function DiaryWritePage() {
   // 이미지 제거
   const removeImage = (index: number) => {
     setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    setImagePreviewUrls(prev => prev.filter((_, i) => i !== index));
   };
 
   // 감정 선택
@@ -266,10 +271,10 @@ export default function DiaryWritePage() {
         {/* 이미지 섹션 */}
         <div className={styles.imageSection}>
           <div className={styles.imageContainer}>
-            {selectedImages.map((image, index) => (
+            {imagePreviewUrls.map((imageUrl, index) => (
               <div key={index} className={styles.imageWrapper}>
                 <Image
-                  src={image}
+                  src={imageUrl}
                   alt={`선택된 이미지 ${index + 1}`}
                   width={100}
                   height={100}

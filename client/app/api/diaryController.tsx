@@ -28,7 +28,7 @@ export async function postDiary(data: {
   plant_id: number[]
   water: number[];
   sun: number[];
-  images: string[];
+  images: File[];
 }) {
   try {
 
@@ -46,10 +46,16 @@ export async function postDiary(data: {
     // 이미지가 있으면 먼저 이미지 업로드
     const images = [];
     if (req.images && req.images.length > 0) {
+      // FormData를 사용하여 이미지 업로드
+      const formData = new FormData();
+      req.images.forEach((file, index) => {
+        formData.append(`file`, file);
+      });
+
       res = await apiRequest("/diaries/image", {
         method: "POST",
-        body: JSON.stringify({ file: req.images })
-      });
+        body: formData
+      }, true, true); // FormData 사용을 위해 isFormData=true 전달
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -58,12 +64,12 @@ export async function postDiary(data: {
       }
 
       const result = await res.json();
-      images.push(result);
+      images.push(result.imageUrl);
     }
 
     req.images = images;
     // 다이어리 데이터 전송
-    const response = await apiRequest("/diary", {
+    const response = await apiRequest("/diaries", {
       method: "POST",
       body: JSON.stringify(req)
     });

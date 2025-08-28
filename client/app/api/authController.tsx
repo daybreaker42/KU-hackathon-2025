@@ -206,9 +206,14 @@ export const removeAuthToken = (): void => {
  */
 export const createAuthHeaders = (includeAuth: boolean = true, isFormData: boolean = false): HeadersInit => {
   const headers: HeadersInit = {
-    'Content-Type': isFormData ? 'multipart/form-data' : 'application/json',
     'ngrok-skip-browser-warning': 'true', // ngrok 브라우저 경고 스킵
   };
+
+  // FormData가 아닌 경우에만 Content-Type 설정
+  // FormData의 경우 브라우저가 자동으로 multipart/form-data와 boundary를 설정
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   // 인증이 필요한 경우 Authorization 헤더 추가
   if (includeAuth) {
