@@ -1,103 +1,104 @@
+"use client";
+
 import Image from "next/image";
+import { useState, useEffect } from "react";
+import styles from "./page.module.css";
+
+// 타입 정의
+interface NavProps {
+  text: string;
+  img?: string;
+}
+
+interface TimeCategory {
+  text: string;
+  img: string;
+}
+
+function Nav({ text, img }: NavProps) {
+  return(
+    <div>
+      <h2>{text}</h2>
+      {!img 
+      ? <div><span className="material_symbols_outlined">
+          account_circle
+        </span></div>
+      : <Image src={img} alt={text} width={50} height={50} />
+      }
+    </div>
+  )
+}
+
+function Plant() {
+  return (
+    <div>
+      <h2>식물 컴포넌트</h2>
+      {/* <Image src={currentImg} alt={currentText} width={100} height={100} /> */}
+    </div>
+  )
+}
+
+function Todo() {
+  return (
+    <div>
+      <span>할 일 컴포넌트</span>
+    </div>
+  );
+}
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [currentText, setCurrentText] = useState<string>("");
+  const [currentImg, setCurrentImg] = useState<string>("/plant-normal.png");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  const timeCategories: TimeCategory[] = [
+    {
+      text: "좋은 아침 입니다.",
+      img: "/plant-happy.png"
+    },
+    {
+      text: "좋은 점심 입니다.", 
+      img: "/plant-normal.png"
+    },
+    {
+      text: "좋은 저녁 입니다.",
+      img: "/plant-normal.png"
+    },
+    {
+      text: "오늘 하루는 어땠나요?",
+      img: "/plant-sick.png"
+    }
+  ];
+
+  const getTimeBasedContent = (): TimeCategory => {
+    const now = new Date();
+    const hour: number = now.getHours();
+    
+    let timeIndex: number;
+    if (hour >= 6 && hour < 11) {
+      timeIndex = 0;
+    } else if (hour >= 11 && hour < 16) {
+      timeIndex = 1;
+    } else if (hour >= 16 && hour < 21) {
+      timeIndex = 2;
+    } else {
+      timeIndex = 3;
+    }
+    
+    return timeCategories[timeIndex];
+  };
+
+  useEffect(() => {
+    const content: TimeCategory = getTimeBasedContent();
+    setCurrentText(content.text);
+    setCurrentImg(content.img);
+  }, []);
+
+  return (
+    <main className={styles.main}>
+      <div className={styles.container}>
+        <Nav text={currentText} img={""} />
+        <Plant/>
+      </div>
+    </main>
   );
 }
