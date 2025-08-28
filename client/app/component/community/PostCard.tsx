@@ -1,6 +1,8 @@
 'use client';
 
 import { Heart, MessageCircle } from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
 import { CommunityPost } from '@/app/types/community/community';
 
 interface PostCardProps {
@@ -13,12 +15,31 @@ interface PostCardProps {
 
 export default function PostCard({ post, onClick, variant = 'compact', imagePosition = 'right', showAuthor = true }: PostCardProps) {
   const isCompact = variant === 'compact';
+  const [imageError, setImageError] = useState(false);
 
-  const imageThumbnail = post.hasImage && (
-    <div className={`bg-[#EFEAD8] rounded-lg flex items-center justify-center flex-shrink-0 ${
+  // 이미지 URL 유효성 검사
+  const hasValidImage = post.images && post.images.length > 0 && post.images[0] && post.images[0].trim() !== '';
+
+  const imageThumbnail = hasValidImage && (
+    <div className={`bg-[#EFEAD8] rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden ${
       isCompact ? 'w-[50px] h-[50px]' : 'w-[60px] h-[60px]'
       }`}> {/* 이미지 배경을 새 배경에 맞게 조정 */}
-      <span className={isCompact ? 'text-[20px]' : 'text-[24px]'}>🌱</span>
+      {!imageError ? (
+        <Image 
+          src={post.images![0]} 
+          alt="게시글 이미지"
+          width={isCompact ? 50 : 60}
+          height={isCompact ? 50 : 60}
+          className="w-full h-full object-cover"
+          onError={() => {
+            console.log('이미지 로딩 실패:', post.images![0]); // 디버깅을 위한 로그
+            setImageError(true);
+          }}
+          unoptimized={false} // Next.js 이미지 최적화 사용
+        />
+      ) : (
+        <span className={isCompact ? 'text-[20px]' : 'text-[24px]'}>🌱</span>
+      )}
     </div>
   );
   

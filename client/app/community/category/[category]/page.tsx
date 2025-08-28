@@ -38,7 +38,7 @@ const mapApiPostToUiPost = (apiPost: ApiCommunityPost): CommunityPost => {
     likes: apiPost.likes_count,
     comments: apiPost.comments_count,
     category: apiPost.category as 'question' | 'daily' | 'free' | 'plant',
-    hasImage: apiPost.images && apiPost.images.length > 0,
+    images: apiPost.images, // 이미지 배열 직접 매핑
     plant: apiPost.plant_name ? {
       id: 0,
       name: apiPost.plant_name,
@@ -160,7 +160,7 @@ export default function CategoryPostsPage() {
   }
 
   return (
-    <div className="p-[18px] bg-[#FAF6EC] min-h-screen w-[393px] mx-auto">
+    <div className="p-[18px] pb-[80px] bg-[#FAF6EC] min-h-screen w-[393px] mx-auto">
       {/* 헤더 */}
       <div className="flex flex-col mb-[20px]">
         <div className='flex items-center justify-between'>
@@ -181,7 +181,7 @@ export default function CategoryPostsPage() {
       {/* 게시글 수 정보 - 총 개수와 현재 페이지 표시 */}
       <div className="mb-[20px]">
         <span className="text-[#6C757D] text-[14px]">
-          총 {totalPosts}개의 게시글 (페이지 {currentPage}/{totalPages})
+          총 {totalPosts}개의 게시글
           {/* 한 페이지당 최대 {itemsPerPage}개씩 표시 */}
         </span>
       </div>

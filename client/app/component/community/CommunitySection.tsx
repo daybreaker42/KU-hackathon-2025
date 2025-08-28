@@ -35,7 +35,7 @@ const mapApiPostToUiPost = (apiPost: ApiCommunityPost): CommunityPost => {
     likes: apiPost.likes_count, // likes_count를 likes로 매핑
     comments: apiPost.comments_count, // comments_count를 comments로 매핑
     category: apiPost.category as 'question' | 'daily' | 'free' | 'plant', // 타입 캐스팅
-    hasImage: apiPost.images && apiPost.images.length > 0, // 이미지 여부 확인
+    images: apiPost.images, // 이미지 배열 직접 매핑
     plant: apiPost.plant_name ? { // plant_name이 있으면 Plant 객체 생성
       id: 0, // 임시 ID (추후 서버에서 plant 객체 전체를 반환하면 수정)
       name: apiPost.plant_name,
@@ -105,6 +105,8 @@ export default function CommunitySection({ title, category, plantId, showMoreBut
         
         // 실제 API 호출 - 각 카테고리에서 최신 3개씩 가져오기
         const postsData = await getCommunityPostsByCategory(category, 1, 3);
+
+        // console.log(JSON.stringify(postsData));
 
         // 서버 데이터를 UI 컴포넌트 형태로 변환
         const uiPosts = postsData.posts.map(mapApiPostToUiPost);

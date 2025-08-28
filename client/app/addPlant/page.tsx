@@ -6,17 +6,7 @@ import Image from 'next/image'; // next/image import
 import { Camera } from 'lucide-react';
 import BackButton from '@/app/component/common/BackButton';
 import CloseButton from '@/app/component/common/CloseButton';
-
-interface PlantData {
-  name: string;
-  nickname: string;
-  wateringCycle: number;
-  wateringFrequency: number;
-  wateringDays: string[];
-  purchaseDate?: string;
-  purchasePlace?: string;
-  memo?: string;
-}
+import { uploadPlantImage, createPlant, CreatePlantData } from '@/app/api/communityController'; // API 함수 import
 
 const AddPlantPage: React.FC = () => {
   const router = useRouter();
@@ -25,6 +15,7 @@ const AddPlantPage: React.FC = () => {
   // 상태 관리
   const [step, setStep] = useState(1);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null); // 업로드된 이미지 URL 저장
   const [plantName, setPlantName] = useState('');
   const [nickname, setNickname] = useState('');
   const [wateringCycle, setWateringCycle] = useState<1 | 2 | 3 | 4>(1);
@@ -36,43 +27,49 @@ const AddPlantPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
-  // TODO - 실제로 사진 업로드, 식물 정보 추가 api 연동하기
-
-  // 사진 업로드 핸들러
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // 사진 업로드 핸들러 - 실제 API 연동
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // 미리보기 생성
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target?.result as string);
       };
       reader.readAsDataURL(file);
+
       setStep(2);
-      // API 호출로 식물 이름 추천 받기
-      getPlantSuggestions(file);
+      setLoading(true);
+
+      try {
+        // 실제 이미지 업로드 API 호출
+        const uploadResult = await uploadPlantImage(file);
+        setUploadedImageUrl(uploadResult.imageUrl);
+        console.log('이미지 업로드 성공:', uploadResult.imageUrl);
+
+        // 식물 이름 추천은 현재 임시 데이터 사용 (추후 AI 분석 API 연동 가능)
+        getPlantSuggestions(file);
+      } catch (error) {
+        console.error('이미지 업로드 실패:', error);
+        alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
+        setStep(1);
+        setImagePreview(null);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
-  // 식물 이름 추천 API 호출 (가정)
+  // 식물 이름 추천 API 호출 (현재는 임시 데이터, 향후 AI 분석 API 연동 가능)
   const getPlantSuggestions = async (file: File) => {
-    setLoading(true);
     try {
-      // 실제 API 호출 코드
-      const formData = new FormData();
-      formData.append('image', file);
-      // const response = await fetch('/api/plant-identify', { method: 'POST', body: formData });
-      // const data = await response.json();
-      // setSuggestions(data.suggestions);
-
-      // 임시 데이터 - 실제로는 위의 API 호출로 대체
+      // 현재는 임시 데이터 사용
       console.log('식물 사진 분석 중:', file.name);
       setTimeout(() => {
         setSuggestions(['몬스테라', '필로덴드론', '싱고니움', '호야']);
-        setLoading(false);
-      }, 2000);
+      }, 1000);
     } catch (error) {
       console.error('식물 식별 실패:', error);
-      setLoading(false);
     }
   };
 
@@ -110,22 +107,43 @@ const AddPlantPage: React.FC = () => {
     }
   };
 
-  // 완료 처리
-  const complete = () => {
-    const plantData: PlantData = {
-      name: plantName,
-      nickname,
-      wateringCycle,
-      wateringFrequency,
-      wateringDays: Array.from(wateringDays),
-      purchaseDate: purchaseDate || undefined,
-      purchasePlace: purchasePlace || undefined,
-      memo: memo || undefined,
-    };
+  // 완료 처리 - 실제 식물 등록 API 호출
+  const complete = async () => {
+    if (!uploadedImageUrl) {
+      alert('이미지가 업로드되지 않았습니다.');
+      return;
+    }
 
-    // 데이터 저장 로직 (API 호출 등)
-    console.log('식물 데이터:', plantData);
-    setStep(5);
+    setLoading(true);
+
+    try {
+      // API 요청 데이터 구성
+      const plantApiData: CreatePlantData = {
+        name: nickname, // API에서는 name이 사용자가 지정한 애칭
+        variety: plantName, // variety가 실제 식물 품종
+        img_url: uploadedImageUrl,
+        cycle_type: 'WEEKLY', // 주 단위 고정
+        cycle_value: wateringCycle.toString(),
+        cycle_unit: '일',
+        sunlight_needs: '간접광선', // 기본값 설정
+        purchase_date: purchaseDate ? new Date(purchaseDate).toISOString() : undefined,
+        purchase_location: purchasePlace || undefined,
+        memo: memo || undefined,
+      };
+
+      // console.log(plantApiData.img_url);
+
+      // 실제 식물 등록 API 호출
+      const result = await createPlant(plantApiData);
+      console.log('식물 등록 성공:', result);
+
+      setStep(5);
+    } catch (error) {
+      console.error('식물 등록 실패:', error);
+      alert('식물 등록에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // 홈으로 이동
@@ -156,7 +174,20 @@ const AddPlantPage: React.FC = () => {
   const renderStep2 = () => (
     <div className="flex flex-col items-center gap-6">
       {imagePreview && (
-        <img src={imagePreview} alt="식물 사진" className="max-w-64 max-h-64 rounded-lg shadow-md border-4 border-[#4CAF50]" />
+        <div className="relative">
+          <Image
+            src={imagePreview}
+            alt="식물 사진"
+            width={256}
+            height={256}
+            className="max-w-64 max-h-64 rounded-lg shadow-md border-4 border-[#4CAF50] object-cover"
+          />
+          {loading && (
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
+              <div className="text-white text-sm">업로드 중...</div>
+            </div>
+          )}
+        </div>
       )}
       <div className="w-full max-w-md flex flex-col gap-4">
         <div className="flex flex-col gap-2">
@@ -167,6 +198,7 @@ const AddPlantPage: React.FC = () => {
             onChange={(e) => setPlantName(e.target.value)}
             placeholder="식물 품종을 입력하세요"
             className="px-4 py-3 border-2 border-[#4CAF50] rounded-lg focus:outline-none focus:border-[#4CAF50]"
+            disabled={loading}
           />
         </div>
 
@@ -197,10 +229,15 @@ const AddPlantPage: React.FC = () => {
             onChange={(e) => setNickname(e.target.value)}
             placeholder="식물의 애칭을 입력하세요"
             className="px-4 py-3 border-2 border-[#4CAF50] rounded-lg focus:outline-none focus:border-[#4CAF50]"
+            disabled={loading}
           />
         </div>
 
-        <button className="px-6 py-3 bg-[#4CAF50] text-white rounded-lg hover:bg-[#45a049] transition-colors mt-4" onClick={nextStep}>
+        <button
+          className="px-6 py-3 bg-[#4CAF50] text-white rounded-lg hover:bg-[#45a049] transition-colors mt-4 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          onClick={nextStep}
+          disabled={loading}
+        >
           다음으로
         </button>
       </div>
@@ -307,9 +344,13 @@ const AddPlantPage: React.FC = () => {
           />
         </div>
 
-          <button className="px-6 py-3 bg-[#4CAF50] text-white rounded-lg hover:bg-[#45a049] transition-colors mt-4" onClick={complete}>
-          완료하기
-        </button>
+          <button
+            className="px-6 py-3 bg-[#4CAF50] text-white rounded-lg hover:bg-[#45a049] transition-colors mt-4 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            onClick={complete}
+            disabled={loading}
+          >
+            {loading ? '등록 중...' : '완료하기'}
+          </button>
       </div>
     </div>
     </div>

@@ -1,9 +1,11 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Heart } from 'lucide-react';
-import { getCommunityPostById, CommunityPost, getCommunityPostComments, Comment as APIComment, CommentsResponse, createCommunityComment, CreateCommentData, updateCommunityComment, UpdateCommentData, deleteCommunityComment } from '@/app/api/communityController'; // API import
+import Image from 'next/image';
+import { Heart, Edit, Trash2, MoreVertical } from 'lucide-react';
+import { getCommunityPostById, CommunityPost, getCommunityPostComments, Comment as APIComment, createCommunityComment, CreateCommentData, updateCommunityComment, UpdateCommentData, deleteCommunityComment, toggleCommunityPostLike, LikeResponse, deleteCommunityPost } from '@/app/api/communityController'; // API import
 import { getCurrentUser } from '@/app/api/authController'; // 사용자 정보 import
 import BackButton from '@/app/component/common/BackButton';
 import Comments from '@/app/component/community/Comments';
@@ -73,6 +75,7 @@ const convertAPICommentsToLocal = (apiComments: APIComment[]): Comment[] => {
 
 export default function PostDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const postId = params.id as string;
   
   const [post, setPost] = useState<CommunityPost | null>(null);
@@ -82,15 +85,39 @@ export default function PostDetailPage() {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<{ id: number; email: string; name: string } | null>(null);
 
+  // 댓글 페이지네이션 상태 추가
+  const [currentCommentsPage, setCurrentCommentsPage] = useState(1);
+  const [totalCommentsPages, setTotalCommentsPages] = useState(1);
+  const [commentsPerPage] = useState(10); // 페이지당 댓글 수
+
+  // 게시글 관련 상태
+  const [showOptions, setShowOptions] = useState(false);
+
   // 현재 사용자 정보 가져오기
   useEffect(() => {
     const user = getCurrentUser();
     setCurrentUser(user);
   }, []);
 
+  // 외부 클릭 시 옵션 메뉴 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      // 옵션 메뉴 버튼이나 드롭다운 내부 클릭이 아닌 경우에만 닫기
+      if (showOptions && !target.closest('.relative')) {
+        setShowOptions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showOptions]);
+
   useEffect(() => {
     if (!postId) return;
-
+    // 맨 처음 로딩시 post 정보 및 댓글 정보 가져오는 useeffect
     const fetchPostDetail = async () => {
       try {
         setLoading(true);
@@ -100,9 +127,13 @@ export default function PostDetailPage() {
         setIsLiked(postData.isLiked);
         
         // 댓글 API 호출
-        const commentsResponse = await getCommunityPostComments(postId);
+        const commentsResponse = await getCommunityPostComments(postId, {
+          page: currentCommentsPage,
+          limit: commentsPerPage
+        });
         const localComments = convertAPICommentsToLocal(commentsResponse.comments);
         setComments(localComments);
+        setTotalCommentsPages(commentsResponse.totalPages); // 총 페이지 수 업데이트
 
       } catch (error) {
         console.error('Error fetching post detail:', error);
@@ -113,25 +144,42 @@ export default function PostDetailPage() {
     };
 
     fetchPostDetail();
-  }, [postId]);
+  }, [postId, currentCommentsPage, commentsPerPage]);
 
   // 좋아요 토글 핸들러
-  const handleLikeToggle = () => {
-    // TODO: 좋아요 API 연동 필요
-    setIsLiked(!isLiked);
-    setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
-  };
-
-  // 댓글 새로고침 핸들러
-  const handleCommentsRefresh = async () => {
+  const handleLikeToggle = async () => {
     try {
-      const commentsResponse = await getCommunityPostComments(postId);
-      const localComments = convertAPICommentsToLocal(commentsResponse.comments);
-      setComments(localComments);
+      // API 호출로 좋아요 토글
+      const likeResponse: LikeResponse = await toggleCommunityPostLike(postId);
+      setIsLiked(likeResponse.isLiked);
+      setLikesCount(likeResponse.likesCount);
     } catch (error) {
-      console.error('댓글 새로고침 중 오류 발생:', error);
+      console.error('좋아요 토글 실패:', error);
+      // API 실패 시 로컬에서 토글 (백업 처리)
+      setIsLiked(!isLiked);
+      setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
     }
   };
+
+  // 댓글 페이지 변경 핸들러
+  const handleCommentsPageChange = (page: number) => {
+    setCurrentCommentsPage(page);
+  // useEffect가 실행되어 새로운 페이지의 댓글을 자동으로 로드합니다
+  };
+
+  // 현재 사용자가 게시글 작성자인지 확인
+  const isPostAuthor = currentUser && post && post.author?.id === currentUser.id;
+
+  // 디버깅을 위한 콘솔 로그
+  // // console.log('디버깅 정보:', {
+  //   currentUser,
+  //   post: post ? {
+  //     id: post.id,
+  //     title: post.title,
+  //     author: post.author
+  //   } : null,
+  //   isPostAuthor
+  // });
 
   if (loading) {
     return (
@@ -186,11 +234,75 @@ export default function PostDetailPage() {
     <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] w-[393px] mx-auto">
       <div className="flex-1 overflow-y-auto p-[18px] pb-[100px]">
         {/* 헤더 */}
-        <div className="flex items-center mb-[20px]">
-          <BackButton className="mr-[12px]" />
-          <h1 className="text-[#023735] font-medium text-[18px] truncate">
-            {post.title}
-          </h1>
+        <div className="flex items-center justify-between mb-[20px]">
+          <div className="flex items-center flex-1">
+            <BackButton className="mr-[12px]" />
+            <h1 className="text-[#023735] font-medium text-[18px] truncate">
+              {post.title}
+            </h1>
+          </div>
+
+          {/* 작성자만 보이는 옵션 버튼 - 디버깅을 위해 임시로 항상 표시 */}
+          {(isPostAuthor || true) && (
+            <div className="relative">
+              <button
+                onClick={() => setShowOptions(!showOptions)}
+                className="p-[8px] hover:bg-[#F0ECE0] rounded-lg transition-colors"
+              >
+                <MoreVertical size={16} className="text-[#6C757D]" />
+              </button>
+
+              {showOptions && (
+                <div className="absolute right-0 top-[100%] mt-[4px] bg-white border border-[#D4CDB8] rounded-lg shadow-lg z-10 min-w-[100px]">
+                  <button
+                    onClick={(e) => {
+                      // console.log('수정 버튼 클릭됨! 이벤트:', e);
+                      // console.log('현재 상태:', { isPostAuthor, currentUser, post });
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowOptions(false);
+                      // 새로 만든 edit 페이지로 이동
+                      router.push(`/community/edit/${postId}`);
+                    }}
+                    className="flex items-center w-full px-[20px] py-[12px] text-[14px] text-[#023735] hover:bg-[#F0ECE0] transition-colors"
+                  >
+                    <Edit size={14} className="mr-[8px]" />
+                    수정
+                  </button>
+                  <button
+                    onClick={async (e) => {
+                      // console.log('삭제 버튼 클릭됨! 이벤트:', e);
+                      // console.log('현재 상태:', { isPostAuthor, currentUser, post });
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowOptions(false);
+                      
+                      const confirmed = window.confirm('정말로 이 게시글을 삭제하시겠습니까?\n삭제된 게시글은 복구할 수 없습니다.');
+                      if (!confirmed) {
+                        // console.log('삭제 취소됨');
+                        return;
+                      }
+
+                      try {
+                        // console.log('삭제 API 호출:', postId);
+                        await deleteCommunityPost(postId);
+                        // console.log('삭제 성공');
+                        alert('게시글이 삭제되었습니다.');
+                        router.push('/community'); // 커뮤니티 목록으로 이동
+                      } catch (error) {
+                        console.error('게시글 삭제 실패:', error);
+                        alert(error instanceof Error ? error.message : '게시글 삭제에 실패했습니다.');
+                      }
+                    }}
+                    className="flex items-center w-full px-[20px] py-[12px] text-[14px] text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <Trash2 size={14} className="mr-[8px]" />
+                    삭제
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* 작성자 정보 */}
@@ -217,9 +329,19 @@ export default function PostDetailPage() {
             {post.images.map((imageUrl, index) => (
               <div
                 key={index}
-                className="w-[120px] h-[120px] bg-[#EFEAD8] rounded-lg flex-shrink-0"
+                className="w-[120px] h-[120px] bg-[#EFEAD8] rounded-lg flex-shrink-0 overflow-hidden"
               >
-                <img src={imageUrl} alt={`post image ${index + 1}`} className="w-full h-full object-cover rounded-lg" />
+                <Image
+                  src={imageUrl}
+                  alt={`post image ${index + 1}`}
+                  width={120}
+                  height={120}
+                  className="w-full h-full object-cover rounded-lg"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    target.style.display = 'none';
+                  }}
+                />
               </div>
             ))}
           </div>
@@ -301,7 +423,6 @@ export default function PostDetailPage() {
               setComments(prevComments => [...prevComments, newReply]);
             }
           }}
-          onRefresh={handleCommentsRefresh}
           onEditComment={async (commentId: number, content: string) => {
             try {
               // API 호출
@@ -345,6 +466,9 @@ export default function PostDetailPage() {
             }
           }}
           currentUserId={currentUser?.id}
+          currentPage={currentCommentsPage}
+          totalPages={totalCommentsPages}
+          onPageChange={handleCommentsPageChange}
         />
       </div>
     </div>

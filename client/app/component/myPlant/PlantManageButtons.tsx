@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function PlantManageButtons() {
   return (
-    <div className="fixed bottom-[80px] z-10 w-[393px] left-1/2 -translate-x-1/2 px-[24px] pointer-events-none">
+    <div className="fixed bottom-[20px] z-10 w-[393px] left-1/2 -translate-x-1/2 px-[24px] pointer-events-none">
       <div className="flex gap-3 ml-auto w-fit pointer-events-auto">
         {/* 식물 추가 버튼 */}
         <Link

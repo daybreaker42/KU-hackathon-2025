@@ -385,6 +385,34 @@ export const deleteCommunityComment = async (
   }
 };
 
+// 게시글 좋아요 토글 API
+export interface LikeResponse {
+  isLiked: boolean;
+  likesCount: number;
+}
+
+export const toggleCommunityPostLike = async (
+  postId: string | number
+): Promise<LikeResponse> => {
+  try {
+    const endpoint = `/community/posts/${postId}/like`;
+
+    const response = await apiRequest(endpoint, {
+      method: 'POST',
+    });
+
+    if (!response.ok) {
+      throw new Error(`좋아요 토글 실패: ${response.status}`);
+    }
+
+    const data: LikeResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error('좋아요 토글 중 오류 발생:', error);
+    throw error;
+  }
+};
+
 // 이미지 여러장 업로드 API
 export const uploadImages = async (
   files: File[]
@@ -400,8 +428,7 @@ export const uploadImages = async (
     const response = await apiRequest(endpoint, {
       method: 'POST',
       body: formData,
-      // 'Content-Type' 헤더는 FormData 사용 시 브라우저가 자동으로 설정하도록 둡니다.
-    });
+    }, true, true);
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -421,10 +448,74 @@ export const uploadImages = async (
  * === Plants API 함수들 ===
  */
 
-// 내가 키우는 식물 목록 가져오기 API
-/**
- * === Plants API 함수들 ===
- */
+// 식물 이미지 업로드 API (단일 파일)
+export const uploadPlantImage = async (
+  file: File
+): Promise<{ imageUrl: string }> => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file); // API 문서에 따르면 key는 'file'
+
+    const endpoint = '/plants/image';
+
+    const response = await apiRequest(endpoint, {
+      method: 'POST',
+      body: formData,
+    }, true, true); // requireAuth = true, isFormData = true
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`식물 이미지 업로드 실패: ${errorData.message || response.status}`);
+    }
+
+    const data: { imageUrl: string } = await response.json();
+    return data;
+  } catch (error) {
+    console.error('식물 이미지 업로드 중 오류 발생:', error);
+    throw error;
+  }
+};
+
+// 식물 등록 API
+export interface CreatePlantData {
+  name: string;
+  variety: string;
+  img_url: string;
+  cycle_type: string;
+  cycle_value: string;
+  cycle_unit: string;
+  sunlight_needs?: string;
+  purchase_date?: string;
+  purchase_location?: string;
+  memo?: string;
+}
+
+export const createPlant = async (
+  plantData: CreatePlantData
+): Promise<Plant> => {
+  try {
+    const endpoint = '/plants';
+
+    const response = await apiRequest(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(plantData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`식물 등록 실패: ${errorData.message || response.status}`);
+    }
+
+    const data: Plant = await response.json();
+    return data;
+  } catch (error) {
+    console.error('식물 등록 중 오류 발생:', error);
+    throw error;
+  }
+};
 
 // 내가 키우는 식물 목록 가져오기 API
 export const getMyPlants = async (): Promise<{ id: number; name: string; variety: string; img_url: string; createdAt: string; }[]> => {
@@ -449,6 +540,79 @@ export const getMyPlants = async (): Promise<{ id: number; name: string; variety
     }));
   } catch (error) {
     console.error('식물 목록 조회 중 오류 발생:', error);
+    throw error;
+  }
+};
+
+/**
+ * === Community Post 수정/삭제 API 함수들 ===
+ */
+
+// 게시글 수정 API
+export interface UpdateCommunityPostData {
+  title?: string;
+  content?: string;
+  category?: string;
+  plant_name?: string;
+  images?: string[];
+}
+
+export const updateCommunityPost = async (
+  postId: string | number,
+  postData: UpdateCommunityPostData
+): Promise<CommunityPost> => {
+  try {
+    const endpoint = `/community/posts/${postId}`;
+
+    const response = await apiRequest(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify(postData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        throw new Error('게시글 수정 권한이 없습니다.');
+      } else if (response.status === 404) {
+        throw new Error('게시글을 찾을 수 없습니다.');
+      } else {
+        const errorData = await response.json();
+        throw new Error(`게시글 수정 실패: ${errorData.message || response.status}`);
+      }
+    }
+
+    const data: CommunityPost = await response.json();
+    return data;
+  } catch (error) {
+    console.error('게시글 수정 중 오류 발생:', error);
+    throw error;
+  }
+};
+
+// 게시글 삭제 API
+export const deleteCommunityPost = async (
+  postId: string | number
+): Promise<void> => {
+  try {
+    const endpoint = `/community/posts/${postId}`;
+
+    const response = await apiRequest(endpoint, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        throw new Error('게시글 삭제 권한이 없습니다.');
+      } else if (response.status === 404) {
+        throw new Error('게시글을 찾을 수 없습니다.');
+      } else {
+        throw new Error(`게시글 삭제 실패: ${response.status}`);
+      }
+    }
+  } catch (error) {
+    console.error('게시글 삭제 중 오류 발생:', error);
     throw error;
   }
 };

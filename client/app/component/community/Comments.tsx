@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { RefreshCw } from 'lucide-react';
 import { Comment } from '@/app/types/community/community';
 import CommentItem from './CommentItem';
 import styles from './comment.module.css';
@@ -15,13 +14,26 @@ interface CommentsProps {
   comments: LocalComment[];
   onAddComment: (content: string) => void;
   onAddReply: (parentId: number, content: string) => void;
-  onRefresh: () => void;
   onEditComment?: (commentId: number, content: string) => void;
   onDeleteComment?: (commentId: number) => void;
   currentUserId?: number;
+  // 페이지네이션 관련 props 추가
+  currentPage?: number;
+  totalPages?: number;
+  onPageChange?: (page: number) => void;
 }
 
-export default function Comments({ comments, onAddComment, onAddReply, onRefresh, onEditComment, onDeleteComment, currentUserId }: CommentsProps) {
+export default function Comments({
+  comments,
+  onAddComment,
+  onAddReply,
+  onEditComment,
+  onDeleteComment,
+  currentUserId,
+  currentPage = 1,
+  totalPages = 1,
+  onPageChange
+}: CommentsProps) {
   const [newComment, setNewComment] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -162,22 +174,49 @@ export default function Comments({ comments, onAddComment, onAddReply, onRefresh
           </div>
         )}
 
-        {/* 페이지네이션 */}
-        {comments.length > 0 && (
+        {/* 페이지네이션 - 총 페이지가 1보다 클 때만 표시 */}
+        {comments.length > 0 && totalPages > 1 && (
           <div className="flex justify-center items-center mt-[30px] space-x-[8px]">
-            <button className="text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+            {/* 이전 페이지 버튼 */}
+            <button
+              onClick={() => onPageChange && currentPage > 1 && onPageChange(currentPage - 1)}
+              disabled={currentPage <= 1}
+              className={`text-[14px] transition-colors ${currentPage <= 1
+                  ? 'text-[#D4CDB8] cursor-not-allowed'
+                  : 'text-[#6C757D] hover:text-[#42CA71]'
+                }`}
+            >
               &lt;
             </button>
-            <button className="w-[24px] h-[24px] bg-[#42CA71] text-white text-[14px] rounded">
-              1
-            </button>
-            <button className="w-[24px] h-[24px] text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
-              2
-            </button>
-            <button className="w-[24px] h-[24px] text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
-              3
-            </button>
-            <button className="text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+
+            {/* 페이지 번호 버튼들 */}
+            {Array.from({ length: totalPages }, (_, index) => {
+              const pageNumber = index + 1;
+              const isCurrentPage = pageNumber === currentPage;
+
+              return (
+                <button
+                  key={pageNumber}
+                  onClick={() => onPageChange && onPageChange(pageNumber)}
+                  className={`w-[24px] h-[24px] text-[14px] rounded transition-colors ${isCurrentPage
+                      ? 'bg-[#42CA71] text-white'
+                      : 'text-[#6C757D] hover:text-[#42CA71] hover:bg-[#F0ECE0]'
+                    }`}
+                >
+                  {pageNumber}
+                </button>
+              );
+            })}
+
+            {/* 다음 페이지 버튼 */}
+            <button
+              onClick={() => onPageChange && currentPage < totalPages && onPageChange(currentPage + 1)}
+              disabled={currentPage >= totalPages}
+              className={`text-[14px] transition-colors ${currentPage >= totalPages
+                  ? 'text-[#D4CDB8] cursor-not-allowed'
+                  : 'text-[#6C757D] hover:text-[#42CA71]'
+                }`}
+            >
               &gt;
             </button>
           </div>

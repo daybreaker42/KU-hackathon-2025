@@ -27,6 +27,21 @@ response example:
 ## 🏠 Home
 ```http
 GET /home/my-plants       # 내 식물 리스트 가져오기
+res:
+[
+  {
+    "id": 1,
+    "name": "몬스테라",
+    "variety": "몬스테라 델리시오사",
+    "img_url": "https://example.com/plant1.jpg",
+    "status": "good",
+    "daysUntilWatering": 3,
+    "lastWatered": "2025-08-25T10:00:00Z",
+    "wateringCycle": "7days",
+    "sunlightNeeds": "간접광선",
+    "recentEmotion": "행복"
+  }
+]
 GET /home/today-tasks     # 오늘 할 일 가져오기
 GET /home/weekly-diaries  # 주간 일기 작성 현황
 GET /home/diaries/{date}  # 특정 날짜 일기 내용 가져오기
@@ -36,16 +51,86 @@ GET /home/friend-feeds    # 친구 반응 가져오기
 ## 🌱 Plants
 ```http
 POST /plants/image        # 식물 이미지 업로드
+req body: formdata, key: file
+res ex:
+{
+  "imageUrl": "https://s3.amazonaws.com/bucket/plants/uuid-filename.jpg"
+}
 POST /plants              # 식물 등록
+req body:
+{
+  "name": "몬스테라",
+  "variety": "몬스테라 델리시오사",
+  "img_url": "https://example.com/plant1.jpg",
+  "cycle_type": "WEEKLY",
+  "cycle_value": "7",
+  "cycle_unit": "일",
+  "sunlight_needs": "간접광선",
+  "purchase_date": "2025-08-20T00:00:00Z",
+  "purchase_location": "화원",
+  "memo": "첫 번째 식물"
+}
+res ex:
+{
+  "id": 1,
+  "name": "몬스테라",
+  "variety": "몬스테라 델리시오사",
+  "img_url": "https://example.com/plant1.jpg",
+  "cycle_type": "WEEKLY",
+  "cycle_value": "7",
+  "cycle_unit": "일",
+  "sunlight_needs": "간접광선",
+  "purchase_date": "2025-08-20T00:00:00Z",
+  "purchase_location": "화원",
+  "memo": "첫 번째 식물",
+  "author": {},
+  "createdAt": "2025-08-28T10:00:00Z",
+  "updatedAt": "2025-08-28T10:00:00Z"
+}
 GET /plants               # 내 식물 목록 조회
 GET /plants/{id}          # 특정 식물 조회
+res ex:
+{
+  "id": 2,
+  "name": "세베",
+  "variety": "산세베리아",
+  "img_url": "https://i.ytimg.com/vi/LOPw_hgNtP4/mqdefault.jpg",
+  "cycle_type": "BIWEEKLY",
+  "cycle_value": "14",
+  "cycle_unit": "days",
+  "sunlight_needs": "직사광선",
+  "purchase_date": "2024-02-20T00:00:00.000Z",
+  "purchase_location": "꽃집",
+  "memo": "공기정화 식물",
+  "author": {
+    "id": 1,
+    "name": "김민준"
+  },
+  "createdAt": "2025-08-28T14:10:06.250Z",
+  "updatedAt": "2025-08-28T16:03:57.854Z"
+}
 PATCH /plants/{id}        # 식물 정보 수정
 DELETE /plants/{id}       # 식물 삭제
+
+res ex:
+Code	Description	Links
+200	
+식물 삭제 성공
+
+No links
+403	
+삭제 권한 없음
+
+No links
+404	
+식물을 찾을 수 없음
+
 ```
 
 ## 🧑‍🤝‍🧑 Community
 ```http
 POST /community/image                     # 커뮤니티 이미지 업로드
+
 GET /community                            # 게시글 목록 조회
 GET /community/{id}                       # 특정 게시글 조회
 POST /community/posts                     # 게시글 작성

@@ -2,33 +2,23 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation'; // Next.js 라우터 import 추가
-import { Plant } from '@/app/types/community/community';
+import { useRouter } from 'next/navigation';
+import { getMyPlants } from '@/app/api/communityController'; // API 함수 import
 
-// 식물 데이터 타입 정의
+// 식물 데이터 타입 정의 (API 응답에 맞게 수정)
+interface MyPlant {
+  id: number;
+  name: string;
+  variety: string;
+  img_url: string;
+  createdAt: string;
+}
 
-
-// Mock 데이터
-const mockPlants: Plant[] = [
-  {
-    id: 1,
-    name: '몬스테라',
-    imageUrl: '/plant-happy.png'
-  },
-  {
-    id: 2,
-    name: '고무나무',
-    imageUrl: '/plant-normal.png'
-  },
-  {
-    id: 3,
-    name: '스킨답서스',
-    imageUrl: '/plant-sick.png'
-  }
-];
+// 기본 이미지 경로 상수
+const DEFAULT_PLANT_IMAGE = '/images/plant-normal.png';
 
 export default function MyPlantsList() {
-  const [plants, setPlants] = useState<Plant[]>([]);
+  const [plants, setPlants] = useState<MyPlant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter(); // 라우터 인스턴스 생성
@@ -39,26 +29,45 @@ export default function MyPlantsList() {
     router.push(`/community/category/plant?plantId=${plantId}`);
   };
 
+  // 이미지 URL 검증 및 기본 이미지 반환 함수
+  const getValidImageUrl = (imageUrl: string | null | undefined): string => {
+    // 이미지 URL이 없거나 빈 문자열인 경우 기본 이미지 반환
+    if (!imageUrl || imageUrl.trim() === '') {
+      return DEFAULT_PLANT_IMAGE;
+    }
+
+    // 상대 경로인 경우 그대로 사용
+    if (imageUrl.startsWith('/')) {
+      return imageUrl;
+    }
+
+    // HTTP/HTTPS URL인 경우 그대로 사용
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+
+    // 기타 경우 기본 이미지 반환
+    return DEFAULT_PLANT_IMAGE;
+  };
+
   useEffect(() => {
     // API에서 내 식물 리스트를 가져오는 함수
     const fetchMyPlants = async () => {
       try {
         setLoading(true);
         
-        // 실제 API 호출 대신 mock 데이터 사용
-        // TODO - 내 식물 리스트 가져오는 api 구현
-        // const response = await fetch('/api/my-plants');
-        // const data = await response.json();
-        
-        // 네트워크 지연 시뮬레이션
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Mock 데이터 설정
-        setPlants(mockPlants);
+        // 실제 API 호출
+        const plantsData = await getMyPlants();
+        setPlants(plantsData);
         setError(null);
+
+        console.log('내 식물 리스트 조회 성공:', plantsData);
       } catch (err) {
         setError('식물 리스트를 불러오는데 실패했습니다.');
         console.error('Error fetching plants:', err);
+
+        // API 실패 시 빈 배열로 설정 (mock 데이터 대신)
+        setPlants([]);
       } finally {
         setLoading(false);
       }
@@ -130,7 +139,7 @@ export default function MyPlantsList() {
           >
             <div className="relative">
               <Image 
-                src={plant.imageUrl} 
+                src={getValidImageUrl(plant.img_url)} // 검증된 이미지 URL 사용
                 alt={plant.name}
                 width={100}
                 height={100}
@@ -138,7 +147,7 @@ export default function MyPlantsList() {
                 onError={(e) => {
                   // 이미지 로드 실패 시 기본 이미지 표시
                   const target = e.target as HTMLImageElement;
-                  target.src = '/plant-normal.png';
+                  target.src = DEFAULT_PLANT_IMAGE;
                 }}
               />
             </div>
