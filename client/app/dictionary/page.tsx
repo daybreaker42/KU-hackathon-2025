@@ -203,16 +203,6 @@ export default function PlantDictionaryPage() {
             </div>
           )}
 
-          {/* 새로운 사진 선택 버튼 */}
-          {plantInfo && !identificationLoading && !identificationSuccess && (
-            <button
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
-              onClick={handleNewImageSelect}
-            >
-              📷 새로운 사진 선택
-            </button>
-          )}
-
           {/* 오류 메시지 */}
           {error && (
             <div className="w-full max-w-md bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded-lg">
