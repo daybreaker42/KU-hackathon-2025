@@ -41,6 +41,7 @@ export default function MyPlantsList() {
         setLoading(true);
         
         // 실제 API 호출 대신 mock 데이터 사용
+        // TODO - 내 식물 리스트 가져오는 api 구현
         // const response = await fetch('/api/my-plants');
         // const data = await response.json();
         
@@ -124,7 +125,7 @@ export default function MyPlantsList() {
                 alt={plant.name}
                 width={100}
                 height={100}
-                className="w-[100px] h-[100px] object-cover rounded-lg border border-gray-200"
+                className="w-[100px] h-[100px] object-cover rounded-lg"
                 onError={(e) => {
                   // 이미지 로드 실패 시 기본 이미지 표시
                   const target = e.target as HTMLImageElement;
