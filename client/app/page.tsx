@@ -398,7 +398,7 @@ export default function Home() {
   };
 
   return (
-    <main className={styles.main}>
+    <main>
       <div className={styles.container}>
         <div className={styles.content}>
           <Nav text={navText} img={""} />

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { Comment } from '@/app/types/community/community';
 import CommentItem from './CommentItem';
+import styles from './comment.module.css';
 
 interface CommentsProps {
   comments: Comment[];
@@ -14,11 +15,46 @@ interface CommentsProps {
 
 export default function Comments({ comments, onAddComment, onAddReply, onRefresh }: CommentsProps) {
   const [newComment, setNewComment] = useState('');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // textarea 높이를 자동으로 조정하는 함수
+  const adjustTextareaHeight = () => {
+    if (textareaRef.current) {
+      const textarea = textareaRef.current;
+      textarea.style.height = 'auto';
+      
+      // 최소 높이 (1줄)와 최대 높이 (2줄) 계산
+      const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight);
+      const padding = 24; // top + bottom padding
+      const minHeight = lineHeight + padding;
+      const maxHeight = lineHeight * 2 + padding;
+      
+      const scrollHeight = textarea.scrollHeight;
+      
+      if (scrollHeight <= maxHeight) {
+        textarea.style.height = Math.max(minHeight, scrollHeight) + 'px';
+      } else {
+        textarea.style.height = maxHeight + 'px';
+      }
+    }
+  };
+
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNewComment(e.target.value);
+    adjustTextareaHeight();
+  };
+
+  // 컴포넌트 마운트 시 초기 높이 설정
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, []);
 
   const handleCommentSubmit = () => {
     if (newComment.trim()) {
       onAddComment(newComment);
       setNewComment('');
+      // 댓글 제출 후 높이 초기화
+      setTimeout(() => adjustTextareaHeight(), 0);
     }
   };
 
@@ -52,41 +88,32 @@ export default function Comments({ comments, onAddComment, onAddReply, onRefresh
   return (
     <div>
       {/* 댓글 작성 섹션 */}
-      <div className="mb-[30px]">
-        <h3 className="text-[#023735] font-medium text-[16px] mb-[15px]">댓글 작성</h3>
-        <div className="space-y-[12px]">
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="댓글을 입력하세요..."
-            className="w-full p-[12px] border border-[#D4CDB8] bg-[#F5F1E7] rounded-lg resize-none h-[80px] text-[14px] focus:outline-none focus:border-[#42CA71] transition-colors"
-          />
-          <div className="flex justify-end">
-            <button
-              onClick={handleCommentSubmit}
-              disabled={!newComment.trim()}
-              className="px-[20px] py-[8px] bg-[#42CA71] text-white text-[14px] font-medium rounded-lg hover:bg-[#369F5C] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              작성하기
-            </button>
-          </div>
-        </div>
+      <div className={styles.commentInputContainer}>
+        <textarea
+          ref={textareaRef}
+          value={newComment}
+          onChange={handleTextareaChange}
+          placeholder="댓글 입력"
+          className={styles.commentInput}
+          rows={1}
+        />
+        <button
+          onClick={handleCommentSubmit}
+          disabled={!newComment.trim()}
+          className={styles.commentButton}
+        >
+          작성하기
+        </button>
       </div>
+
 
       {/* 댓글 리스트 */}
       <div>
         {/* 댓글 헤더 */}
         <div className="flex justify-between items-center mb-[15px]">
           <h3 className="text-[#023735] font-medium text-[16px]">
-            댓글 ({comments.length})
+            댓글 {comments.length}
           </h3>
-          <button
-            onClick={onRefresh}
-            className="flex items-center space-x-[4px] text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors"
-          >
-            <RefreshCw size={14} />
-            <span>새로고침</span>
-          </button>
         </div>
 
         {/* 댓글 목록 */}
@@ -116,8 +143,8 @@ export default function Comments({ comments, onAddComment, onAddReply, onRefresh
         {/* 댓글이 없는 경우 */}
         {comments.length === 0 && (
           <div className="text-center py-[40px]">
-            <p className="text-[#6C757D] text-[14px]">아직 댓글이 없습니다.</p>
-            <p className="text-[#6C757D] text-[12px] mt-[4px]">첫 번째 댓글을 작성해보세요!</p>
+            <p className="text-[#6C757D] text-[medium]">아직 댓글이 없습니다.</p>
+            <p className="text-[#6C757D] text-[small] mt-[4px]">첫 번째 댓글을 작성해보세요!</p>
           </div>
         )}
 
