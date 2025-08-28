@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import { get } from "http";
+import Footer from "./component/common/footer";
 
 // 타입 정의
 interface NavProps {
@@ -62,11 +63,6 @@ function Reaction() {
   )
 }
 
-function Footer() {
-  return (
-    <div className = {styles.footer}>푸터</div>
-  )
-}
 
 export default function Home() {
   const [navText, setNavText] = useState<string>("");
@@ -118,19 +114,9 @@ export default function Home() {
           <Todo />
           <Dairy />
           <Reaction />
-          {/* 추가 컨텐츠 - 스크롤 테스트용 */}
-          <div style={{height: '200px', backgroundColor: '#f3f4f6', margin: '10px 0'}}>
-            추가 컨텐츠 1
-          </div>
-          <div style={{height: '200px', backgroundColor: '#e5e7eb', margin: '10px 0'}}>
-            추가 컨텐츠 2
-          </div>
-          <div style={{height: '200px', backgroundColor: '#d1d5db', margin: '10px 0'}}>
-            추가 컨텐츠 3
-          </div>
         </div>
       </div>
-      <Footer />
+      <Footer/>
     </main>
   );
 }

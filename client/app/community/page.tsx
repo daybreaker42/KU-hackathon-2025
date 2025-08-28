@@ -1,5 +1,5 @@
-import MyPlantsList from "@/components/community/MyPlantsList";
-import CommunitySection from "@/components/community/CommunitySection";
+import MyPlantsList from "@/app/component/community/MyPlantsList";
+import CommunitySection from "@/app/component/community/CommunitySection";
 
 export default function CommunityPage() {
   return (
