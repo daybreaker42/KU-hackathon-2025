@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Heart } from 'lucide-react';
-import { getCommunityPostById, CommunityPost } from '@/app/api/communityController'; // API import
+import { getCommunityPostById, CommunityPost, getCommunityPostComments, Comment as APIComment, CommentsResponse } from '@/app/api/communityController'; // API import
 import BackButton from '@/app/component/common/BackButton';
 import Comments from '@/app/component/community/Comments';
 
@@ -18,23 +18,55 @@ export interface Comment {
   parentId?: number;
 }
 
-// Mock 데이터 - 댓글은 아직 API가 없으므로 유지합니다.
-const mockComments: Comment[] = [
-  {
-    id: 1,
-    author: "성준 한",
-    content: "아 그거 그렇게 하는거 아님데;",
-    timeAgo: "5분전",
-    createdAt: "2025-01-28T10:00:00Z"
-  },
-  {
-    id: 2,
-    author: "성준 한",
-    content: "감사합니다^^",
-    timeAgo: "5분전",
-    createdAt: "2025-01-28T10:05:00Z"
+// API Comment를 로컬 Comment로 변환하는 함수
+const convertAPICommentToLocal = (apiComment: APIComment): Comment => {
+  // timeAgo 계산
+  const now = new Date();
+  const createdAt = new Date(apiComment.createdAt);
+  const diffInMinutes = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60));
+
+  let timeAgo: string;
+  if (diffInMinutes < 1) {
+    timeAgo = "방금 전";
+  } else if (diffInMinutes < 60) {
+    timeAgo = `${diffInMinutes}분 전`;
+  } else if (diffInMinutes < 1440) {
+    const hours = Math.floor(diffInMinutes / 60);
+    timeAgo = `${hours}시간 전`;
+  } else {
+    const days = Math.floor(diffInMinutes / 1440);
+    timeAgo = `${days}일 전`;
   }
-];
+
+  return {
+    id: apiComment.id,
+    author: apiComment.author.name,
+    content: apiComment.content,
+    timeAgo,
+    createdAt: apiComment.createdAt,
+    parentId: apiComment.parent_id || undefined
+  };
+};
+
+// API 댓글 데이터를 로컬 형식으로 변환하는 함수
+const convertAPICommentsToLocal = (apiComments: APIComment[]): Comment[] => {
+  const result: Comment[] = [];
+
+  // 부모 댓글과 대댓글을 모두 평탄화
+  apiComments.forEach(comment => {
+    // 부모 댓글 추가
+    result.push(convertAPICommentToLocal(comment));
+
+    // 대댓글 추가
+    if (comment.replies && comment.replies.length > 0) {
+      comment.replies.forEach(reply => {
+        result.push(convertAPICommentToLocal(reply));
+      });
+    }
+  });
+
+  return result;
+};
 
 export default function PostDetailPage() {
   const params = useParams();
@@ -57,8 +89,10 @@ export default function PostDetailPage() {
         setLikesCount(postData.likes_count);
         setIsLiked(postData.isLiked);
         
-        // TODO: 댓글 API가 구현되면 아래 줄을 교체해야 합니다.
-        setComments(mockComments);
+        // 댓글 API 호출
+        const commentsResponse = await getCommunityPostComments(postId);
+        const localComments = convertAPICommentsToLocal(commentsResponse.comments);
+        setComments(localComments);
 
       } catch (error) {
         console.error('Error fetching post detail:', error);
@@ -93,9 +127,14 @@ export default function PostDetailPage() {
   };
 
   // 댓글 새로고침 핸들러
-  const handleCommentsRefresh = () => {
-    // TODO - 댓글 새로고침 API 호출
-    console.log('댓글 새로고침');
+  const handleCommentsRefresh = async () => {
+    try {
+      const commentsResponse = await getCommunityPostComments(postId);
+      const localComments = convertAPICommentsToLocal(commentsResponse.comments);
+      setComments(localComments);
+    } catch (error) {
+      console.error('댓글 새로고침 중 오류 발생:', error);
+    }
   };
 
   if (loading) {
@@ -210,9 +249,10 @@ export default function PostDetailPage() {
         <Comments
           comments={comments}
           onAddComment={(content) => {
+            // TODO: 댓글 생성 API 연동 필요
             const comment: Comment = {
               id: comments.length + 1,
-              author: "현재 사용자",
+              author: "현재 사용자", // TODO: 실제 사용자 정보로 변경
               content,
               timeAgo: "방금 전",
               createdAt: new Date().toISOString()
