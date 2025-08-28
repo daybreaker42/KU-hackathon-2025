@@ -1,6 +1,6 @@
 import MyPlantsList from "@/app/component/community/MyPlantsList";
 import CommunitySection from "@/app/component/community/CommunitySection";
-import Footer from "../component/common/footer";
+import Footer from "@/app/component/common/footer";
 import WritePostButton from "@/app/component/community/WritePostButton";
 
 export default function CommunityPage() {
@@ -20,12 +20,6 @@ export default function CommunityPage() {
             title="이거 어떻게 키워요?"
             category="question"
           />
-
-          {/* 식물별 카테고리 섹션 */}
-          {/* <CommunitySection
-            title="식물별 카테고리"
-            category="plant"
-          /> */}
 
           {/* 일상 섹션 */}
           <CommunitySection
