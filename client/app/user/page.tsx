@@ -34,8 +34,8 @@ export default function UserProfilePage() {
   const router = useRouter();
 
   // 실제 사용자 정보를 localStorage에서 가져와서 상태 관리
-  const [profileImageSrc] = useState('/plant-happy.png'); // 기본 이미지, localStorage에서 사용자 프로필 이미지 URL 설정
-  const [currentUsername, setCurrentUsername] = useState('사용자 이름'); // 기본값, localStorage에서 실제 사용자 이름 설정  
+  const [profileImageSrc, setProfileImageSrc] = useState('/plant-happy.png'); // 기본 이미지, localStorage에서 사용자 프로필 이미지 URL 설정
+  const [currentUsername, setCurrentUsername] = useState('사용자 이름'); // 기본값, localStorage에서 실제 사용자 이름 설정
   const [userEmail, setUserEmail] = useState('user@example.com'); // 기본값, localStorage에서 실제 사용자 이메일 설정
   const [isLoading, setIsLoading] = useState(true);
   const [userActivities, setUserActivities] = useState<UserActivity[]>([]); // 실제 API에서 가져온 사용자 활동 데이터
@@ -45,10 +45,9 @@ export default function UserProfilePage() {
   useEffect(() => {
     const user = getCurrentUser();
     if (user) {
+      setProfileImageSrc(user.profileImage || '/plant-happy.png'); // 프로필 이미지가 없으면 기본 이미지 사용
       setCurrentUsername(user.name);
       setUserEmail(user.email);
-      // 현재 user 타입에는 profile_img가 없으므로 기본 이미지 사용
-      // 향후 API 확장 시 프로필 이미지 지원 예정
     }
     setIsLoading(false);
   }, []);
