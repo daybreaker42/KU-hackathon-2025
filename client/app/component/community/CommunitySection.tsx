@@ -137,14 +137,14 @@ export default function CommunitySection({ title, category, plantId, showMoreBut
         </div>
         <div className="space-y-[10px]">
           {[1, 2].map((item) => (
-            <div key={item} className="bg-gray-100 rounded-lg p-[15px] animate-pulse">
-              <div className="h-[20px] bg-gray-300 rounded mb-[8px] w-[60%]"></div>
-              <div className="h-[16px] bg-gray-300 rounded mb-[10px]"></div>
+            <div key={item} className="bg-[#F0EDE0] rounded-lg p-[15px] animate-pulse border border-[#E5E0D3]"> {/* 베이지 톤으로 조정 */}
+              <div className="h-[20px] bg-[#E0D9C7] rounded mb-[8px] w-[60%]"></div> {/* 스켈레톤 색상 조정 */}
+              <div className="h-[16px] bg-[#E0D9C7] rounded mb-[10px]"></div>
               <div className="flex justify-between items-center">
-                <div className="h-[14px] bg-gray-300 rounded w-[40px]"></div>
+                <div className="h-[14px] bg-[#E0D9C7] rounded w-[40px]"></div>
                 <div className="flex space-x-[10px]">
-                  <div className="h-[14px] bg-gray-300 rounded w-[30px]"></div>
-                  <div className="h-[14px] bg-gray-300 rounded w-[30px]"></div>
+                  <div className="h-[14px] bg-[#E0D9C7] rounded w-[30px]"></div>
+                  <div className="h-[14px] bg-[#E0D9C7] rounded w-[30px]"></div>
                 </div>
               </div>
             </div>

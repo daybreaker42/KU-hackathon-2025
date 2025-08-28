@@ -170,15 +170,15 @@ export default function CategoryPostsPage() {
         {/* 게시글 리스트 스켈레톤 */}
         <div className="space-y-[15px]">
           {Array.from({ length: 5 }).map((_, index) => (
-            <div key={index} className="bg-gray-100 rounded-lg p-[15px] animate-pulse">
-              <div className="h-[20px] bg-gray-300 rounded mb-[8px] w-[70%]"></div>
-              <div className="h-[16px] bg-gray-300 rounded mb-[10px]"></div>
-              <div className="h-[16px] bg-gray-300 rounded mb-[12px] w-[90%]"></div>
+            <div key={index} className="bg-[#F0EDE0] rounded-lg p-[15px] animate-pulse border border-[#E5E0D3]"> {/* 베이지 톤으로 조정 */}
+              <div className="h-[20px] bg-[#E0D9C7] rounded mb-[8px] w-[70%]"></div> {/* 스켈레톤 색상 조정 */}
+              <div className="h-[16px] bg-[#E0D9C7] rounded mb-[10px]"></div>
+              <div className="h-[16px] bg-[#E0D9C7] rounded mb-[12px] w-[90%]"></div>
               <div className="flex justify-between items-center">
-                <div className="h-[14px] bg-gray-300 rounded w-[60px]"></div>
+                <div className="h-[14px] bg-[#E0D9C7] rounded w-[60px]"></div>
                 <div className="flex space-x-[10px]">
-                  <div className="h-[28px] bg-gray-300 rounded-full w-[50px]"></div>
-                  <div className="h-[28px] bg-gray-300 rounded-full w-[50px]"></div>
+                  <div className="h-[28px] bg-[#E0D9C7] rounded-full w-[50px]"></div>
+                  <div className="h-[28px] bg-[#E0D9C7] rounded-full w-[50px]"></div>
                 </div>
               </div>
             </div>
@@ -194,14 +194,12 @@ export default function CategoryPostsPage() {
       <div className="flex items-center justify-between mb-[20px]">
         <div className="flex items-center">
           {/* 뒤로가기 버튼 */}
-          <button 
+          <button
             onClick={handleBack}
-            className="mr-[12px] p-[4px] hover:bg-gray-100 rounded-full transition-colors"
+            className="mr-[12px] p-[4px] hover:bg-[#F0EDE0] rounded-full transition-colors" // hover 색상을 베이지 톤으로 변경
           >
             <ArrowLeft size={20} className="text-[#023735]" />
-          </button>
-          
-          {/* 페이지 제목 */}
+          </button>          {/* 페이지 제목 */}
           <h1 className="text-[#023735] font-medium text-[20px]">
             {categoryNames[category]}
             {category === 'plant' && plantId && (
@@ -224,7 +222,7 @@ export default function CategoryPostsPage() {
 
       {/* 필터 및 정렬 옵션 */}
       {showFilters && (
-        <div className="bg-[#F8F9FA] rounded-lg p-[15px] mb-[20px] border border-gray-100">
+        <div className="bg-[#F5F2E8] rounded-lg p-[15px] mb-[20px] border border-[#E5E0D3]"> {/* 베이지 톤으로 배경색 변경 */}
           <div className="flex items-center justify-between">
             <span className="text-[#023735] font-medium text-[14px]">정렬</span>
             <div className="flex space-x-[8px]">
@@ -235,7 +233,7 @@ export default function CategoryPostsPage() {
                   className={`px-[12px] py-[6px] rounded-full text-[12px] transition-colors ${
                     sortBy === option.value
                       ? 'bg-[#42CA71] text-white'
-                      : 'bg-white text-[#6C757D] hover:bg-[#E9ECEF]'
+                    : 'bg-[#EFEBE0] text-[#6C757D] hover:bg-[#E8E4D6] border border-[#D0C9B8]' // 비선택 상태도 베이지 톤으로 조정
                   }`}
                 >
                   {option.label}

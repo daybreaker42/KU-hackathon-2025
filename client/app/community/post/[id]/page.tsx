@@ -114,24 +114,24 @@ export default function PostDetailPage() {
         <div className="flex-1 overflow-y-auto p-[18px]">
           {/* 헤더 스켈레톤 */}
           <div className="flex items-center mb-[20px]">
-            <div className="w-[24px] h-[24px] bg-gray-300 rounded-full animate-pulse mr-[12px]"></div>
-            <div className="h-[24px] bg-gray-300 rounded w-[150px] animate-pulse"></div>
+            <div className="w-[24px] h-[24px] bg-[#E0D9C7] rounded-full animate-pulse mr-[12px]"></div> {/* 스켈레톤 색상을 베이지 톤으로 변경 */}
+            <div className="h-[24px] bg-[#E0D9C7] rounded w-[150px] animate-pulse"></div>
           </div>
           
           {/* 작성자 정보 스켈레톤 */}
           <div className="flex items-center mb-[20px]">
-            <div className="w-[40px] h-[40px] bg-gray-300 rounded-full animate-pulse mr-[12px]"></div>
+            <div className="w-[40px] h-[40px] bg-[#E0D9C7] rounded-full animate-pulse mr-[12px]"></div> {/* 스켈레톤 색상을 베이지 톤으로 변경 */}
             <div>
-              <div className="h-[16px] bg-gray-300 rounded w-[80px] animate-pulse mb-[4px]"></div>
-              <div className="h-[14px] bg-gray-300 rounded w-[60px] animate-pulse"></div>
+              <div className="h-[16px] bg-[#E0D9C7] rounded w-[80px] animate-pulse mb-[4px]"></div>
+              <div className="h-[14px] bg-[#E0D9C7] rounded w-[60px] animate-pulse"></div>
             </div>
           </div>
           
           {/* 내용 스켈레톤 */}
           <div className="space-y-[8px] mb-[20px]">
-            <div className="h-[16px] bg-gray-300 rounded animate-pulse"></div>
-            <div className="h-[16px] bg-gray-300 rounded w-[80%] animate-pulse"></div>
-            <div className="h-[16px] bg-gray-300 rounded w-[60%] animate-pulse"></div>
+            <div className="h-[16px] bg-[#E0D9C7] rounded animate-pulse"></div>
+            <div className="h-[16px] bg-[#E0D9C7] rounded w-[80%] animate-pulse"></div>
+            <div className="h-[16px] bg-[#E0D9C7] rounded w-[60%] animate-pulse"></div>
           </div>
         </div>
       </div>
@@ -163,7 +163,7 @@ export default function PostDetailPage() {
         <div className="flex items-center mb-[20px]">
           <button 
             onClick={handleBack}
-            className="mr-[12px] p-[4px] hover:bg-gray-100 rounded-full transition-colors"
+            className="mr-[12px] p-[4px] hover:bg-[#F0EDE0] rounded-full transition-colors" // hover 색상을 베이지 톤으로 변경
           >
             <ArrowLeft size={20} className="text-[#023735]" />
           </button>
@@ -174,7 +174,7 @@ export default function PostDetailPage() {
 
         {/* 작성자 정보 */}
         <div className="flex items-center mb-[20px]">
-          <div className="w-[40px] h-[40px] bg-gray-300 rounded-full flex items-center justify-center mr-[12px]">
+          <div className="w-[40px] h-[40px] bg-[#E8E4D6] rounded-full flex items-center justify-center mr-[12px]"> {/* 프로필 배경을 베이지 톤으로 변경 */}
             <span className="text-[20px]">👤</span>
           </div>
           <div>
@@ -196,9 +196,9 @@ export default function PostDetailPage() {
             {[1, 2, 3].map((index) => (
               <div
                 key={index}
-                className="w-[120px] h-[120px] bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center"
+                className="w-[120px] h-[120px] bg-[#E8E4D6] rounded-lg flex-shrink-0 flex items-center justify-center" // 이미지 배경을 베이지 톤으로 변경
               >
-                <span className="text-gray-400 text-[12px]">이미지 {index}</span>
+                <span className="text-[#8B7355] text-[12px]">이미지 {index}</span> {/* 텍스트 색상도 조정 */}
               </div>
             ))}
           </div>
@@ -209,7 +209,7 @@ export default function PostDetailPage() {
           <button 
             onClick={handleLikeToggle}
             className={`flex items-center space-x-[8px] p-[8px] rounded-lg transition-colors ${
-              isLiked ? 'text-red-500 bg-red-50' : 'text-[#6C757D] hover:bg-gray-50'
+              isLiked ? 'text-red-500 bg-red-50' : 'text-[#6C757D] hover:bg-[#F0EDE0]' // hover 색상을 베이지 톤으로 변경
             }`}
           >
             <Heart 
@@ -228,7 +228,7 @@ export default function PostDetailPage() {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="댓글을 입력하세요..."
-              className="w-full p-[12px] border border-gray-300 rounded-lg resize-none h-[80px] text-[14px] focus:outline-none focus:border-[#42CA71] transition-colors"
+              className="w-full p-[12px] border border-[#D0C9B8] bg-[#F5F2E8] rounded-lg resize-none h-[80px] text-[14px] focus:outline-none focus:border-[#42CA71] transition-colors" // 베이지 톤으로 색상 변경
             />
             <div className="flex justify-end">
               <button
@@ -261,10 +261,10 @@ export default function PostDetailPage() {
           {/* 댓글 목록 */}
           <div className="space-y-[16px]">
             {comments.map((comment) => (
-              <div key={comment.id} className="border-b border-gray-100 pb-[16px] last:border-b-0">
+              <div key={comment.id} className="border-b border-[#E5E0D3] pb-[16px] last:border-b-0"> {/* 테두리 색상을 베이지 톤으로 변경 */}
                 <div className="flex items-start space-x-[12px]">
                   {/* 프로필 이미지 */}
-                  <div className="w-[32px] h-[32px] bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-[32px] h-[32px] bg-[#E8E4D6] rounded-full flex items-center justify-center flex-shrink-0"> {/* 프로필 배경을 베이지 톤으로 변경 */}
                     <span className="text-[16px]">👤</span>
                   </div>
                   
