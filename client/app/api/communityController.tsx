@@ -428,8 +428,7 @@ export const uploadImages = async (
     const response = await apiRequest(endpoint, {
       method: 'POST',
       body: formData,
-      // 'Content-Type' 헤더는 FormData 사용 시 브라우저가 자동으로 설정하도록 둡니다.
-    });
+    }, true, true);
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -449,10 +448,74 @@ export const uploadImages = async (
  * === Plants API 함수들 ===
  */
 
-// 내가 키우는 식물 목록 가져오기 API
-/**
- * === Plants API 함수들 ===
- */
+// 식물 이미지 업로드 API (단일 파일)
+export const uploadPlantImage = async (
+  file: File
+): Promise<{ imageUrl: string }> => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file); // API 문서에 따르면 key는 'file'
+
+    const endpoint = '/plants/image';
+
+    const response = await apiRequest(endpoint, {
+      method: 'POST',
+      body: formData,
+    }, true, true); // requireAuth = true, isFormData = true
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`식물 이미지 업로드 실패: ${errorData.message || response.status}`);
+    }
+
+    const data: { imageUrl: string } = await response.json();
+    return data;
+  } catch (error) {
+    console.error('식물 이미지 업로드 중 오류 발생:', error);
+    throw error;
+  }
+};
+
+// 식물 등록 API
+export interface CreatePlantData {
+  name: string;
+  variety: string;
+  img_url: string;
+  cycle_type: string;
+  cycle_value: string;
+  cycle_unit: string;
+  sunlight_needs?: string;
+  purchase_date?: string;
+  purchase_location?: string;
+  memo?: string;
+}
+
+export const createPlant = async (
+  plantData: CreatePlantData
+): Promise<Plant> => {
+  try {
+    const endpoint = '/plants';
+
+    const response = await apiRequest(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(plantData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`식물 등록 실패: ${errorData.message || response.status}`);
+    }
+
+    const data: Plant = await response.json();
+    return data;
+  } catch (error) {
+    console.error('식물 등록 중 오류 발생:', error);
+    throw error;
+  }
+};
 
 // 내가 키우는 식물 목록 가져오기 API
 export const getMyPlants = async (): Promise<{ id: number; name: string; variety: string; img_url: string; createdAt: string; }[]> => {
