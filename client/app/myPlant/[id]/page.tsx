@@ -117,15 +117,11 @@ const mockGallery: GalleryImage[] = [
   { id: "4", url: "/images/plant-normal.png", date: "2024-08-10", caption: "건강한 모습" },
 ];
 
-// 탭 타입 정의
-type TabType = "records" | "memories" | "gallery" | "care";
-
 export default function PlantDetailPage() {
   const params = useParams();
   const plantId = params.id as string;
   
   const [plant, setPlant] = useState<Plant | null>(null);
-  const [activeTab, setActiveTab] = useState<TabType>("records");
   const [records, setRecords] = useState<PlantRecord[]>([]);
   const [memories, setMemories] = useState<Memory[]>([]);
   const [gallery, setGallery] = useState<GalleryImage[]>([]);
@@ -207,7 +203,7 @@ export default function PlantDetailPage() {
             />
           </div>
 
-          {/* 식물 정보 - 세로 배치 */}
+          {/* 식물 기본 정보 - 세로 배치 */}
           <div className="text-center">
             <h2 className="text-[#023735] font-bold text-[24px] mb-[8px]">
               {plant.name}
@@ -215,72 +211,55 @@ export default function PlantDetailPage() {
             <p className="text-[#4A6741] text-[16px] mb-[12px]">
               {plant.species}
             </p>
-            <p className="text-[#6B7280] text-[14px] mb-[16px]">
-              입양일: {new Date(plant.adoptionDate).toLocaleDateString('ko-KR')}
-            </p>
-            {/* 식물 설명 */}
-            <p className="text-[#4A6741] text-[14px] leading-[1.6] max-w-[280px]">
-              {plant.description}
-            </p>
           </div>
         </div>
 
-        {/* 탭 네비게이션 - 스크롤 방식 */}
-        <div className="px-[18px] mb-[24px]">
-          <div className="overflow-x-auto">
-            <div className="flex space-x-[12px] pb-[4px] min-w-max">
-              <button
-                onClick={() => setActiveTab("records")}
-                className={`py-[12px] px-[20px] rounded-[20px] text-[14px] font-medium transition-colors border-2 whitespace-nowrap ${
-                  activeTab === "records"
-                  ? "bg-[#4A6741] text-white border-[#4A6741]"
-                  : "text-[#4A6741] border-[#E5E7EB] hover:border-[#4A6741]"
-                }`}
-              >
-                식물 기록
-              </button>
-              <button
-                onClick={() => setActiveTab("memories")}
-                className={`py-[12px] px-[20px] rounded-[20px] text-[14px] font-medium transition-colors border-2 whitespace-nowrap ${
-                  activeTab === "memories"
-                  ? "bg-[#4A6741] text-white border-[#4A6741]"
-                  : "text-[#4A6741] border-[#E5E7EB] hover:border-[#4A6741]"
-                }`}
-              >
-                Memories
-              </button>
-              <button
-                onClick={() => setActiveTab("gallery")}
-                className={`py-[12px] px-[20px] rounded-[20px] text-[14px] font-medium transition-colors border-2 whitespace-nowrap ${
-                  activeTab === "gallery"
-                  ? "bg-[#4A6741] text-white border-[#4A6741]"
-                  : "text-[#4A6741] border-[#E5E7EB] hover:border-[#4A6741]"
-                }`}
-              >
-                Gallery
-              </button>
-              <button
-                onClick={() => setActiveTab("care")}
-                className={`py-[12px] px-[20px] rounded-[20px] text-[14px] font-medium transition-colors border-2 whitespace-nowrap ${
-                  activeTab === "care"
-                  ? "bg-[#4A6741] text-white border-[#4A6741]"
-                  : "text-[#4A6741] border-[#E5E7EB] hover:border-[#4A6741]"
-                }`}
-              >
-                Upcoming Care
-              </button>
+        {/* 모든 섹션을 수직으로 배열 - 좌측 정렬 */}
+        <div className="px-[18px] pb-[20px] space-y-[32px]">
+
+          {/* 식물 정보 섹션 */}
+          <div>
+            <h3 className="text-[#023735] font-bold text-[18px] mb-[16px]">
+              식물 정보
+            </h3>
+            <div className="space-y-[12px]">
+              <div className="rounded-[16px] p-[16px] border border-[#E5E7EB]">
+                <div className="space-y-[8px]">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#4A6741] text-[14px]">입양일</span>
+                    <span className="text-[#023735] text-[14px] font-medium">
+                      {new Date(plant.adoptionDate).toLocaleDateString('ko-KR')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#4A6741] text-[14px]">급수 주기</span>
+                    <span className="text-[#023735] text-[14px] font-medium">
+                      {plant.wateringInterval}일마다
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#4A6741] text-[14px]">햇빛 주기</span>
+                    <span className="text-[#023735] text-[14px] font-medium">
+                      {plant.sunlightInterval}일마다
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="rounded-[16px] p-[16px] border border-[#E5E7EB]">
+                <h4 className="text-[#023735] font-medium text-[14px] mb-[8px]">설명</h4>
+                <p className="text-[#4A6741] text-[14px] leading-[1.6]">
+                  {plant.description}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* 탭 컨텐츠 */}
-        <div className="px-[18px] pb-[20px]">
-          {/* 식물 기록 탭 */}
-          {activeTab === "records" && (
+          {/* 식물 기록 섹션 */}
+          <div>
+            <h3 className="text-[#023735] font-bold text-[18px] mb-[16px]">
+              최근 활동 기록
+            </h3>
             <div className="space-y-[12px]">
-              <h3 className="text-[#023735] font-bold text-[18px] mb-[20px] text-center">
-                최근 활동 기록
-              </h3>
               {records.map((record) => {
                 const typeInfo = getRecordTypeInfo(record.type);
                 return (
@@ -309,14 +288,14 @@ export default function PlantDetailPage() {
                 );
               })}
             </div>
-          )}
+          </div>
 
-          {/* Memories 탭 */}
-          {activeTab === "memories" && (
+          {/* Memories 섹션 */}
+          <div>
+            <h3 className="text-[#023735] font-bold text-[18px] mb-[16px]">
+              소중한 추억들
+            </h3>
             <div className="space-y-[12px]">
-              <h3 className="text-[#023735] font-bold text-[18px] mb-[20px] text-center">
-                소중한 추억들
-              </h3>
               {memories.map((memory) => (
                 <div key={memory.id} className="rounded-[16px] p-[16px] border border-[#E5E7EB]">
                   <div className="flex items-start space-x-[12px]">
@@ -347,49 +326,47 @@ export default function PlantDetailPage() {
                 </div>
               ))}
             </div>
-          )}
+          </div>
 
-          {/* Gallery 탭 */}
-          {activeTab === "gallery" && (
-            <div>
-              <h3 className="text-[#023735] font-bold text-[18px] mb-[20px] text-center">
-                성장 갤러리
-              </h3>
-              <div className="overflow-x-auto">
-                <div className="flex space-x-[12px] pb-[4px]">
-                  {gallery.map((image) => (
-                    <div key={image.id} className="flex-shrink-0 w-[120px]">
-                      <div className="relative w-[120px] h-[120px] rounded-[12px] overflow-hidden border border-[#E5E7EB]">
-                        <Image
-                          src={image.url}
-                          alt={image.caption || "식물 사진"}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="mt-[8px]">
-                        <p className="text-[#6B7280] text-[10px] text-center">
-                          {new Date(image.date).toLocaleDateString('ko-KR')}
-                        </p>
-                        {image.caption && (
-                          <p className="text-[#4A6741] text-[11px] text-center mt-[2px] truncate">
-                            {image.caption}
-                          </p>
-                        )}
-                      </div>
+          {/* Gallery 섹션 */}
+          <div>
+            <h3 className="text-[#023735] font-bold text-[18px] mb-[16px]">
+              성장 갤러리
+            </h3>
+            <div className="overflow-x-auto">
+              <div className="flex space-x-[12px] pb-[4px]">
+                {gallery.map((image) => (
+                  <div key={image.id} className="flex-shrink-0 w-[120px]">
+                    <div className="relative w-[120px] h-[120px] rounded-[12px] overflow-hidden border border-[#E5E7EB]">
+                      <Image
+                        src={image.url}
+                        alt={image.caption || "식물 사진"}
+                        fill
+                        className="object-cover"
+                      />
                     </div>
-                  ))}
-                </div>
+                    <div className="mt-[8px]">
+                      <p className="text-[#6B7280] text-[10px]">
+                        {new Date(image.date).toLocaleDateString('ko-KR')}
+                      </p>
+                      {image.caption && (
+                        <p className="text-[#4A6741] text-[11px] mt-[2px] truncate">
+                          {image.caption}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          )}
+          </div>
 
-          {/* Upcoming Care 탭 */}
-          {activeTab === "care" && (
+          {/* Upcoming Care 섹션 */}
+          <div>
+            <h3 className="text-[#023735] font-bold text-[18px] mb-[16px]">
+              다가오는 돌봄 일정
+            </h3>
             <div className="space-y-[12px]">
-              <h3 className="text-[#023735] font-bold text-[18px] mb-[20px] text-center">
-                다가오는 돌봄 일정
-              </h3>
               
               {/* 다음 급수일 */}
               <div className="rounded-[16px] p-[16px] border border-[#E5E7EB]">
@@ -460,7 +437,8 @@ export default function PlantDetailPage() {
                 </div>
               </div>
             </div>
-          )}
+          </div>
+
         </div>
       </div>
     </div>
