@@ -92,7 +92,10 @@ export default function UserProfilePage() {
               </li>
 
               <li className="py-5">
-                <h2 className="font-bold text-lg text-[#023735] mb-4">내가 작성한 글</h2>
+                                <div className="flex justify-between items-center mb-4">
+                  <h2 className="font-bold text-lg text-[#023735]">내가 작성한 글</h2>
+                  <button className="text-[#42CA71] text-[14px] hover:text-[#369F5C] transition-colors">더보기</button>
+                </div>
                 <div className="space-y-3">
                   {userPosts.map((post) => (
                     <PostCard
