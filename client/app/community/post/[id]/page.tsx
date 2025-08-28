@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Heart } from 'lucide-react';
-import { getCommunityPostById, CommunityPost, getCommunityPostComments, Comment as APIComment, CommentsResponse, createCommunityComment, CreateCommentData, updateCommunityComment, UpdateCommentData, deleteCommunityComment } from '@/app/api/communityController'; // API import
+import { getCommunityPostById, CommunityPost, getCommunityPostComments, Comment as APIComment, CommentsResponse, createCommunityComment, CreateCommentData, updateCommunityComment, UpdateCommentData, deleteCommunityComment, toggleCommunityPostLike, LikeResponse } from '@/app/api/communityController'; // API import
 import { getCurrentUser } from '@/app/api/authController'; // 사용자 정보 import
 import BackButton from '@/app/component/common/BackButton';
 import Comments from '@/app/component/community/Comments';
@@ -116,10 +116,18 @@ export default function PostDetailPage() {
   }, [postId]);
 
   // 좋아요 토글 핸들러
-  const handleLikeToggle = () => {
-    // TODO: 좋아요 API 연동 필요
-    setIsLiked(!isLiked);
-    setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
+  const handleLikeToggle = async () => {
+    try {
+      // API 호출로 좋아요 토글
+      const likeResponse: LikeResponse = await toggleCommunityPostLike(postId);
+      setIsLiked(likeResponse.isLiked);
+      setLikesCount(likeResponse.likesCount);
+    } catch (error) {
+      console.error('좋아요 토글 실패:', error);
+      // API 실패 시 로컬에서 토글 (백업 처리)
+      setIsLiked(!isLiked);
+      setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
+    }
   };
 
   // 댓글 새로고침 핸들러
