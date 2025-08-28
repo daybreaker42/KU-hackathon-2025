@@ -73,9 +73,133 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 45px;
+    margin-bottom: 20px;
 }
 
 .plantImg{
     width: 199px;
+    margin-bottom:20px;
+}
+
+.plantTitle {
+    font-size: large;
+    font-weight: bold;
+    color: #333;
+}
+
+.todo{
+    width:100%;
+    border-radius: 27px;
+    border: 2px solid #DED9CC;
+    padding: 13px;
+    display:flex;
+    justify-content: center;   
+    color:#023735;
+    display:flex;
+    flex-direction: column;
+    text-align: center;
+    margin-bottom:20px;
+}
+
+.todoTitle{
+    font-size:small;
+    margin-bottom:10px;
+}
+
+.todoList{
+    font-size:medium;
+    display: flex;
+    gap:8px;
+    flex-direction: column;
+}
+
+.todoItem {
+    display:flex;
+    gap:8px;
+    flex-direction: column;
+    align-items: center;
+}
+
+.todoItem hr{
+    width:100%;
+    border:1px solid #DED9CC;
+}
+
+.label{
+    font-size:large;
+    font-weight: bold;
+    color:#023735;
+    margin-bottom:7px;
+}
+
+.weekContainer {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    margin-bottom:10px;
+}
+
+.dayItem {
+    cursor:pointer;
+    background-color: #FAF6EC;
+    border: 2px solid #DED9CC;
+    text-align: center;
+    width:45px;
+    height:45px;
+    border-radius: 50%;
+    line-height: 41px;
+    font-size: medium;
+    color:#023735;
+}
+
+.dayItem.today {
+    border: 2px solid #42CA71;
+}
+
+.dayItem.selected{
+    border: 2px solid #b1ada2;
+}
+
+.dayItem.fill{
+    background-color:#F9D131;
+}
+
+.diarySection{
+    border: 2px solid #DED9CC;
+    border-radius: 27px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.diaryTitle{
+    font-size:large;
+    font-weight: bold;
+    color:#023735;
+    margin:3px 3px 5px 3px;
+}
+
+.diaryContent{
+    display:flex;
+    align-items: center;
+}
+
+.diaryImage{
+    width:80px;
+    height:80px;
+    object-fit:cover;
+    object-position: center;
+    border-radius:17px;
+    margin-right: 7px;
+}
+
+.diaryText{
+    margin: 3px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3; /* 표준 속성 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+    max-height: calc(1.4em * 3); /* line-height * 3줄 */
 }
