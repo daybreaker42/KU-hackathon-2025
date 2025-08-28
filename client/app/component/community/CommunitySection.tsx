@@ -93,6 +93,11 @@ export default function CommunitySection({ title, category, plantId, showMoreBut
     }
   };
 
+  // 게시글 클릭 핸들러 추가
+  const handlePostClick = (postId: number) => {
+    router.push(`/community/post/${postId}`);
+  };
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -167,7 +172,11 @@ export default function CommunitySection({ title, category, plantId, showMoreBut
       {/* 게시글 리스트 */}
       <div className="space-y-[10px]">
         {posts.map((post) => (
-          <div key={post.id} className="bg-[#F8F9FA] rounded-lg p-[15px] border border-gray-100">
+          <button
+            key={post.id}
+            onClick={() => handlePostClick(post.id)} // 게시글 클릭 이벤트 추가
+            className="w-full bg-[#F8F9FA] rounded-lg p-[15px] border border-gray-100 hover:border-[#42CA71] hover:bg-gray-50 transition-all text-left"
+          >
             {/* 게시글 헤더 */}
             <div className="flex justify-between items-start mb-[8px]">
               <div className="flex-1 mr-[10px]">
@@ -209,18 +218,18 @@ export default function CommunitySection({ title, category, plantId, showMoreBut
               </span>
               <div className="flex items-center space-x-[10px]">
                 {/* 좋아요 버튼 - lucide-react 아이콘 적용 및 테두리 추가 */}
-                <button className="flex items-center space-x-[4px] text-[#6C757D] text-[12px] hover:text-[#42CA71] hover:border-[#42CA71] transition-colors border border-gray-300 rounded-full px-[8px] py-[4px]">
+                <div className="flex items-center space-x-[4px] text-[#6C757D] text-[12px] border border-gray-300 rounded-full px-[8px] py-[4px]">
                   <Heart size={12} />
                   <span>{post.likes}</span>
-                </button>
+                </div>
                 {/* 댓글 버튼 - lucide-react 아이콘 적용 및 테두리 추가 */}
-                <button className="flex items-center space-x-[4px] text-[#6C757D] text-[12px] hover:text-[#42CA71] hover:border-[#42CA71] transition-colors border border-gray-300 rounded-full px-[8px] py-[4px]">
+                <div className="flex items-center space-x-[4px] text-[#6C757D] text-[12px] border border-gray-300 rounded-full px-[8px] py-[4px]">
                   <MessageCircle size={12} />
                   <span>{post.comments}</span>
-                </button>
+                </div>
               </div>
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </div>
