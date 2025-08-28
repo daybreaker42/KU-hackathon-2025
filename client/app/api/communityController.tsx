@@ -170,6 +170,74 @@ export const searchCommunityPosts = async (
   return getCommunityPosts({ search, page, limit });
 };
 
+// 커뮤니티 게시글 생성 API
+export interface CreateCommunityPostData {
+  title: string;
+  content: string;
+  category: string;
+  plant_name?: string;
+  images?: string[];
+}
+
+export const createCommunityPost = async (
+  postData: CreateCommunityPostData
+): Promise<CommunityPost> => {
+  try {
+    const endpoint = '/community/posts';
+    
+    const response = await apiRequest(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(postData),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`게시글 생성 실패: ${errorData.message || response.status}`);
+    }
+
+    const data: CommunityPost = await response.json();
+    return data;
+  } catch (error) {
+    console.error('게시글 생성 중 오류 발생:', error);
+    throw error;
+  }
+};
+
+// 이미지 여러장 업로드 API
+export const uploadImages = async (
+  files: File[]
+): Promise<{ imageUrls: string[] }> => {
+  try {
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('images', file);
+    });
+
+    const endpoint = '/image/upload/multiple?folder=plants';
+    
+    const response = await apiRequest(endpoint, {
+      method: 'POST',
+      body: formData,
+      // 'Content-Type' 헤더는 FormData 사용 시 브라우저가 자동으로 설정하도록 둡니다.
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`이미지 업로드 실패: ${errorData.message || response.status}`);
+    }
+
+    const data: { imageUrls: string[] } = await response.json();
+    return data;
+  } catch (error) {
+    console.error('이미지 업로드 중 오류 발생:', error);
+    throw error;
+  }
+};
+
+
 /**
  * === Plants API 함수들 ===
  */

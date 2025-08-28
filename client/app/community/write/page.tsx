@@ -1,31 +1,65 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Camera, ChevronDown, X } from 'lucide-react';
 import BackButton from '@/app/component/common/BackButton';
+import { createCommunityPost, uploadImages, getMyPlants } from '@/app/api/communityController';
 
 // 카테고리 옵션
-const categoryOptions = [
+type Category = 'question' | 'daily' | 'free' | 'plant';
+
+const categoryOptions: { value: Category; label: string }[] = [
   { value: 'question', label: '이거 어떻게 키워요?' },
   { value: 'daily', label: '일상' },
   { value: 'free', label: '자유 주제' },
   { value: 'plant', label: '식물별 카테고리' }
 ];
 
+interface MyPlant {
+  id: number;
+  name: string;
+}
+
 export default function WritePostPage() {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [category, setCategory] = useState('question');
+  const [category, setCategory] = useState<Category>('question');
   const [images, setImages] = useState<string[]>([]);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const [myPlants, setMyPlants] = useState<MyPlant[]>([]);
+  const [selectedPlant, setSelectedPlant] = useState<string>('');
+  const [isPlantDropdownOpen, setIsPlantDropdownOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    const fetchMyPlants = async () => {
+      try {
+        const plants = await getMyPlants();
+        setMyPlants(plants.map(p => ({ id: p.id, name: p.name })));
+      } catch (error) {
+        console.error('내 식물 목록을 가져오는 데 실패했습니다:', error);
+      }
+    };
+    fetchMyPlants();
+  }, []);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
-      const newImages = files.map(file => URL.createObjectURL(file));
-      setImages(prev => [...prev, ...newImages]);
+      if (files.length === 0) return;
+
+      setIsUploading(true);
+      try {
+        const response = await uploadImages(files);
+        setImages(prev => [...prev, ...response.imageUrls]);
+      } catch (error) {
+        console.error('이미지 업로드에 실패했습니다:', error);
+        alert('이미지 업로드에 실패했습니다.');
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -33,12 +67,27 @@ export default function WritePostPage() {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement post submission logic
-    console.log({ title, content, category, images });
-    alert('게시글이 등록되었습니다.');
-    router.push('/community');
+    if (isUploading) {
+      alert('이미지 업로드 중입니다. 잠시만 기다려주세요.');
+      return;
+    }
+
+    try {
+      await createCommunityPost({
+        title,
+        content,
+        category,
+        plant_name: category === 'plant' ? selectedPlant : undefined,
+        images
+      });
+      alert('게시글이 성공적으로 등록되었습니다.');
+      router.push('/community');
+    } catch (error) {
+      console.error('게시글 등록에 실패했습니다:', error);
+      alert('게시글 등록에 실패했습니다.');
+    }
   };
   
   const selectedCategoryLabel = categoryOptions.find(c => c.value === category)?.label;
@@ -49,7 +98,7 @@ export default function WritePostPage() {
       <div className="flex items-center justify-between mb-[20px]">
         <BackButton />
         <h1 className="text-[#023735] font-medium text-[18px] flex-1 text-center">새로운 글 작성하기</h1>
-        <div className="w-[24px]"></div> {/* BackButton과 균형을 맞추기 위한 공간 */}
+        <div className="w-[24px]"></div>
       </div>
 
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
@@ -86,6 +135,41 @@ export default function WritePostPage() {
           </div>
         </div>
 
+        {/* 식물 선택 (카테고리가 'plant'일 경우) */}
+        {category === 'plant' && (
+          <div className="mb-[15px]">
+            <label className="block text-[#023735] font-medium text-[14px] mb-[8px]">
+              식물 선택하기
+            </label>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsPlantDropdownOpen(!isPlantDropdownOpen)}
+                className="w-full flex justify-between items-center px-[15px] py-[10px] bg-white border border-[#E5E0D3] rounded-lg text-[#023735] text-[16px]"
+              >
+                <span>{selectedPlant || '내 식물 선택'}</span>
+                <ChevronDown size={20} className={`transition-transform ${isPlantDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isPlantDropdownOpen && (
+                <ul className="absolute z-10 w-full mt-[5px] bg-white border border-[#E5E0D3] rounded-lg shadow-lg">
+                  {myPlants.map(plant => (
+                    <li
+                      key={plant.id}
+                      onClick={() => {
+                        setSelectedPlant(plant.name);
+                        setIsPlantDropdownOpen(false);
+                      }}
+                      className="px-[15px] py-[10px] hover:bg-[#F5F2E8] cursor-pointer"
+                    >
+                      {plant.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* 제목 입력 */}
         <div className="mb-[15px]">
           <label className="block text-[#023735] font-medium text-[14px] mb-[8px]">
@@ -117,10 +201,16 @@ export default function WritePostPage() {
         <div className="mb-[20px]">
           <h2 className="text-[#023735] font-medium text-[14px] mb-[8px]">이미지 첨부하기</h2>
           <div className="flex items-center gap-[10px] overflow-x-auto p-2">
-            <label className="flex-shrink-0 w-[80px] h-[80px] bg-white border-2 border-dashed border-[#E5E0D3] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#F5F2E8]">
-              <Camera size={24} className="text-[#9CA3AF]" />
-              <span className="text-[12px] text-[#9CA3AF] mt-1">{images.length}/10</span>
-              <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} disabled={images.length >= 10} />
+            <label className={`flex-shrink-0 w-[80px] h-[80px] bg-white border-2 border-dashed border-[#E5E0D3] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#F5F2E8] ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+              {isUploading ? (
+                <div className="text-sm text-gray-500">로딩중</div>
+              ) : (
+                <>
+                  <Camera size={24} className="text-[#9CA3AF]" />
+                  <span className="text-[12px] text-[#9CA3AF] mt-1">{images.length}/10</span>
+                </>
+              )}
+              <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} disabled={images.length >= 10 || isUploading} />
             </label>
             {images.map((image, index) => (
               <div key={index} className="relative flex-shrink-0 w-[80px] h-[80px]">
@@ -140,10 +230,10 @@ export default function WritePostPage() {
         {/* 등록 버튼 */}
         <button
           type="submit"
-          disabled={!title || !content}
+          disabled={!title || !content || isUploading || (category === 'plant' && !selectedPlant)}
           className="w-full py-[12px] bg-[#42CA71] text-white font-medium rounded-lg disabled:bg-[#A3D9B8] disabled:cursor-not-allowed"
         >
-          등록하기
+          {isUploading ? '이미지 업로드 중...' : '등록하기'}
         </button>
       </form>
     </div>
