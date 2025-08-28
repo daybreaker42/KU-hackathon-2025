@@ -3,8 +3,8 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import styles from "./page.module.css";
-import { get } from "http";
 import Footer from "./component/common/footer";
+import Link from "next/link";
 
 // 타입 정의
 interface NavProps {
@@ -14,12 +14,17 @@ interface NavProps {
 
 function Nav({ text, img }: NavProps) {
   return(
-    <div>
-      <h2>{text}</h2>
+    <div className={styles.nav}>
+      <h2 className={styles.navTitle}>{text}</h2>
       {!img 
-      ? <div><span className="material_symbols_outlined">
+      ? <Link 
+        className={styles.profile}
+        href={"/user"}
+      >
+        <span className="material_symbols_outlined">
           account_circle
-        </span></div>
+        </span>
+      </Link>
       : <Image src={img} alt={text} width={50} height={50} />
       }
     </div>
@@ -33,9 +38,9 @@ interface PlantProps {
 
 function Plant({ text, img }: PlantProps) {
   return (
-    <div>
+    <div className={styles.plant}>
+      <Image className={styles.plantImg} src={img} alt={text} width={100} height={100} />
       <h2>{text}</h2>
-      <Image src={img} alt={text} width={100} height={100} />
     </div>
   )
 }
