@@ -56,28 +56,28 @@ const DEFAULT_PLANT_IMAGE = '/images/plant-normal.png';
 
 // 이미지 URL 검증 및 기본 이미지 반환 함수
 const getValidImageUrl = (imageUrl: string | null | undefined): string => {
-  console.log('🖼️ 이미지 URL 검증 시작:', imageUrl);
+  // console.log('🖼️ 이미지 URL 검증 시작:', imageUrl);
   
   // 이미지 URL이 없거나 빈 문자열인 경우 기본 이미지 반환
   if (!imageUrl || imageUrl.trim() === '') {
-    console.log('❌ 이미지 URL이 없어 기본 이미지 사용:', DEFAULT_PLANT_IMAGE);
+    // console.log('❌ 이미지 URL이 없어 기본 이미지 사용:', DEFAULT_PLANT_IMAGE);
     return DEFAULT_PLANT_IMAGE;
   }
 
   // 상대 경로인 경우 그대로 사용
   if (imageUrl.startsWith('/')) {
-    console.log('✅ 상대 경로 이미지 URL 사용:', imageUrl);
+    // console.log('✅ 상대 경로 이미지 URL 사용:', imageUrl);
     return imageUrl;
   }
 
   // HTTP/HTTPS URL인 경우 그대로 사용
   if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-    console.log('✅ 외부 URL 이미지 사용:', imageUrl);
+    // console.log('✅ 외부 URL 이미지 사용:', imageUrl);
     return imageUrl;
   }
 
   // 기타 경우 기본 이미지 반환
-  console.log('❌ 유효하지 않은 이미지 URL, 기본 이미지 사용:', imageUrl, '→', DEFAULT_PLANT_IMAGE);
+  // console.log('❌ 유효하지 않은 이미지 URL, 기본 이미지 사용:', imageUrl, '→', DEFAULT_PLANT_IMAGE);
   return DEFAULT_PLANT_IMAGE;
 };
 
@@ -89,13 +89,13 @@ export default function MyPlantsList() {
 
   // 이미지 에러 핸들러
   const handleImageError = (plantId: number, originalUrl: string) => {
-    console.log('❌ 이미지 로드 실패 처리:', { plantId, originalUrl });
+    // console.log('❌ 이미지 로드 실패 처리:', { plantId, originalUrl });
     setImageErrors(prev => new Set(prev).add(plantId));
   };
 
   // 이미지 로드 성공 핸들러  
   const handleImageLoad = (plantId: number, url: string) => {
-    console.log('✅ 이미지 로드 성공:', { plantId, url });
+    // console.log('✅ 이미지 로드 성공:', { plantId, url });
     setImageErrors(prev => {
       const newSet = new Set(prev);
       newSet.delete(plantId);
@@ -117,19 +117,19 @@ export default function MyPlantsList() {
 
         // 실제 API 호출
         const plantsData = await getMyPlants();
-        console.log('🌱 API에서 받아온 전체 응답:', plantsData);
-        console.log('🌱 식물 개수:', plantsData.length);
-        plantsData.forEach((plant, index) => {
-          console.log(`🌱 식물 ${index + 1}:`, {
-            id: plant.id,
-            name: plant.name,
-            variety: plant.variety,
-            img_url: plant.img_url,
-            img_url_type: typeof plant.img_url,
-            img_url_length: plant.img_url?.length || 0,
-            valid_url: getValidImageUrl(plant.img_url)
-          });
-        });
+        // console.log('🌱 API에서 받아온 전체 응답:', plantsData);
+        // console.log('🌱 식물 개수:', plantsData.length);
+        // plantsData.forEach((plant, index) => {
+        //   console.log(`🌱 식물 ${index + 1}:`, {
+        //     id: plant.id,
+        //     name: plant.name,
+        //     variety: plant.variety,
+        //     img_url: plant.img_url,
+        //     img_url_type: typeof plant.img_url,
+        //     img_url_length: plant.img_url?.length || 0,
+        //     valid_url: getValidImageUrl(plant.img_url)
+        //   });
+        // });
         setPlants(plantsData);
       } catch (err) {
         console.error('식물 리스트 조회 중 오류:', err);
@@ -144,7 +144,7 @@ export default function MyPlantsList() {
         프로덕션에서는 제거 예정입니다.
         
         // 서버 연결 실패 시 Mock 데이터로 fallback
-        console.log('Mock 데이터로 fallback');
+        // console.log('Mock 데이터로 fallback');
         await new Promise(resolve => setTimeout(resolve, 1000));
         setPlants(mockPlants.map(mock => ({
           id: mock.id,
