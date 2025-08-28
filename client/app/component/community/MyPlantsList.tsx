@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation'; // Next.js 라우터 import 추가
 import { Plant } from '@/app/types/community/community';
 
 // 식물 데이터 타입 정의
@@ -30,6 +31,13 @@ export default function MyPlantsList() {
   const [plants, setPlants] = useState<Plant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter(); // 라우터 인스턴스 생성
+
+  // 식물 클릭 핸들러 추가
+  const handlePlantClick = (plantId: number) => {
+    // 식물별 커뮤니티 페이지로 이동
+    router.push(`/community/category/plant?plantId=${plantId}`);
+  };
 
   useEffect(() => {
     // API에서 내 식물 리스트를 가져오는 함수
@@ -115,7 +123,11 @@ export default function MyPlantsList() {
       </h2>
       <div className="flex gap-[15px] overflow-x-auto pb-[10px]">
         {plants.map((plant) => (
-          <div key={plant.id} className="flex flex-col w-[100px] flex-shrink-0">
+          <button
+            key={plant.id}
+            onClick={() => handlePlantClick(plant.id)} // 클릭 이벤트 핸들러 연결
+            className="flex flex-col w-[100px] flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+          >
             <div className="relative">
               <Image 
                 src={plant.imageUrl} 
@@ -135,7 +147,7 @@ export default function MyPlantsList() {
                 {plant.name}
               </p>
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </div>
