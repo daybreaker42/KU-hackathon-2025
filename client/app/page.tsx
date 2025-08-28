@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import Footer from "./component/common/footer";
 import Link from "next/link";
-import { getDayDiary, getLastUploaded } from "./controller";
+import { getDayDiary, getLastUploaded } from "./api/homeController";
 
 // 타입 정의
 interface NavProps {
@@ -380,7 +380,10 @@ export default function Home() {
             <Plant text={plantContent.text} img={plantContent.img} />
               <Todo today={today} todoList={todoList} />
               <div>
-                <div className={styles.label}>작성한 일기</div>
+                <div className={styles.labelContainer}>
+                  <div className={styles.label}>작성한 일기</div>
+                  <Link href="/diary" className={styles.moreLink}>더보기</Link>
+                </div>
                 <Diary dayIndex={dayIndex} onClick={handleDayClick} diaryData={diaryData}/>
               </div>
               <div>
