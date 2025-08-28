@@ -45,28 +45,22 @@ export async function postDiary(data: {
   title: string;
   content: string;
   emotion: string;
-  memory: Array<{id: number, memo: string}>;
-  plant_id: number[]
-  water: number[];
-  sun: number[];
+  memory: string;
+  plant_id: number;
+  water: boolean;
+  sun: boolean;
   images: File[];
+  date: string;
 }) {
   try {
 
-    // 목업
-    const req = {
-      title: data.title,
-      content: data.content,
-      emotion: data.emotion,
-      memory: data.memory[0].memo,
-      plant_id: data.plant_id[0],
-      images: data.images
-    }
+    // 새로운 구조에 맞게 수정
+
 
     let res;
     // 이미지가 있으면 먼저 이미지 업로드
     const images = [];
-    if (req.images && req.images.length > 0) {
+    if (data.images && data.images.length > 0) {
       // FormData를 사용하여 이미지 업로드
       const formData = new FormData();
       req.images.forEach((file) => {
@@ -88,11 +82,11 @@ export async function postDiary(data: {
       images.push(result.imageUrl);
     }
 
-    req.images = images;
+    data.images = images;
     // 다이어리 데이터 전송
     const response = await apiRequest("/diaries", {
       method: "POST",
-      body: JSON.stringify(req)
+      body: JSON.stringify(data)
     });
     
     if (!response.ok) {
@@ -125,6 +119,120 @@ export async function deleteDiary(diaryId: number) {
     return true;
   } catch (error) {
     console.error("Error deleting diary:", error);
+    throw error;
+  }
+}
+
+// 일기 댓글 관련 타입 정의
+export interface DiaryComment {
+  id: number;
+  content: string;
+  author: {
+    id: number;
+    name: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  parent_id?: number;
+  replies?: DiaryComment[];
+}
+
+export interface CreateDiaryCommentData {
+  content: string;
+  parent_id?: number;
+}
+
+export interface UpdateDiaryCommentData {
+  content: string;
+}
+
+// 일기 댓글 조회
+export async function getDiaryComments(diaryId: number): Promise<DiaryComment[]> {
+  try {
+    const response = await apiRequest(`/diaries/${diaryId}/comments?page=1&limit=10`, {
+      method: "GET"
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error fetching diary comments:", errorData);
+      throw new Error(errorData.message || "Unknown error");
+    }
+
+    const data = await response.json();
+    return data.comments || [];
+  } catch (error) {
+    console.error("Error fetching diary comments:", error);
+    throw error;
+  }
+}
+
+// 일기 댓글 작성
+export async function createDiaryComment(diaryId: number, commentData: CreateDiaryCommentData): Promise<DiaryComment> {
+  try {
+    const response = await apiRequest(`/diaries/${diaryId}/comments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(commentData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error creating diary comment:", errorData);
+      throw new Error(errorData.message || "Unknown error");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error creating diary comment:", error);
+    throw error;
+  }
+}
+
+// 일기 댓글 수정
+export async function updateDiaryComment(commentId: number, commentData: UpdateDiaryCommentData): Promise<DiaryComment> {
+  try {
+    const response = await apiRequest(`/diaries/comments/${commentId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(commentData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error updating diary comment:", errorData);
+      throw new Error(errorData.message || "Unknown error");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error updating diary comment:", error);
+    throw error;
+  }
+}
+
+// 일기 댓글 삭제
+export async function deleteDiaryComment(commentId: number): Promise<void> {
+  try {
+    const response = await apiRequest(`/diaries/comments/${commentId}`, {
+      method: "DELETE"
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error deleting diary comment:", errorData);
+      throw new Error(errorData.message || "Unknown error");
+    }
+
+    return;
+  } catch (error) {
+    console.error("Error deleting diary comment:", error);
     throw error;
   }
 }

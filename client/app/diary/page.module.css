@@ -139,6 +139,22 @@
   font-weight: bold;
 }
 
+.dayItem.emotionMode {
+  font-size: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 2px solid #E6DFD1;
+}
+
+.dayItem.emotionMode.selected {
+  border: 2px solid #DCB519;
+  background-color: rgba(220, 181, 25, 0.2);
+}
+
+.dayItem.emotionMode.today {
+  border: 2px solid #42CA71 !important;
+  background-color: rgba(66, 202, 113, 0.2);
+}
+
 .todayIndicator {
   position: absolute;
   bottom: 2px;
@@ -219,6 +235,14 @@
   color: #FAF6EC;
 }
 
+.actionButton.emotionBtn {
+  width:41px;
+  text-align: center;
+  font-size:medium;
+  height:41px;
+  padding:10px 0;
+}
+
 .noDiary {
   text-align: center;
   padding: 20px 0;
@@ -228,6 +252,18 @@
 .noDiary p {
   margin-bottom: 20px;
   font-size: medium;
+}
+
+
+.deleteButtonContainer{
+  width:100%;
+  display:flex;
+  justify-content: end;
+}
+
+.deleteButton{
+  font-weight:bold;
+  color:#023735;
 }
 
 .addDiaryButton {
@@ -324,4 +360,94 @@
   font-size: 12px;
   color: #827D73;
   text-align: right;
+}
+
+/* 삭제 확인 모달 */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: white;
+  border-radius: 12px;
+  padding: 0;
+  width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.modalHeader {
+  padding: 20px 20px 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #023735;
+  text-align: center;
+}
+
+.modalBody {
+  padding: 20px;
+  text-align: center;
+}
+
+.modalText {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+}
+
+.modalSubText {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+.cancelButton,
+.confirmDeleteButton {
+  flex: 1;
+  padding: 16px;
+  border: none;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancelButton {
+  color: #666;
+  border-right: 1px solid #f0f0f0;
+}
+
+.cancelButton:hover {
+  background-color: #f8f8f8;
+}
+
+.confirmDeleteButton {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+.confirmDeleteButton:hover {
+  background-color: #fef2f2;
 }

@@ -134,8 +134,8 @@ export const getAuthToken = (): string | null => {
  * 7일간 유효한 쿠키로 저장, 보안 설정 포함
  */
 export const setAuthToken = (token: string): void => {
-  console.log('토큰 저장 시도:', token); // 디버깅용 로그 추가
-  console.log('토큰 타입:', typeof token); // 토큰 타입 확인
+  // console.log('토큰 저장 시도:', token); // 디버깅용 로그 추가
+  // console.log('토큰 타입:', typeof token); // 토큰 타입 확인
   
   if (!token || token === 'undefined') {
     console.error('유효하지 않은 토큰:', token);
@@ -249,7 +249,7 @@ export const apiRequest = async (
 ): Promise<Response> => {
   const url = `${BASE_URL}${endpoint}`;
   const headers = createAuthHeaders(requireAuth, isFormData);
-
+  console.log(headers);
   const response = await fetch(url, {
     ...options,
     headers: {

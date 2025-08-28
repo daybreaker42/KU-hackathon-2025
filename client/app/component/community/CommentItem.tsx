@@ -60,11 +60,6 @@ export default function CommentItem({ comment, onReply, onEdit, onDelete, curren
           </div>
         )}
 
-        {/* 프로필 이미지 */}
-        <div className="w-[32px] h-[32px] bg-[#EFEAD8] rounded-full flex items-center justify-center flex-shrink-0">
-          <span className="text-[16px]">👤</span>
-        </div>
-
         {/* 댓글 내용 */}
         <div className="flex-1">
           <div className="flex items-center justify-between mb-[8px]">

@@ -49,10 +49,6 @@ export default function DiaryWritePage() {
     author: any;
     createdAt: string;
     updatedAt: string;
-    // 다이어리 작성용 로컬 상태
-    growthNote?: string;
-    isWatered?: boolean;  // 급수 여부 (토글)
-    isSunlightAdjusted?: boolean;  // 햇빛 조절 여부 (토글)
   }
 
   // API 응답 타입 정의
@@ -72,12 +68,15 @@ export default function DiaryWritePage() {
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [content, setContent] = useState('');
   const [selectedMood, setSelectedMood] = useState<string>('😊');
+  const [memory, setMemory] = useState(''); // 새로운 구조에 맞게 단일 메모리로 변경
+  const [water, setWater] = useState(false); // 물주기 여부
+  const [sun, setSun] = useState(false); // 햇빛 조절 여부
   const [isLoading, setIsLoading] = useState(false);
   
   // 사용자의 식물 목록 (API에서 가져올 데이터)
   const [userPlants, setUserPlants] = useState<PlantInfo[]>([]);
 
-  // 선택된 식물 상태 추가
+  // 선택된 식물 ID (단일 선택으로 변경)
   const [selectedPlantId, setSelectedPlantId] = useState<number | null>(null);
 
   // 컴포넌트 마운트 시 식물 데이터 가져오기
@@ -87,14 +86,7 @@ export default function DiaryWritePage() {
         setIsLoading(true);
         const response = await getPlant() as unknown as PlantApiResponse;
         if (response.plants) {
-          // API 응답 데이터에 로컬 상태 필드 추가
-          const plantsWithLocalState = response.plants.map((plant: PlantInfo) => ({
-            ...plant,
-            growthNote: '',
-            isWatered: false,
-            isSunlightAdjusted: false
-          }));
-          setUserPlants(plantsWithLocalState);
+          setUserPlants(response.plants);
         }
       } catch (error) {
         console.error('식물 목록을 가져오는데 실패했습니다:', error);
@@ -122,40 +114,10 @@ export default function DiaryWritePage() {
     return moodOption ? moodOption.label : '기쁨';
   };
 
-  // 식물별 성장일기 업데이트
-  const updatePlantGrowthNote = (plantId: number, note: string) => {
-    setUserPlants(prev => 
-      prev.map(plant => 
-        plant.id === plantId ? { ...plant, growthNote: note } : plant
-      )
-    );
-  };
-
-  // 식물별 급수 토글
-  const togglePlantWatering = (plantId: number) => {
-    setUserPlants(prev => 
-      prev.map(plant => 
-        plant.id === plantId ? { ...plant, isWatered: !plant.isWatered } : plant
-      )
-    );
-  };
-
-  // 식물별 햇빛 조절 토글
-  const togglePlantSunlight = (plantId: number) => {
-    setUserPlants(prev => 
-      prev.map(plant => 
-        plant.id === plantId ? { ...plant, isSunlightAdjusted: !plant.isSunlightAdjusted } : plant
-      )
-    );
-  };
-
   // 식물 카드 선택
   const handlePlantSelect = (plantId: number) => {
     setSelectedPlantId(selectedPlantId === plantId ? null : plantId);
   };
-
-  // 선택된 식물 정보 가져오기
-  const selectedPlant = userPlants.find(plant => plant.id === selectedPlantId);
 
   // 이미지 선택 핸들러
   const handleImageSelect = () => {
@@ -207,35 +169,28 @@ export default function DiaryWritePage() {
       alert('내용을 입력해주세요.');
       return;
     }
+
+    if (!selectedPlantId) {
+      alert('식물을 선택해주세요.');
+      return;
+    }
     
     setIsLoading(true);
     
     try {
-      // 선택된 식물들의 ID 수집
-      const selectedPlants = userPlants.filter(plant => plant.growthNote && plant.growthNote.trim() !== '');
-      const plant_id = selectedPlants.map(plant => plant.id);
-      
-      // 물을 준 식물들의 ID 수집 (isWatered가 true인 것들)
-      const water = userPlants.filter(plant => plant.isWatered).map(plant => plant.id);
-      
-      // 햇빛 조절한 식물들의 ID 수집 (isSunlightAdjusted가 true인 것들)
-      const sun = userPlants.filter(plant => plant.isSunlightAdjusted).map(plant => plant.id);
-      
-      // 메모리 데이터 생성 (성장일기가 있는 식물들)
-      const memory = selectedPlants.filter(plant => plant.growthNote !== '').map(plant => ({
-        id: plant.id,
-        memo: plant.growthNote!
-      }));
+      // 날짜 포맷팅 (yyyy-mm-dd)
+      const dateString = `${selectedDate.year}-${String(selectedDate.month).padStart(2, '0')}-${String(selectedDate.day).padStart(2, '0')}`;
 
       const diaryData = {
         title,
         content,
         emotion: getEmotionText(selectedMood),
-        memory,
-        plant_id,
-        water,
-        sun,
-        images: selectedImages
+        memory: memory.trim() || '', // 단일 메모리 필드
+        plant_id: selectedPlantId, // 선택된 단일 식물 ID
+        water, // boolean 값
+        sun, // boolean 값
+        images: selectedImages, // File[] 배열
+        date: dateString // yyyy-mm-dd 형식
       };
       
       const res = await postDiary(diaryData) as unknown as { success: boolean };
@@ -398,16 +353,16 @@ export default function DiaryWritePage() {
         </div>
 
         {/* 선택된 식물의 관리 영역 */}
-        {selectedPlant && (
+        {selectedPlantId && (
           <div>
-            {/* 성장일기 */}
+            {/* 메모리 */}
             <div className={styles.inputContainer}>
-              <label className={styles.label}>성장일기</label>
+              <label className={styles.label}>기억하고 싶은 것</label>
               <input
                 type="text"
-                value={selectedPlant.growthNote}
-                onChange={(e) => updatePlantGrowthNote(selectedPlant.id, e.target.value)}
-                placeholder="새싹 출현 / 꽃망울 수 / 식물의 키"
+                value={memory}
+                onChange={(e) => setMemory(e.target.value)}
+                placeholder="오늘 식물과 함께한 특별한 순간을 기록해보세요"
                 className={styles.input}
               />
             </div>
@@ -417,8 +372,8 @@ export default function DiaryWritePage() {
               <label className={styles.plantLabel}>급수 관리</label>
               <button
                 type="button"
-                onClick={() => togglePlantWatering(selectedPlant.id)}
-                className={`${styles.toggleButton} ${selectedPlant.isWatered ? styles.active : ''}`}
+                onClick={() => setWater(!water)}
+                className={`${styles.toggleButton} ${water ? styles.active : ''}`}
               >
                 급수
               </button>
@@ -429,8 +384,8 @@ export default function DiaryWritePage() {
               <label className={styles.plantLabel}>햇빛 관리</label>
               <button
                 type="button"
-                onClick={() => togglePlantSunlight(selectedPlant.id)}
-                className={`${styles.toggleButton} ${selectedPlant.isSunlightAdjusted ? styles.active : ''}`}
+                onClick={() => setSun(!sun)}
+                className={`${styles.toggleButton} ${sun ? styles.active : ''}`}
               >
                 햇빛 조절
               </button>

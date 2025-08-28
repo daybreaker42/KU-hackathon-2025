@@ -8,12 +8,64 @@ import styles from "./page.module.css";
 import { getDayDiary, SimpleDiaryData, getMonthlyDiary, MonthlyDiaryData } from "../api/homeController";
 import Comments from "../component/community/Comments";
 import { Comment } from "../types/community/community";
-import { deleteDiary } from "../api/diaryController";
+import { deleteDiary, getDiaryComments, createDiaryComment, updateDiaryComment, deleteDiaryComment, DiaryComment, CreateDiaryCommentData, UpdateDiaryCommentData } from "../api/diaryController";
+import { getCurrentUser } from "../api/authController";
 
 // 로컬 Comment 타입 (authorId 포함)
 interface LocalComment extends Comment {
   authorId: number;
 }
+
+// API Comment를 로컬 Comment로 변환하는 함수
+const convertAPICommentToLocal = (apiComment: DiaryComment): LocalComment => {
+  // timeAgo 계산
+  const now = new Date();
+  const createdAt = new Date(apiComment.createdAt);
+  const diffInMinutes = Math.floor((now.getTime() - createdAt.getTime()) / (1000 * 60));
+
+  let timeAgo: string;
+  if (diffInMinutes < 1) {
+    timeAgo = "방금 전";
+  } else if (diffInMinutes < 60) {
+    timeAgo = `${diffInMinutes}분 전`;
+  } else if (diffInMinutes < 1440) {
+    const hours = Math.floor(diffInMinutes / 60);
+    timeAgo = `${hours}시간 전`;
+  } else {
+    const days = Math.floor(diffInMinutes / 1440);
+    timeAgo = `${days}일 전`;
+  }
+
+  return {
+    id: apiComment.id,
+    author: apiComment.author.name,
+    authorId: apiComment.author.id,
+    content: apiComment.content,
+    timeAgo,
+    createdAt: apiComment.createdAt,
+    parentId: apiComment.parent_id || undefined
+  };
+};
+
+// API 댓글 데이터를 로컬 형식으로 변환하는 함수
+const convertAPICommentsToLocal = (apiComments: DiaryComment[]): LocalComment[] => {
+  const result: LocalComment[] = [];
+
+  // 부모 댓글과 대댓글을 모두 평탄화
+  apiComments.forEach(comment => {
+    // 부모 댓글 추가
+    result.push(convertAPICommentToLocal(comment));
+
+    // 대댓글 추가
+    if (comment.replies && comment.replies.length > 0) {
+      comment.replies.forEach(reply => {
+        result.push(convertAPICommentToLocal(reply));
+      });
+    }
+  });
+
+  return result;
+};
 
 // 감정 라벨을 이모티콘으로 변환하는 함수
 const getEmotionEmoji = (emotionLabel: string): string => {
@@ -63,9 +115,11 @@ export default function DiaryPage() {
   const [currentMonth, setCurrentMonth] = useState<number>(initialDate.currentMonth);
   const [currentYear, setCurrentYear] = useState<number>(initialDate.currentYear);
   const [diaryData, setDiaryData] = useState<SimpleDiaryData | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<LocalComment[]>([]);
   const [isEmotion, setIsEmotion] = useState<boolean>(false);
   const [monthlyDiary, setMonthlyDiary] = useState<MonthlyDiaryData | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<{ id: number; email: string; name: string } | null>(null);
 
   // 터치/드래그 관련 상태
   const [touchStart, setTouchStart] = useState<number>(0);
@@ -192,38 +246,89 @@ export default function DiaryPage() {
       // 해당 날짜의 일기 가져오기
       const diary = await getDayDiary(newSelectedDate);
       setDiaryData(diary);
+      
+      // 일기가 있으면 댓글도 가져오기
+      if (diary) {
+        try {
+          const diaryComments = await getDiaryComments(diary.id);
+          const localComments = convertAPICommentsToLocal(diaryComments);
+          setComments(localComments);
+        } catch (error) {
+          console.error('댓글 로딩 실패:', error);
+          setComments([]);
+        }
+      } else {
+        setComments([]);
+      }
     }
   };
 
   // 댓글 관련 함수들
-  const handleAddComment = (content: string) => {
-    const newComment: Comment = {
-      id: Date.now(),
-      content,
-      author: "현재 사용자",
-      timeAgo: "방금",
-      createdAt: new Date().toISOString(),
-      parentId: undefined,
-    };
-    setComments([...comments, newComment]);
+  const handleAddComment = async (content: string) => {
+    if (!currentUser || !diaryData) {
+      console.error('사용자 정보나 일기 정보가 없습니다.');
+      return;
+    }
+
+    try {
+      // API 호출
+      const commentData: CreateDiaryCommentData = { content };
+      const newComment = await createDiaryComment(diaryData.id, commentData);
+
+      // 로컬 상태 업데이트
+      const localComment = convertAPICommentToLocal(newComment);
+      setComments(prevComments => [...prevComments, localComment]);
+    } catch (error) {
+      console.error('댓글 작성 실패:', error);
+      // API 실패 시 로컬에서 처리
+      const comment: LocalComment = {
+        id: Date.now(),
+        author: currentUser.name,
+        authorId: currentUser.id,
+        content,
+        timeAgo: "방금 전",
+        createdAt: new Date().toISOString(),
+        parentId: undefined,
+      };
+      setComments(prevComments => [...prevComments, comment]);
+    }
   };
 
-  const handleAddReply = (parentId: number, content: string) => {
-    const newReply: Comment = {
-      id: Date.now(),
-      content,
-      author: "현재 사용자",
-      timeAgo: "방금",
-      createdAt: new Date().toISOString(),
-      parentId,
-    };
-    setComments([...comments, newReply]);
+  const handleAddReply = async (parentId: number, content: string) => {
+    if (!currentUser || !diaryData) {
+      console.error('사용자 정보나 일기 정보가 없습니다.');
+      return;
+    }
+
+    try {
+      // API 호출
+      const commentData: CreateDiaryCommentData = { content, parent_id: parentId };
+      const newReply = await createDiaryComment(diaryData.id, commentData);
+
+      // 로컬 상태 업데이트
+      const localReply = convertAPICommentToLocal(newReply);
+      setComments(prevComments => [...prevComments, localReply]);
+    } catch (error) {
+      console.error('대댓글 작성 실패:', error);
+      // API 실패 시 로컬에서 처리
+      const reply: LocalComment = {
+        id: Date.now(),
+        author: currentUser.name,
+        authorId: currentUser.id,
+        content,
+        timeAgo: "방금 전",
+        createdAt: new Date().toISOString(),
+        parentId,
+      };
+      setComments(prevComments => [...prevComments, reply]);
+    }
   };
 
-  const handleRefresh = () => {
-    // 댓글 새로고침 로직
-    console.log("댓글 새로고침");
-  };
+  // 현재 사용자 정보 가져오기
+  useEffect(() => {
+    const user = getCurrentUser();
+    setCurrentUser(user);
+  }, []);
 
   useEffect(() => {
     // URL 파라미터에서 지정된 날짜 또는 오늘 날짜의 일기 가져오기
@@ -262,7 +367,35 @@ export default function DiaryPage() {
   ];
 
   const handleDiaryDelete = async () => {
-    await deleteDiary(diaryData?.id || 0);
+    if (!diaryData?.id) {
+      alert('삭제할 일기를 찾을 수 없습니다.');
+      return;
+    }
+
+    try {
+      console.log('Deleting diary with id:', diaryData.id);
+      await deleteDiary(diaryData.id);
+      
+      // 삭제 성공 후 UI 업데이트
+      setDiaryData(null);
+      setShowDeleteModal(false);
+      
+      // 월별 일기 데이터를 다시 로드하여 달력 색칠 업데이트
+      const updatedMonthlyData = await getMonthlyDiary(currentYear, currentMonth + 1);
+      setMonthlyDiary(updatedMonthlyData);
+      
+    } catch (error) {
+      console.error('일기 삭제 실패:', error);
+      alert('일기 삭제에 실패했습니다.');
+    }
+  }
+
+  const openDeleteModal = () => {
+    setShowDeleteModal(true);
+  }
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
   }
 
   return (
@@ -322,6 +455,10 @@ export default function DiaryPage() {
             
             // 월별 일기 데이터에서 해당 날짜에 일기가 있는지 확인
             const hasContent = monthlyDiary?.diaryDates.includes(day) || false;
+            
+            // 해당 날짜의 감정 이모지 가져오기
+            const emotionForDay = monthlyDiary?.emotions?.[day.toString()];
+            const emotionEmoji = emotionForDay ? getEmotionEmoji(emotionForDay) : null;
 
             return (
               <div
@@ -329,7 +466,7 @@ export default function DiaryPage() {
                 className={`${styles.dayItem} ${isSelected ? styles.selected : ''} ${hasContent ? styles.hasContent : ''} ${isToday ? styles.today : ''}`}
                 onClick={() => handleDateClick(day)}
               >
-                {day}
+                {isEmotion && emotionEmoji ? emotionEmoji : day}
               </div>
             );
           })}
@@ -360,12 +497,14 @@ export default function DiaryPage() {
               
               {/* 일기 액션 버튼들 */}
               <div className={styles.diaryActions}>
-                <button className={styles.actionButton}>{getEmotionEmoji(diaryData.emotion)}</button>
-                {diaryData.memory !== '' && <button className={styles.actionButton}>{diaryData.memory}</button>}
+                <button className={`${styles.actionButton} ${styles.emotionBtn}`}>{getEmotionEmoji(diaryData.emotion)}</button>
+                {(diaryData.memory && diaryData.memory.trim() !== '') && <button className={styles.actionButton}>{diaryData.memory}</button>}
                 {diaryData.water && <button className={`${styles.actionButton} ${styles.plant}`}>급수</button>}
                 {diaryData.sun && <button className={`${styles.actionButton} ${styles.plant}`}>햇빛 조절</button>}
               </div>
-              <div onClick={handleDiaryDelete}>삭제하기</div>
+              <div className={styles.deleteButtonContainer}>
+                <div onClick={openDeleteModal} className={styles.deleteButton}>삭제하기</div>
+              </div>
             </div>
           ) : (
             (() => {
@@ -396,12 +535,77 @@ export default function DiaryPage() {
 
         {/* 댓글 섹션 */}
         <Comments
-          comments={comments.map(comment => ({ ...comment, authorId: comment.id }))}
+          comments={comments}
           onAddComment={handleAddComment}
           onAddReply={handleAddReply}
-          onRefresh={handleRefresh}
+          onEditComment={async (commentId: number, content: string) => {
+            try {
+              // API 호출
+              const commentData: UpdateDiaryCommentData = { content };
+              const updatedComment = await updateDiaryComment(commentId, commentData);
+
+              // 로컬 상태 업데이트
+              const localComment = convertAPICommentToLocal(updatedComment);
+              setComments(prevComments =>
+                prevComments.map(comment =>
+                  comment.id === commentId ? localComment : comment
+                )
+              );
+            } catch (error) {
+              console.error('댓글 수정 실패:', error);
+              // 로컬에서 직접 수정
+              setComments(prevComments =>
+                prevComments.map(comment =>
+                  comment.id === commentId
+                    ? { ...comment, content, timeAgo: "방금 전" }
+                    : comment
+                )
+              );
+            }
+          }}
+          onDeleteComment={async (commentId: number) => {
+            try {
+              // API 호출
+              await deleteDiaryComment(commentId);
+
+              // 로컬 상태 업데이트
+              setComments(prevComments =>
+                prevComments.filter(comment => comment.id !== commentId)
+              );
+            } catch (error) {
+              console.error('댓글 삭제 실패:', error);
+              // 로컬에서 직접 삭제
+              setComments(prevComments =>
+                prevComments.filter(comment => comment.id !== commentId)
+              );
+            }
+          }}
+          currentUserId={currentUser?.id}
         />
       </div>
+
+      {/* 삭제 확인 모달 */}
+      {showDeleteModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>일기 삭제</h3>
+            </div>
+            <div className={styles.modalBody}>
+              <p className={styles.modalText}>정말로 이 일기를 삭제하시겠습니까?</p>
+              <p className={styles.modalSubText}>삭제된 일기는 복구할 수 없습니다.</p>
+            </div>
+            <div className={styles.modalActions}>
+              <button onClick={closeDeleteModal} className={styles.cancelButton}>
+                취소
+              </button>
+              <button onClick={handleDiaryDelete} className={styles.confirmDeleteButton}>
+                삭제
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
