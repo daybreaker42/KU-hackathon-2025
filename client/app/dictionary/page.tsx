@@ -4,7 +4,6 @@ import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { Camera } from 'lucide-react';
 import BackButton from '@/app/component/common/BackButton';
-import CloseButton from '@/app/component/common/CloseButton';
 import { uploadPlantImage, identifyPlant, PlantIdentificationData } from '@/app/api/communityController';
 
 export default function PlantDictionaryPage() {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-// import Image from 'next/image'; // 임시로 주석 처리 - img 태그 테스트 중
+import Image from 'next/image'; // Image 컴포넌트 import
 import Link from 'next/link'; // Link import 추가
 // API 및 타입 import
 // import { autoLogin, isAuthenticated } from '@/app/api/authController';
@@ -88,13 +88,13 @@ export default function MyPlantsList() {
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set()); // 이미지 에러 추적
 
   // 이미지 에러 핸들러
-  const handleImageError = (plantId: number, originalUrl: string) => {
+  const handleImageError = (plantId: number,) => {
     // console.log('❌ 이미지 로드 실패 처리:', { plantId, originalUrl });
     setImageErrors(prev => new Set(prev).add(plantId));
   };
 
   // 이미지 로드 성공 핸들러  
-  const handleImageLoad = (plantId: number, url: string) => {
+  const handleImageLoad = (plantId: number) => {
     // console.log('✅ 이미지 로드 성공:', { plantId, url });
     setImageErrors(prev => {
       const newSet = new Set(prev);
@@ -236,14 +236,14 @@ export default function MyPlantsList() {
           >
             <div className="relative">
               {/* 이미지 에러가 발생한 경우 기본 이미지 표시 */}
-              <img 
+              <Image
                 src={imageErrors.has(plant.id) ? DEFAULT_PLANT_IMAGE : getValidImageUrl(plant.img_url)}
                 alt={plant.name}
                 width={100}
                 height={100}
                 className="w-[100px] h-[100px] object-cover rounded-lg"
-                onError={() => handleImageError(plant.id, plant.img_url)}
-                onLoad={() => handleImageLoad(plant.id, plant.img_url)}
+                onError={() => handleImageError(plant.id)}
+                onLoadingComplete={() => handleImageLoad(plant.id)} // onLoad 대신 onLoadingComplete 사용
               />
             </div>
             <div className="mt-[10px] text-center">

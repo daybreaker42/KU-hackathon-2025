@@ -28,23 +28,27 @@ export default function FriendsPage() {
   const [processingRequestId, setProcessingRequestId] = useState<number | null>(null);
   const [actionStatus, setActionStatus] = useState<{ id?: number; message: string; type: 'success' | 'error' } | null>(null);
 
-  // Tab State
-  const [selectedTab, setSelectedTab] = useState<'friends' | 'received' | 'sent' | 'search'>('friends');
+  // Tab State - 검색 탭 제거
+  const [selectedTab, setSelectedTab] = useState<'friends' | 'received' | 'sent'>('friends');
 
   // --- Data Fetching Effects ---
 
+  // Fetch friends function
+  const fetchFriends = async () => {
+    setFriendsLoading(true);
+    setFriendsError(null);
+    try {
+      const data = await getFriendsList();
+      setFriends(data);
+    } catch (err: any) {
+      setFriendsError(err.message || '친구 목록을 불러오는데 실패했습니다.');
+    } finally {
+      setFriendsLoading(false);
+    }
+  };
+
   // Fetch initial friends list
   useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const data = await getFriendsList();
-        setFriends(data);
-      } catch (err: any) {
-        setFriendsError(err.message || '친구 목록을 불러오는데 실패했습니다.');
-      } finally {
-        setFriendsLoading(false);
-      }
-    };
     fetchFriends();
   }, []);
 
@@ -72,11 +76,10 @@ export default function FriendsPage() {
     if (searchQuery.trim() === '') {
       setSearchResults([]);
       setSearchError(null);
-      setSelectedTab('friends'); // Go back to friends list if search is cleared
       return;
     }
 
-    setSelectedTab('search'); // Switch to search tab when query is active
+    // 검색어가 있으면 검색 실행
     setSearchLoading(true);
     setSearchError(null);
     const handler = setTimeout(async () => {
@@ -157,7 +160,7 @@ export default function FriendsPage() {
           {friend.email && <p className="text-sm text-gray-500">{friend.email}</p>}
         </div>
       </div>
-      {selectedTab === 'search' && (
+      {searchQuery.trim() !== '' && (
         <button
           onClick={() => handleSendRequest(friend.id)}
           disabled={sendingRequestId === friend.id}
@@ -256,114 +259,260 @@ export default function FriendsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex justify-around mb-4  p-2 rounded-lg">
+        <div className="flex justify-around mb-4 p-2 rounded-lg">
           <button
             onClick={() => setSelectedTab('friends')}
-            className={`flex-1 py-2 text-center font-bold rounded-md transition-colors
+            className={`flex-1 py-2 text-center font-bold rounded-md transition-colors mx-1
               ${selectedTab === 'friends' ? 'bg-[#4CAF50] text-white' : 'text-gray-600 hover:bg-gray-100'}
             `}
           >
             내 친구
+            {friends.length > 0 && (
+              <span className="ml-1 text-xs bg-white bg-opacity-20 px-1 rounded-full">
+                {friends.length}
+              </span>
+            )}
           </button>
           <button
             onClick={() => setSelectedTab('received')}
-            className={`flex-1 py-2 text-center font-bold rounded-md transition-colors
+            className={`flex-1 py-2 text-center font-bold rounded-md transition-colors mx-1
               ${selectedTab === 'received' ? 'bg-[#4CAF50] text-white' : 'text-gray-600 hover:bg-gray-100'}
             `}
           >
             받은 요청
+            {receivedRequests.length > 0 && (
+              <span className="ml-1 text-xs bg-red-500 text-white px-1 rounded-full">
+                {receivedRequests.length}
+              </span>
+            )}
           </button>
           <button
             onClick={() => setSelectedTab('sent')}
-            className={`flex-1 py-2 text-center font-bold rounded-md transition-colors
+            className={`flex-1 py-2 text-center font-bold rounded-md transition-colors mx-1
               ${selectedTab === 'sent' ? 'bg-[#4CAF50] text-white' : 'text-gray-600 hover:bg-gray-100'}
             `}
           >
             보낸 요청
+            {sentRequests.length > 0 && (
+              <span className="ml-1 text-xs bg-yellow-500 text-white px-1 rounded-full">
+                {sentRequests.length}
+              </span>
+            )}
           </button>
         </div>
 
         <main className='bg-transparent bg-none' style={{ background: '#FAF6EC', backgroundImage: 'none' }}>
-          {/* Global Action Status Message */}
+          {/* Global Action Status Message - 더 눈에 띄는 토스트 메시지 */}
           {actionStatus && (
-            <div className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-50 p-3 rounded-md text-center text-white
+            <div className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-50 p-4 rounded-lg text-center text-white shadow-lg max-w-sm
               ${actionStatus.type === 'success' ? 'bg-green-500' : 'bg-red-500'}
             `}>
-              {actionStatus.message}
+              <div className="flex items-center justify-center">
+                <span className="mr-2">
+                  {actionStatus.type === 'success' ? '✅' : '❌'}
+                </span>
+                <span className="font-medium">{actionStatus.message}</span>
+              </div>
             </div>
           )}
 
           {/* Conditional Content Rendering */}
-          {selectedTab === 'search' && (
+          
+          {/* 검색어가 있을 때 - 검색 결과 표시 */}
+          {searchQuery.trim() !== '' && (
             <>
               {searchLoading && (
-                <div className="text-center text-gray-600">사용자 검색 중...</div>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4CAF50] mb-4"></div>
+                  <p className="text-gray-600 font-medium">사용자를 검색하는 중입니다...</p>
+                  <p className="text-sm text-gray-500 mt-1">잠시만 기다려주세요</p>
+                </div>
               )}
               {searchError && (
-                <div className="text-center text-red-500">{searchError}</div>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="text-red-500 text-4xl mb-4">⚠️</div>
+                  <p className="text-red-600 font-semibold mb-2">검색 중 오류가 발생했습니다</p>
+                  <p className="text-red-500 text-sm text-center mb-4">{searchError}</p>
+                  <button
+                    onClick={() => {
+                      setSearchError(null);
+                      if (searchQuery.trim()) {
+                        // 검색 재시도 로직은 useEffect가 처리
+                        setSearchQuery(searchQuery + ' '); // 임시로 변경하여 useEffect 트리거
+                        setTimeout(() => setSearchQuery(searchQuery), 100);
+                      }
+                    }}
+                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                  >
+                    다시 시도
+                  </button>
+                </div>
               )}
               {!searchLoading && !searchError && searchResults.length === 0 && (
-                <div className="text-center text-gray-600">검색 결과가 없습니다.</div>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="text-gray-400 text-4xl mb-4">🔍</div>
+                  <p className="text-gray-600 font-medium mb-2">검색 결과가 없습니다</p>
+                  <p className="text-sm text-gray-500 text-center">
+                    &ldquo;<span className="font-medium">{searchQuery}</span>&rdquo;와 일치하는 사용자를 찾을 수 없습니다
+                  </p>
+                  <p className="text-xs text-gray-400 mt-2">다른 검색어를 시도해보세요</p>
+                </div>
               )}
               {!searchLoading && !searchError && searchResults.length > 0 && (
-                <ul className="space-y-4">
-                  {searchResults.map((friend) => renderFriendItem(friend))}
-                </ul>
+                <div>
+                  <p className="text-sm text-gray-600 mb-4 text-center">
+                    총 <span className="font-semibold text-[#4CAF50]">{searchResults.length}명</span>의 사용자를 찾았습니다
+                  </p>
+                  <ul className="space-y-4">
+                    {searchResults.map((friend) => renderFriendItem(friend))}
+                  </ul>
+                </div>
               )}
             </>
           )}
 
-          {selectedTab === 'friends' && searchQuery.trim() === '' && (
+          {/* 검색어가 없을 때 - 탭별 내용 표시 */}
+          {searchQuery.trim() === '' && selectedTab === 'friends' && (
             <>
               {friendsLoading && (
-                <div className="text-center text-gray-600">친구 목록을 불러오는 중...</div>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4CAF50] mb-4"></div>
+                  <p className="text-gray-600 font-medium">친구 목록을 불러오는 중입니다...</p>
+                  <p className="text-sm text-gray-500 mt-1">잠시만 기다려주세요</p>
+                </div>
               )}
               {friendsError && (
-                <div className="text-center text-red-500">{friendsError}</div>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="text-red-500 text-4xl mb-4">⚠️</div>
+                  <p className="text-red-600 font-semibold mb-2">친구 목록을 불러올 수 없습니다</p>
+                  <p className="text-red-500 text-sm text-center mb-4">{friendsError}</p>
+                  <button 
+                    onClick={() => {
+                      setFriendsError(null);
+                      // fetchFriends 함수가 없으므로 페이지 새로고침으로 대체
+                      window.location.reload();
+                    }}
+                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                  >
+                    다시 시도
+                  </button>
+                </div>
               )}
               {!friendsLoading && !friendsError && friends.length === 0 && (
-                <div className="text-center text-gray-600">아직 친구가 없습니다.</div>
+                <div className="flex flex-col items-center justify-center py-16">
+                  <div className="text-gray-300 text-5xl mb-4">🤝</div>
+                  <p className="text-gray-600 font-medium mb-2">아직 친구가 없습니다</p>
+                  <p className="text-sm text-gray-500 text-center max-w-xs">
+                    위 검색창에서 새로운 친구를 찾아<br/>
+                    친구 신청을 보내보세요!
+                  </p>
+                </div>
               )}
               {!friendsLoading && !friendsError && friends.length > 0 && (
-                <ul className="space-y-4">
-                  {friends.map((friend) => renderFriendItem(friend))}
-                </ul>
+                <div>
+                  <p className="text-sm text-gray-600 mb-4 text-center">
+                    총 <span className="font-semibold text-[#4CAF50]">{friends.length}명</span>의 친구가 있습니다
+                  </p>
+                  <ul className="space-y-4">
+                    {friends.map((friend) => renderFriendItem(friend))}
+                  </ul>
+                </div>
               )}
             </>
           )}
 
-          {selectedTab === 'received' && searchQuery.trim() === '' && (
+          {searchQuery.trim() === '' && selectedTab === 'received' && (
             <>
               {requestsLoading && (
-                <div className="text-center text-gray-600">받은 친구 요청 목록을 불러오는 중...</div>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4CAF50] mb-4"></div>
+                  <p className="text-gray-600 font-medium">받은 친구 요청을 불러오는 중입니다...</p>
+                  <p className="text-sm text-gray-500 mt-1">잠시만 기다려주세요</p>
+                </div>
               )}
               {requestsError && (
-                <div className="text-center text-red-500">{requestsError}</div>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="text-red-500 text-4xl mb-4">⚠️</div>
+                  <p className="text-red-600 font-semibold mb-2">친구 요청을 불러올 수 없습니다</p>
+                  <p className="text-red-500 text-sm text-center mb-4">{requestsError}</p>
+                  <button 
+                    onClick={() => {
+                      setRequestsError(null);
+                      window.location.reload();
+                    }}
+                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                  >
+                    다시 시도
+                  </button>
+                </div>
               )}
-              {!requestsLoading && !requestsError && receivedRequests.length === 0 ? (
-                <p className="text-gray-600">받은 친구 요청이 없습니다.</p>
-              ) : (
-                <ul className="space-y-4">
-                  {receivedRequests.map((req) => renderRequestItem(req, 'received'))}
-                </ul>
+              {!requestsLoading && !requestsError && receivedRequests.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-16">
+                  <div className="text-gray-300 text-5xl mb-4">📨</div>
+                  <p className="text-gray-600 font-medium mb-2">받은 친구 요청이 없습니다</p>
+                  <p className="text-sm text-gray-500 text-center max-w-xs">
+                    다른 사용자로부터 친구 요청이 오면<br/>
+                    여기에서 확인할 수 있습니다
+                  </p>
+                </div>
+              )}
+              {!requestsLoading && !requestsError && receivedRequests.length > 0 && (
+                <div>
+                  <p className="text-sm text-gray-600 mb-4 text-center">
+                    <span className="font-semibold text-[#4CAF50]">{receivedRequests.length}개</span>의 친구 요청을 받았습니다
+                  </p>
+                  <ul className="space-y-4">
+                    {receivedRequests.map((req) => renderRequestItem(req, 'received'))}
+                  </ul>
+                </div>
               )}
             </>
           )}
 
-          {selectedTab === 'sent' && searchQuery.trim() === '' && (
+          {searchQuery.trim() === '' && selectedTab === 'sent' && (
             <>
               {requestsLoading && (
-                <div className="text-center text-gray-600">보낸 친구 요청 목록을 불러오는 중...</div>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4CAF50] mb-4"></div>
+                  <p className="text-gray-600 font-medium">보낸 친구 요청을 불러오는 중입니다...</p>
+                  <p className="text-sm text-gray-500 mt-1">잠시만 기다려주세요</p>
+                </div>
               )}
               {requestsError && (
-                <div className="text-center text-red-500">{requestsError}</div>
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="text-red-500 text-4xl mb-4">⚠️</div>
+                  <p className="text-red-600 font-semibold mb-2">친구 요청을 불러올 수 없습니다</p>
+                  <p className="text-red-500 text-sm text-center mb-4">{requestsError}</p>
+                  <button 
+                    onClick={() => {
+                      setRequestsError(null);
+                      window.location.reload();
+                    }}
+                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                  >
+                    다시 시도
+                  </button>
+                </div>
               )}
-              {!requestsLoading && !requestsError && sentRequests.length === 0 ? (
-                <p className="text-gray-600">보낸 친구 요청이 없습니다.</p>
-              ) : (
-                <ul className="space-y-4">
-                  {sentRequests.map((req) => renderRequestItem(req, 'sent'))}
-                </ul>
+              {!requestsLoading && !requestsError && sentRequests.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-16">
+                  <div className="text-gray-300 text-5xl mb-4">📤</div>
+                  <p className="text-gray-600 font-medium mb-2">보낸 친구 요청이 없습니다</p>
+                  <p className="text-sm text-gray-500 text-center max-w-xs">
+                    위 검색창에서 다른 사용자를 찾아<br/>
+                    친구 신청을 보내보세요!
+                  </p>
+                </div>
+              )}
+              {!requestsLoading && !requestsError && sentRequests.length > 0 && (
+                <div>
+                  <p className="text-sm text-gray-600 mb-4 text-center">
+                    <span className="font-semibold text-[#4CAF50]">{sentRequests.length}개</span>의 친구 요청을 보냈습니다
+                  </p>
+                  <ul className="space-y-4">
+                    {sentRequests.map((req) => renderRequestItem(req, 'sent'))}
+                  </ul>
+                </div>
               )}
             </>
           )}
