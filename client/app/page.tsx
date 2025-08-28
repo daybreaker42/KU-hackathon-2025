@@ -26,7 +26,9 @@ function Nav({ text, img }: NavProps) {
           account_circle
         </span>
       </Link>
-      : <Image src={img} alt={text} width={50} height={50} />
+      : <Link href={"/user"}>
+        <Image src={img} alt={text} width={50} height={50} />
+      </Link>
       }
     </div>
   )
@@ -158,30 +160,28 @@ interface ReactionProps {
   reactionData: ReactionList[];
 }
 
-function Reaction({ reactionData, selectedDay }: ReactionProps & { selectedDay: Date }) {
-  // 선택된 날짜의 반응 데이터 찾기 (날짜 비교를 위해 toDateString() 사용)
-  const selectedReaction = reactionData.find(data => 
-    data.day.toDateString() === selectedDay.toDateString()
-  );
-  const reactions = selectedReaction ? selectedReaction.list : [];
-
+function Reaction({ reactionData }: ReactionProps) {
   return (
-    <div className={styles.reaction}>
-      <div className={styles.reactionTitle}>
-        {selectedReaction ? selectedReaction.title : "친구들의 반응"}
-      </div>
-      <div className={styles.reactionList}>
-        {reactions.length === 0 ? (
-          <div className={styles.noReaction}>아직 반응이 없습니다.</div>
-        ) : (
-          reactions.map((reaction, index) => (
-            <div key={`reaction-${index}`} className={styles.reactionItem}>
-              <div className={styles.reactionUser}>{reaction.user}</div>
-              <div className={styles.reactionComment}>{reaction.comment}</div>
+    <div className={styles.reactionList}>
+      {reactionData.map((reactionList, index) => (
+        <div key={`reaction-list-${index}`} className={styles.reactionDayItem}>
+          <div className={styles.reactionDayHeader}>
+            <div className={styles.reactionDay}>{reactionList.day.getDate()}</div>
+            <div className={styles.reactionTitle}>{reactionList.title}</div>
+          </div>
+          {reactionList.list.map((reaction, reactionIndex) => (
+            <div key={`reaction-${reactionIndex}`}>
+              <div className={styles.reactionItem}>
+                <span className={styles.reactionUser}>{reaction.user}</span>
+                <span className={styles.reactionComment}>{reaction.comment}</span>
+              </div>
+              {reactionIndex < reactionList.list.length - 1 && (
+                <hr className={styles.reactionDivider} />
+              )}
             </div>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      ))}
     </div>
   )
 }
@@ -195,7 +195,6 @@ export default function Home() {
   const [dayIndex, setDayIndex] = useState<number>(0);
   const [diaryData, setDiaryData] = useState<{title: string; content: string; photo: string | null} | null>(null);
   const [reactionData, setReactionData] = useState<ReactionList[]>([]);
-  const [selectedDay, setSelectedDay] = useState<Date>(new Date());
 
   const timeCategories: string[] = [
     "좋은 아침 입니다.",
@@ -255,8 +254,7 @@ export default function Home() {
         day: new Date("2025-08-26"), // 월요일
         title: "월요일 식물 일기",
         list: [
-          { user: "아빠", comment: "새로운 한 주 시작이네" },
-          { user: "동생", comment: "식물도 월요병 있나?" }
+          { user: "아빠", comment: "새로운 한 주 시작이네" }
         ]
       },
       {
@@ -265,39 +263,6 @@ export default function Home() {
         list: [
           { user: "엄마", comment: "잎이 더 많아진 것 같아" },
           { user: "할머니", comment: "물을 적당히 주는 게 중요해" }
-        ]
-      },
-      {
-        day: new Date("2025-08-28"), // 수요일 (오늘)
-        title: "수요일 식물 일기",
-        list: [
-          { user: "엄마", comment: "우리 식물이 정말 예뻐졌네!" },
-          { user: "아빠", comment: "물을 자주 줘야 할 것 같아" },
-          { user: "할머니", comment: "잎이 더 무성해진 것 같다" },
-          { user: "동생", comment: "나도 식물 키우고 싶어" }
-        ]
-      },
-      {
-        day: new Date("2025-08-29"), // 목요일
-        title: "목요일 식물 일기",
-        list: [
-          { user: "아빠", comment: "목요일도 화이팅!" }
-        ]
-      },
-      {
-        day: new Date("2025-08-30"), // 금요일
-        title: "금요일 식물 일기",
-        list: [
-          { user: "엄마", comment: "주말이 기다려지네" },
-          { user: "동생", comment: "식물도 주말을 좋아할까?" }
-        ]
-      },
-      {
-        day: new Date("2025-08-31"), // 토요일
-        title: "토요일 식물 일기",
-        list: [
-          { user: "할머니", comment: "8월의 마지막 날이네" },
-          { user: "엄마", comment: "이번 달도 식물을 잘 키웠어" }
         ]
       }
     ];
@@ -316,10 +281,6 @@ export default function Home() {
     setTodoList(getTodoList());
     setReactionData(getReactionData()); // 반응 데이터 설정
     setDayIndex(getTodayIndex()); // 오늘 날짜의 인덱스로 초기화
-    
-    // 오늘 날짜를 Date 객체로 설정
-    const today = new Date();
-    setSelectedDay(today);
 
     // 오늘 일기 가져오기
     const getDiary = async () => {
@@ -351,9 +312,7 @@ export default function Home() {
     
     const weekDates = getCurrentWeekDates();
     const selectedDate = weekDates[dayIndex]; // Date 객체 그대로 전달
-    
-    // 선택된 날짜를 Date 객체로 설정
-    setSelectedDay(selectedDate);
+  
     setDayIndex(dayIndex);
     
     const diary = await getDayDiary(selectedDate);
@@ -373,7 +332,7 @@ export default function Home() {
           </div>
           <div>
             <div className={styles.label}>친구들 반응</div>
-            <Reaction reactionData={reactionData} selectedDay={selectedDay} />
+            <Reaction reactionData={reactionData}/>
           </div>
         </div>
       </div>

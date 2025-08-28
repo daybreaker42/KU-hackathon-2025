@@ -203,3 +203,65 @@
     line-height: 1.4;
     max-height: calc(1.4em * 3); /* line-height * 3줄 */
 }
+
+.reactionList{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.reactionDayItem{
+    border: 2px solid #DED9CC;
+    border-radius: 27px;
+    padding: 10px;
+}
+
+.reactionDayHeader{
+    display:flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.reactionDay{
+    height: 36px;
+    width:36px;
+    text-align: center;
+    line-height: 36px;
+    background-color: #42CA71;
+    border-radius: 17px;
+    color:#023735;
+    font-size:14px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.reactionTitle{
+    font-weight: bold;
+    color:#023735;
+}
+
+.reactionItem {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 4px 3px;
+}
+
+.reactionUser {
+    font-weight: bold;
+    color: #023735;
+    flex-shrink: 0;
+    width: 70px;
+}
+
+.reactionComment {
+    color: #333;
+    flex: 1;
+}
+
+.reactionDivider {
+    border: none;
+    border-top: 2px solid #DED9CC;
+    margin: 4px 0;
+}
+
