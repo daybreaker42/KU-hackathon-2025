@@ -476,6 +476,46 @@ export const uploadPlantImage = async (
   }
 };
 
+// Plant.ID를 통한 식물 식별 API 타입 정의
+export interface PlantIdentificationData {
+  name: string;
+  koreanName: string;
+  probability: number;
+  careInfo: {
+    wateringCycle: string;
+    sunlightNeeds: string;
+    careInstructions: string;
+  };
+}
+
+// Plant.ID를 통한 식물 식별 API
+export const identifyPlant = async (
+  imageUrl: string
+): Promise<PlantIdentificationData> => {
+  try {
+    const endpoint = '/external-api/complete-plant-identification';
+
+    const response = await apiRequest(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ imageUrl }),
+    }, true); // requireAuth = true
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`식물 식별 실패: ${errorData.message || response.status}`);
+    }
+
+    const data: PlantIdentificationData = await response.json();
+    return data;
+  } catch (error) {
+    console.error('식물 식별 중 오류 발생:', error);
+    throw error;
+  }
+};
+
 // 식물 등록 API
 export interface CreatePlantData {
   name: string;

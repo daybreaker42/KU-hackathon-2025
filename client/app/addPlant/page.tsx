@@ -6,7 +6,7 @@ import Image from 'next/image'; // next/image import
 import { Camera } from 'lucide-react';
 import BackButton from '@/app/component/common/BackButton';
 import CloseButton from '@/app/component/common/CloseButton';
-import { uploadPlantImage, createPlant, CreatePlantData } from '@/app/api/communityController'; // API 함수 import
+import { uploadPlantImage, createPlant, CreatePlantData, identifyPlant } from '@/app/api/communityController'; // identifyPlant API 추가
 
 const AddPlantPage: React.FC = () => {
   const router = useRouter();
@@ -24,22 +24,27 @@ const AddPlantPage: React.FC = () => {
   const [purchaseDate, setPurchaseDate] = useState('');
   const [purchasePlace, setPurchasePlace] = useState('');
   const [memo, setMemo] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false); // 이미지 업로드 로딩 상태
+  const [uploadSuccess, setUploadSuccess] = useState(false); // 이미지 업로드 성공 상태
+  const [identificationLoading, setIdentificationLoading] = useState(false); // 식물 식별 로딩 상태
+  const [identificationSuccess, setIdentificationSuccess] = useState(false); // 식물 식별 성공 상태
+  const [loading, setLoading] = useState(false); // 기타 로딩 상태 (식물 등록 등)
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
   // 사진 업로드 핸들러 - 실제 API 연동
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // 미리보기 생성
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+      // 새로운 이미지 선택 시 기존 상태 초기화
+      setSuggestions([]); // 기존 추천 목록 초기화
+      setPlantName(''); // 기존 품종명 초기화
+      setUploadedImageUrl(null); // 기존 업로드 URL 초기화
+      setUploadSuccess(false); // 업로드 성공 상태 초기화
+      setIdentificationSuccess(false); // 식별 성공 상태 초기화
 
+      // 미리보기 생성은 하지 않음 (업로드 완료 후에만 이미지 표시)
       setStep(2);
-      setLoading(true);
+      setUploadLoading(true); // 이미지 업로드 로딩 시작
 
       try {
         // 실제 이미지 업로드 API 호출
@@ -47,29 +52,74 @@ const AddPlantPage: React.FC = () => {
         setUploadedImageUrl(uploadResult.imageUrl);
         console.log('이미지 업로드 성공:', uploadResult.imageUrl);
 
-        // 식물 이름 추천은 현재 임시 데이터 사용 (추후 AI 분석 API 연동 가능)
-        getPlantSuggestions(file);
+        // 업로드 완료 후 이미지 미리보기 생성
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setImagePreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+
+        setUploadLoading(false); // 이미지 업로드 완료
+        setUploadSuccess(true); // 이미지 업로드 성공 표시
+
+        // 잠시 성공 메시지 표시 후 식별 시작
+        setTimeout(() => {
+          setUploadSuccess(false);
+          getPlantSuggestions(uploadResult.imageUrl);
+        }, 1000); // 1초 후 식별 시작
+
       } catch (error) {
         console.error('이미지 업로드 실패:', error);
         alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
         setStep(1);
         setImagePreview(null);
-      } finally {
-        setLoading(false);
+        setUploadLoading(false); // 오류 발생 시 업로드 로딩 해제
+        setUploadSuccess(false);
       }
+    }
+
+    // 파일 input 초기화 (같은 파일을 다시 선택할 수 있도록)
+    if (event.target) {
+      event.target.value = '';
     }
   };
 
-  // 식물 이름 추천 API 호출 (현재는 임시 데이터, 향후 AI 분석 API 연동 가능)
-  const getPlantSuggestions = async (file: File) => {
+  // 식물 이름 추천 API 호출 - Plant.ID API를 통한 실제 식물 식별
+  const getPlantSuggestions = async (imageUrl: string) => {
+    setIdentificationLoading(true); // 식물 식별 로딩 시작
+    
     try {
-      // 현재는 임시 데이터 사용
-      console.log('식물 사진 분석 중:', file.name);
+      console.log('Plant.ID API를 통한 식물 식별 시작:', imageUrl);
+
+      // Plant.ID API 호출
+      const identificationResult = await identifyPlant(imageUrl);
+
+      // 한글 이름에서 앞뒤 공백/개행 문자 제거
+      const koreanName = identificationResult.koreanName.trim();
+
+      console.log('식물 식별 결과:', {
+        original: identificationResult.name,
+        korean: koreanName,
+        probability: identificationResult.probability
+      });
+
+      setSuggestions([koreanName]);
+      // 첫 번째 추천을 자동으로 선택
+      setPlantName(koreanName);
+
+      // 식별 성공 표시
+      setIdentificationSuccess(true);
       setTimeout(() => {
-        setSuggestions(['몬스테라', '필로덴드론', '싱고니움', '호야']);
-      }, 1000);
+        setIdentificationSuccess(false);
+      }, 1500); // 1.5초 후 성공 메시지 제거
+
     } catch (error) {
-      console.error('식물 식별 실패:', error);
+      console.error('Plant.ID 식물 식별 실패:', error);
+      // 오류 발생 시 빈 추천 목록 설정
+      setSuggestions([]);
+    } finally {
+      // 식물 식별 완료 후 로딩 상태 해제
+      setIdentificationLoading(false);
     }
   };
 
@@ -89,6 +139,27 @@ const AddPlantPage: React.FC = () => {
     setWateringDays(newDays);
     // 선택된 요일 수에 따라 주 n회 급수 자동 계산
     setWateringFrequency(newDays.size);
+  };
+
+  // 이미지 재선택 함수 - 전체 상태 초기화 후 파일 선택 대화상자 열기
+  const handleImageReselect = () => {
+    // 모든 관련 상태 초기화
+    setImagePreview(null);
+    setUploadedImageUrl(null);
+    setSuggestions([]);
+    setPlantName('');
+    setUploadLoading(false);
+    setUploadSuccess(false);
+    setIdentificationLoading(false);
+    setIdentificationSuccess(false);
+
+    // step을 1로 돌려서 처음부터 시작
+    setStep(1);
+
+    // 약간의 지연 후 파일 선택 대화상자 열기 (step 변경 후)
+    setTimeout(() => {
+      fileInputRef.current?.click();
+    }, 100);
   };
 
   // 다음 단계로 이동
@@ -173,23 +244,68 @@ const AddPlantPage: React.FC = () => {
 
   const renderStep2 = () => (
     <div className="flex flex-col items-center gap-6">
-      {imagePreview && (
+      {/* 업로드 중일 때는 로딩 화면만 표시 */}
+      {uploadLoading && (
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-64 h-64 bg-gray-200 rounded-lg border-4 border-[#4CAF50] flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin w-8 h-8 border-4 border-[#4CAF50] border-t-transparent rounded-full mx-auto mb-2"></div>
+              <div className="text-gray-600 font-medium">📤 이미지 업로드 중...</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 업로드 성공 시 성공 메시지 표시 */}
+      {uploadSuccess && (
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-64 h-64 bg-green-100 rounded-lg border-4 border-[#4CAF50] flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-4xl mb-2">✅</div>
+              <div className="text-[#4CAF50] font-bold">이미지 업로드 성공!</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 이미지 업로드 완료 후 이미지 표시 */}
+      {imagePreview && !uploadLoading && !uploadSuccess && (
         <div className="relative">
           <Image
             src={imagePreview}
             alt="식물 사진"
             width={256}
             height={256}
-            className="max-w-64 max-h-64 rounded-lg shadow-md border-4 border-[#4CAF50] object-cover"
+            className="max-w-64 max-h-64 rounded-lg shadow-md border-4 border-[#4CAF50] object-cover cursor-pointer hover:opacity-90 transition-opacity"
+            onClick={() => !uploadLoading && !identificationLoading && handleImageReselect()} // 로딩 중이 아닐 때만 클릭 가능
           />
-          {loading && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
-              <div className="text-white text-sm">업로드 중...</div>
+          {/* 재선택 힌트 표시 - 로딩이나 성공 상태가 아닐 때만 표시 */}
+          {!uploadLoading && !identificationLoading && !uploadSuccess && !identificationSuccess && (
+            <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-md">
+              클릭하여 재선택
             </div>
           )}
         </div>
       )}
-      <div className="w-full max-w-md flex flex-col gap-4">
+
+      {/* 식별 상태 메시지 */}
+      {identificationLoading && (
+        <div className="text-center">
+          <div className="animate-spin w-6 h-6 border-4 border-[#4CAF50] border-t-transparent rounded-full mx-auto mb-2"></div>
+          <div className="text-gray-600 italic">🔍 식물 식별 중...</div>
+        </div>
+      )}
+
+      {identificationSuccess && (
+        <div className="text-center">
+          <div className="text-2xl mb-2">🎉</div>
+          <div className="text-[#4CAF50] font-bold">식물 식별 성공!</div>
+        </div>
+      )}
+
+      {/* 입력 필드들 - 업로드가 완료된 후에만 표시 */}
+      {!uploadLoading && !uploadSuccess && (
+        <div className="w-full max-w-md flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <label className="font-bold text-[#333]">품종</label>
           <input
@@ -198,26 +314,35 @@ const AddPlantPage: React.FC = () => {
             onChange={(e) => setPlantName(e.target.value)}
             placeholder="식물 품종을 입력하세요"
             className="px-4 py-3 border-2 border-[#4CAF50] rounded-lg focus:outline-none focus:border-[#4CAF50]"
-            disabled={loading}
+            disabled={uploadLoading || identificationLoading} // 업로드나 식별 중일 때 비활성화
           />
         </div>
 
-        {loading && <div className="text-center text-gray-600 italic">식물 이름을 분석하는 중...</div>}
+          {identificationLoading && <div className="text-center text-gray-600 italic">식물을 찾아보는 중...</div>}
 
-        {!loading && suggestions.length > 0 && (
+        {!identificationLoading && suggestions.length > 0 && (
           <div className="w-full text-center">
-            <p className="mb-3 font-bold">추천 품종:</p>
+              <p className="mb-3 font-bold text-[#4CAF50]">혹시 이 식물인가요?</p>
             <div className="flex flex-wrap gap-2 justify-center">
               {suggestions.map((suggestion, index) => (
                 <button
                   key={index}
-                  className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-full hover:bg-gray-200 transition-colors"
+                  className={`px-4 py-2 border rounded-full transition-colors ${plantName === suggestion
+                      ? 'bg-[#4CAF50] text-white border-[#4CAF50]'
+                      : 'bg-gray-100 border-gray-300 hover:bg-gray-200'
+                    }`}
                   onClick={() => selectSuggestion(suggestion)}
                 >
                   {suggestion}
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {!identificationLoading && suggestions.length === 0 && plantName === '' && (
+          <div className="w-full text-center">
+            <p className="text-gray-500 italic">식물을 식별할 수 없었습니다. 직접 입력해주세요.</p>
           </div>
         )}
 
@@ -229,18 +354,19 @@ const AddPlantPage: React.FC = () => {
             onChange={(e) => setNickname(e.target.value)}
             placeholder="식물의 애칭을 입력하세요"
             className="px-4 py-3 border-2 border-[#4CAF50] rounded-lg focus:outline-none focus:border-[#4CAF50]"
-            disabled={loading}
+            disabled={uploadLoading || identificationLoading} // 업로드나 식별 중일 때 비활성화
           />
         </div>
 
         <button
           className="px-6 py-3 bg-[#4CAF50] text-white rounded-lg hover:bg-[#45a049] transition-colors mt-4 disabled:bg-gray-400 disabled:cursor-not-allowed"
           onClick={nextStep}
-          disabled={loading}
+          disabled={uploadLoading || identificationLoading} // 업로드나 식별 중일 때 비활성화
         >
           다음으로
         </button>
-      </div>
+        </div>
+      )}
     </div>
   );
 

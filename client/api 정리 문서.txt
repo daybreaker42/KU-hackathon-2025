@@ -4,6 +4,24 @@
 
 # 🌿 Yeonriji API Documentation
 
+## external
+
+POST  /external-api/complete-plant-identification   # Plant.ID로 식물을 식별하고, Gemini로 한국어 번역 및 관리 정보를 가져옵니다.
+req ex:
+{"imageUrl":"https://ku-hackathon.s3.ap-southeast-2.amazonaws.com/plant/451f9dff-8b51-4a9e-91c1-81fb3fd46f73-ad9faa6729711b023d6b31b154e01d0aa1e09.jpeg"}
+
+res ex:
+{
+  "name": "Allium lusitanicum",
+  "koreanName": "두메부추\n",
+  "probability": 0.9389,
+  "careInfo": {
+    "wateringCycle": "7",
+    "sunlightNeeds": "간접광선",
+    "careInstructions": "일반적인 식물 관리 방법을 따라주세요."
+  }
+}
+
 ## 🔐 Authentication
 ```http
 POST /auth/signup         # 회원가입
