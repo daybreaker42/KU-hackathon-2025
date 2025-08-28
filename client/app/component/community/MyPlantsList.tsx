@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link'; // Link import 추가
 // API 및 타입 import
 import { autoLogin, isAuthenticated } from '@/app/api/authController';
 import { getMyPlants } from '@/app/api/communityController';
@@ -55,13 +55,6 @@ export default function MyPlantsList() {
   const [plants, setPlants] = useState<Plant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-
-  // 식물 클릭 핸들러 추가
-  const handlePlantClick = (plantId: number) => {
-    // 식물별 커뮤니티 페이지로 이동
-    router.push(`/community/category/plant?plantId=${plantId}`);
-  };
 
   useEffect(() => {
     // 실제 서버에서 내 식물 리스트를 가져오는 함수
@@ -177,20 +170,19 @@ export default function MyPlantsList() {
       </h2>
       <div className="flex gap-[15px] overflow-x-auto pb-[10px]">
         {plants.map((plant) => (
-          <button
+          <Link
             key={plant.id}
-            onClick={() => handlePlantClick(plant.id)} // 클릭 이벤트 핸들러 연결
+            href={`/community/category/plant?plantId=${plant.id}`} // 동적 URL 생성
             className="flex flex-col w-[100px] flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
           >
             <div className="relative">
               <Image 
-                src={plant.img_url || '/plant-normal.png'} // img_url 사용 및 기본값 설정
+                src={plant.img_url || '/plant-normal.png'}
                 alt={plant.name}
                 width={100}
                 height={100}
                 className="w-[100px] h-[100px] object-cover rounded-lg"
                 onError={(e) => {
-                  // 이미지 로드 실패 시 회색 배경으로 변경
                   const target = e.target as HTMLImageElement;
                   target.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
                 }}
@@ -201,7 +193,7 @@ export default function MyPlantsList() {
                 {plant.name || plant.variety}
               </p>
             </div>
-          </button>
+          </Link>
         ))}
       </div>
     </div>
