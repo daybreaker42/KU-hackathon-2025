@@ -1,75 +1,51 @@
 'use client';
 
-import { CommunityPost, Plant } from '@/app/types/community/community';
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Filter } from 'lucide-react';
-import PostCard from '@/app/component/community/PostCard'; // PostCard 컴포넌트 import 추가
+import PostCard from '@/app/component/community/PostCard';
 import Footer from '@/app/component/common/footer';
 import CloseButton from '@/app/component/common/CloseButton';
 import WritePostButton from '@/app/component/community/WritePostButton';
+// API 및 타입 import
+import { autoLogin, isAuthenticated } from '@/app/api/authController';
+import { getCommunityPosts, type CommunityPost as ApiCommunityPost } from '@/app/api/communityController';
+import { CommunityPost } from '@/app/types/community/community';
 
-// Mock 데이터 (실제로는 API에서 가져올 데이터)
-const mockPlants: Plant[] = [
-  { id: 1, name: "몬스테라", imageUrl: "/plants/monstera.jpg" },
-  { id: 2, name: "산세베리아", imageUrl: "/plants/sansevieria.jpg" },
-  { id: 3, name: "스킨답서스", imageUrl: "/plants/pothos.jpg" }
-];
+// 서버 데이터를 UI 컴포넌트 형태로 변환하는 함수
+const mapApiPostToUiPost = (apiPost: ApiCommunityPost): CommunityPost => {
+  // 시간 차이 계산 함수
+  const getTimeAgo = (dateString: string): string => {
+    const now = new Date();
+    const postDate = new Date(dateString);
+    const diffMinutes = Math.floor((now.getTime() - postDate.getTime()) / (1000 * 60));
+    
+    if (diffMinutes < 1) return '방금 전';
+    if (diffMinutes < 60) return `${diffMinutes}분 전`;
+    
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `${diffHours}시간 전`;
+    
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays}일 전`;
+  };
 
-const mockPosts: CommunityPost[] = [
-  {
-    id: 1,
-    title: "이거 어떻게 키워요?",
-    content: "제가 여기 처음 오늘데 어떻게 쓰는지를 모르겠네요. 물은 언제 주면 되나요?",
-    author: "식물초보",
-    timeAgo: "5분전",
-    likes: 13,
-    comments: 13,
-    category: 'question'
-  },
-  {
-    id: 2,
-    title: "몬스테라 잎이 노랗게 변해요",
-    content: "몬스테라를 키운지 2개월 정도 됐는데 잎 끝이 노랗게 변하기 시작했어요. 물은 일주일에 한 번 주고 있습니다.",
-    author: "식물러버",
-    timeAgo: "10분전",
-    likes: 8,
-    comments: 5,
-    category: 'plant',
-    plant: mockPlants[0],
-    hasImage: true
-  },
-  {
-    id: 3,
-    title: "오늘의 식물 일기",
-    content: "우리집 식물들이 하루하루 자라는 모습을 보니 정말 뿌듯해요. 특히 몬스테라가 새 잎을 내고 있어요!",
-    author: "일상러버",
-    timeAgo: "15분전",
-    likes: 24,
-    comments: 8,
-    category: 'daily'
-  },
-  {
-    id: 4,
-    title: "초보자도 키우기 쉬운 식물 추천",
-    content: "식물을 처음 키워보려고 하는데 어떤 것부터 시작하면 좋을까요?",
-    author: "새싹이",
-    timeAgo: "30분전",
-    likes: 19,
-    comments: 12,
-    category: 'question'
-  },
-  {
-    id: 5,
-    title: "식물 키우기 3년차 후기",
-    content: "처음에는 물만 주면 되는 줄 알았는데, 이제는 햇빛, 습도, 통풍까지 신경써야 한다는 걸 깨달았어요.",
-    author: "베테랑",
-    timeAgo: "1시간전",
-    likes: 45,
-    comments: 23,
-    category: 'free'
-  }
-];
+  return {
+    id: apiPost.id,
+    title: apiPost.title,
+    content: apiPost.content,
+    author: apiPost.author.name,
+    timeAgo: getTimeAgo(apiPost.createdAt),
+    likes: apiPost.likes_count,
+    comments: apiPost.comments_count,
+    category: apiPost.category as 'question' | 'daily' | 'free' | 'plant',
+    hasImage: apiPost.images && apiPost.images.length > 0,
+    plant: apiPost.plant_name ? {
+      id: 0,
+      name: apiPost.plant_name,
+      imageUrl: '/plant-normal.png'
+    } : undefined
+  };
+};
 
 // 카테고리명 매핑
 const categoryNames = {
@@ -78,13 +54,6 @@ const categoryNames = {
   free: '자유 주제',
   plant: '식물별 카테고리'
 };
-
-// 정렬 옵션
-const sortOptions = [
-  { value: 'latest', label: '최신순' },
-  { value: 'popular', label: '인기순' },
-  { value: 'comments', label: '댓글순' }
-];
 
 export default function CategoryPostsPage() {
   const params = useParams();
@@ -96,8 +65,23 @@ export default function CategoryPostsPage() {
   
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState('latest'); // 정렬 기준 상태 추가
-  const [showFilters, setShowFilters] = useState(false); // 필터 표시 상태 추가
+  
+  // Pagination 상태
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalPosts, setTotalPosts] = useState(0);
+  const itemsPerPage = 10; // 한 페이지당 표시되는 게시글 수 (10개 고정)
+
+  // 페이지 변경 핸들러 (스크롤 상단 이동 포함)
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // 게시글 클릭 핸들러
+  const handlePostClick = (postId: number) => {
+    router.push(`/community/post/${postId}`);
+  };
 
   // 게시글 데이터 로딩
   useEffect(() => {
@@ -105,76 +89,56 @@ export default function CategoryPostsPage() {
       try {
         setLoading(true);
         
-        // 네트워크 지연 시뮬레이션 (실제로는 API 호출)
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // 카테고리별 필터링
-        let filteredPosts = mockPosts.filter(post => post.category === category);
-        
-        // 식물별 카테고리인 경우 특정 식물 ID로 추가 필터링
-        if (category === 'plant' && plantId) {
-          filteredPosts = filteredPosts.filter(post => post.plant?.id === Number(plantId));
+        // 인증 확인 및 자동 로그인 (개발용)
+        if (!isAuthenticated()) {
+          autoLogin();
         }
         
-        // 정렬 적용
-        const sortedPosts = sortPosts(filteredPosts, sortBy);
-        setPosts(sortedPosts);
+        // 실제 API 호출 - pagination 적용
+        // page: 현재 페이지 번호 (1부터 시작)
+        // limit: 한 페이지당 가져올 게시글 수 (10개)
+        const postsData = await getCommunityPosts({
+          category: category,
+          page: currentPage,
+          limit: itemsPerPage,
+          plant_name: category === 'plant' && plantId ? `plant_${plantId}` : undefined
+        });
+        
+        // 서버 데이터를 UI 컴포넌트 형태로 변환
+        const uiPosts = postsData.posts.map(mapApiPostToUiPost);
+        
+        setPosts(uiPosts);
+        setTotalPages(postsData.totalPages);
+        setTotalPosts(postsData.total);
         
       } catch (error) {
-        console.error('Error fetching posts:', error);
+        console.error('카테고리 게시글 조회 중 오류:', error);
+        setPosts([]);
+        setTotalPages(1);
+        setTotalPosts(0);
       } finally {
         setLoading(false);
       }
     };
 
     fetchPosts();
-  }, [category, plantId, sortBy]); // sortBy 의존성 추가
-
-  // 정렬 함수
-  const sortPosts = (posts: CommunityPost[], sortType: string) => {
-    const sorted = [...posts];
-    switch (sortType) {
-      case 'popular':
-        return sorted.sort((a, b) => b.likes - a.likes);
-      case 'comments':
-        return sorted.sort((a, b) => b.comments - a.comments);
-      case 'latest':
-      default:
-        return sorted.sort((a, b) => a.id - b.id); // 최신순 (실제로는 timestamp 사용)
-    }
-  };
-
-  // 뒤로가기 핸들러
-  const handleBack = () => {
-    router.back();
-  };
-
-  // 게시글 클릭 핸들러 추가
-  const handlePostClick = (postId: number) => {
-    router.push(`/community/post/${postId}`);
-  };
+  }, [category, plantId, currentPage]);
 
   // 로딩 상태
   if (loading) {
     return (
-      <div className="p-[18px] bg-[#FAF6EC] min-h-screen w-[393px] mx-auto"> {/* 배경색을 #FAF6EC로 변경 */}
+      <div className="p-[18px] bg-[#FAF6EC] min-h-screen w-[393px] mx-auto">
         {/* 헤더 스켈레톤 */}
         <div className="flex items-center mb-[20px]">
-          <div className="w-[24px] h-[24px] bg-[#E6DFD1] rounded animate-pulse mr-[12px]"></div> {/* 새 배경에 맞게 색상 조정 */}
+          <div className="w-[24px] h-[24px] bg-[#E6DFD1] rounded animate-pulse mr-[12px]"></div>
           <div className="h-[24px] bg-[#E6DFD1] rounded w-[150px] animate-pulse"></div>
-        </div>
-        
-        {/* 필터 스켈레톤 */}
-        <div className="flex justify-between items-center mb-[20px]">
-          <div className="h-[16px] bg-[#E6DFD1] rounded w-[80px] animate-pulse"></div>
-          <div className="h-[32px] bg-[#E6DFD1] rounded w-[100px] animate-pulse"></div>
         </div>
         
         {/* 게시글 리스트 스켈레톤 */}
         <div className="space-y-[15px]">
           {Array.from({ length: 5 }).map((_, index) => (
-            <div key={index} className="bg-[#F0ECE0] rounded-lg p-[15px] animate-pulse border border-[#E8E3D5]"> {/* 새 배경에 맞게 색상 조정 */}
-              <div className="h-[20px] bg-[#E6DFD1] rounded mb-[8px] w-[70%]"></div> {/* 스켈레톤 색상 조정 */}
+            <div key={index} className="bg-[#F0ECE0] rounded-lg p-[15px] animate-pulse border border-[#E8E3D5]">
+              <div className="h-[20px] bg-[#E6DFD1] rounded mb-[8px] w-[70%]"></div>
               <div className="h-[16px] bg-[#E6DFD1] rounded mb-[10px]"></div>
               <div className="h-[16px] bg-[#E6DFD1] rounded mb-[12px] w-[90%]"></div>
               <div className="flex justify-between items-center">
@@ -192,64 +156,29 @@ export default function CategoryPostsPage() {
   }
 
   return (
-    <div className="p-[18px] bg-[#FAF6EC] min-h-screen w-[393px] mx-auto"> {/* 배경색을 #FAF6EC로 변경 */}
+    <div className="p-[18px] bg-[#FAF6EC] min-h-screen w-[393px] mx-auto">
       {/* 헤더 */}
       <div className="flex flex-col mb-[20px]">
-        <div className='flex items-center justify-between item'>
+        <div className='flex items-center justify-between'>
           <div className="flex items-center">
-          <h1 className="text-[#023735] font-medium text-[20px]">
-            {categoryNames[category]}
-            {category === 'plant' && plantId && (
-              <span className="text-[16px] text-[#6C757D] ml-[8px]">
-                · {mockPlants.find(p => p.id === Number(plantId))?.name}
-              </span>
-            )}
-          </h1>
-        </div>
-        
-          {/* 뒤로가기 버튼 */}
+            <h1 className="text-[#023735] font-medium text-[20px]">
+              {categoryNames[category]}
+              {category === 'plant' && plantId && (
+                <span className="text-[16px] text-[#6C757D] ml-[8px]">
+                  · 식물 #{plantId}
+                </span>
+              )}
+            </h1>
+          </div>
           <CloseButton />
         </div>
-        {/* 필터 토글 버튼 */}
-        {/* <div className='flex justify-end mt-2'>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center space-x-[4px] text-[#42CA71] text-[14px] hover:text-[#369F5C] transition-colors"
-          >
-            <Filter size={16} />
-            <span>필터</span>
-          </button>
-        </div> */}
       </div>
 
-      {/* 필터 및 정렬 옵션 */}
-      {showFilters && (
-        <div className="bg-[#F5F2E8] rounded-lg p-[15px] mb-[20px] border border-[#E5E0D3]"> {/* 베이지 톤으로 배경색 변경 */}
-          <div className="flex items-center justify-between">
-            <span className="text-[#023735] font-medium text-[14px]">정렬</span>
-            <div className="flex space-x-[8px]">
-              {sortOptions.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => setSortBy(option.value)}
-                  className={`px-[12px] py-[6px] rounded-full text-[12px] transition-colors ${
-                    sortBy === option.value
-                      ? 'bg-[#42CA71] text-white'
-                    : 'bg-[#EFEBE0] text-[#6C757D] hover:bg-[#E8E4D6] border border-[#D0C9B8]' // 비선택 상태도 베이지 톤으로 조정
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 게시글 수 정보 */}
+      {/* 게시글 수 정보 - 총 개수와 현재 페이지 표시 */}
       <div className="mb-[20px]">
         <span className="text-[#6C757D] text-[14px]">
-          총 {posts.length}개의 게시글
+          총 {totalPosts}개의 게시글 (페이지 {currentPage}/{totalPages})
+          {/* 한 페이지당 최대 {itemsPerPage}개씩 표시 */}
         </span>
       </div>
 
@@ -272,32 +201,77 @@ export default function CategoryPostsPage() {
               key={post.id}
               post={post}
               onClick={handlePostClick}
-              variant="full" // 풀 사이즈 모드로 표시
+              variant="full"
             />
           ))
         )}
       </div>
 
-      {/* 페이지네이션 */}
-      {posts.length > 0 && (
+      {/* 페이지네이션 - 총 페이지가 2개 이상일 때만 표시 */}
+      {totalPages > 1 && (
         <div className="flex justify-center items-center mt-[40px] space-x-[8px]">
-          <button className="text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+          {/* 
+            Pagination 표시 조건:
+            - totalPages > 1: 총 페이지가 2개 이상일 때만 표시
+            - 한 페이지에 10개의 게시글이 표시됨 (itemsPerPage = 10)
+            - 예: 총 게시글 25개 → 3페이지 (10개 + 10개 + 5개)
+          */}
+          {/* 이전 페이지 버튼 */}
+          <button 
+            onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
+            className={`text-[14px] px-[8px] py-[4px] transition-colors ${
+              currentPage === 1 
+                ? 'text-[#CCCCCC] cursor-not-allowed' 
+                : 'text-[#6C757D] hover:text-[#42CA71]'
+            }`}
+          >
             &lt;
           </button>
-          <button className="w-[24px] h-[24px] bg-[#42CA71] text-white text-[14px] rounded">
-            1
-          </button>
-          <button className="w-[24px] h-[24px] text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
-            2
-          </button>
-          <button className="w-[24px] h-[24px] text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
-            3
-          </button>
-          <button className="text-[#6C757D] text-[14px] hover:text-[#42CA71] transition-colors">
+          
+          {/* 페이지 번호 버튼들 */}
+          {Array.from({ length: Math.min(5, totalPages) }, (_, index) => {
+            let pageNum;
+            if (totalPages <= 5) {
+              pageNum = index + 1;
+            } else if (currentPage <= 3) {
+              pageNum = index + 1;
+            } else if (currentPage >= totalPages - 2) {
+              pageNum = totalPages - 4 + index;
+            } else {
+              pageNum = currentPage - 2 + index;
+            }
+            
+            return (
+              <button
+                key={pageNum}
+                onClick={() => handlePageChange(pageNum)}
+                className={`w-[24px] h-[24px] text-[14px] rounded transition-colors ${
+                  currentPage === pageNum
+                    ? 'bg-[#42CA71] text-white'
+                    : 'text-[#6C757D] hover:text-[#42CA71] hover:bg-[#F0F0F0]'
+                }`}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          
+          {/* 다음 페이지 버튼 */}
+          <button 
+            onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+            disabled={currentPage === totalPages}
+            className={`text-[14px] px-[8px] py-[4px] transition-colors ${
+              currentPage === totalPages 
+                ? 'text-[#CCCCCC] cursor-not-allowed' 
+                : 'text-[#6C757D] hover:text-[#42CA71]'
+            }`}
+          >
             &gt;
           </button>
         </div>
       )}
+      
       <Footer url='community' />
       <WritePostButton />
     </div>
