@@ -2,8 +2,9 @@
 
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import styles from './page.module.css';
+import { Camera } from 'lucide-react';
+import BackButton from '../component/common/BackButton';
+import CloseButton from '../component/common/CloseButton';
 
 interface PlantData {
   name: string;
@@ -122,8 +123,8 @@ const AddPlantPage: React.FC = () => {
 
   // 단계별 렌더링
   const renderStep1 = () => (
-    <div className={styles.step}>
-      <h1 className={styles.title}>추가할 식물의 사진을 업로드하세요</h1>
+    <div className="flex flex-col items-center gap-6">
+      <h1 className="text-2xl font-bold text-center text-[#023735]">추가할 식물의 사진을 업로드하세요</h1>
       <input
         ref={fileInputRef}
         type="file"
@@ -132,166 +133,184 @@ const AddPlantPage: React.FC = () => {
         style={{ display: 'none' }}
       />
       <button
-        className={styles.uploadButton}
+        className="flex items-center gap-2 px-6 py-3 bg-[#4CAF50] text-white rounded-lg hover:bg-[#45a049] transition-colors"
         onClick={() => fileInputRef.current?.click()}
       >
+        <Camera size={20} />
         사진 업로드
       </button>
     </div>
   );
 
   const renderStep2 = () => (
-    <div className={styles.step}>
+    <div className="flex flex-col items-center gap-6">
       {imagePreview && (
-        <img src={imagePreview} alt="식물 사진" className={styles.previewImage} />
+        <img src={imagePreview} alt="식물 사진" className="max-w-64 max-h-64 rounded-lg shadow-md" />
       )}
-      <div className={styles.inputGroup}>
-        <label>품종</label>
-        <input
-          type="text"
-          value={plantName}
-          onChange={(e) => setPlantName(e.target.value)}
-          placeholder="식물 품종을 입력하세요"
-        />
-      </div>
-
-      {loading && <div className={styles.loading}>식물 이름을 분석하는 중...</div>}
-
-      {!loading && suggestions.length > 0 && (
-        <div className={styles.suggestions}>
-          <p>추천 품종:</p>
-          {suggestions.map((suggestion, index) => (
-            <button
-              key={index}
-              className={styles.suggestionButton}
-              onClick={() => selectSuggestion(suggestion)}
-            >
-              {suggestion}
-            </button>
-          ))}
+      <div className="w-full max-w-md flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <label className="font-bold text-[#333]">품종</label>
+          <input
+            type="text"
+            value={plantName}
+            onChange={(e) => setPlantName(e.target.value)}
+            placeholder="식물 품종을 입력하세요"
+            className="px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#4CAF50]"
+          />
         </div>
-      )}
 
-      <div className={styles.inputGroup}>
-        <label>애칭</label>
-        <input
-          type="text"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-          placeholder="식물의 애칭을 입력하세요"
-        />
+        {loading && <div className="text-center text-gray-600 italic">식물 이름을 분석하는 중...</div>}
+
+        {!loading && suggestions.length > 0 && (
+          <div className="w-full text-center">
+            <p className="mb-3 font-bold">추천 품종:</p>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {suggestions.map((suggestion, index) => (
+                <button
+                  key={index}
+                  className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-full hover:bg-gray-200 transition-colors"
+                  onClick={() => selectSuggestion(suggestion)}
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-col gap-2">
+          <label className="font-bold text-[#333]">애칭</label>
+          <input
+            type="text"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            placeholder="식물의 애칭을 입력하세요"
+            className="px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#4CAF50]"
+          />
+        </div>
+
+        <button className="px-6 py-3 bg-[#4CAF50] text-white rounded-lg hover:bg-[#45a049] transition-colors mt-4" onClick={nextStep}>
+          다음으로
+        </button>
       </div>
-
-      <button className={styles.nextButton} onClick={nextStep}>
-        다음으로
-      </button>
     </div>
   );
 
   const renderStep3 = () => (
-    <div className={styles.step}>
-      <h2>급수 주기 설정</h2>
+    <div className="flex flex-col items-center gap-6">
+      <h2 className="text-xl font-bold text-[#023735]">급수 주기 설정</h2>
 
-      <div className={styles.inputGroup}>
-        <label>급수 주기</label>
-        <div className={styles.toggleGroup}>
-          {[1, 2, 3, 4].map((cycle) => (
-            <button
-              key={cycle}
-              className={`${styles.toggleButton} ${
-                wateringCycle === cycle ? styles.active : ''
-              }`}
-              onClick={() => setWateringCycle(cycle as 1 | 2 | 3 | 4)}
-            >
-              {cycle}주
-            </button>
-          ))}
+      <div className="w-full max-w-md flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <label className="font-bold text-[#333]">급수 주기</label>
+          <div className="flex gap-3 justify-center">
+            {[1, 2, 3, 4].map((cycle) => (
+              <button
+                key={cycle}
+                className={`px-4 py-2 border-2 rounded-lg transition-all ${wateringCycle === cycle
+                  ? 'bg-[#4CAF50] text-white border-[#4CAF50]'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }`}
+                onClick={() => setWateringCycle(cycle as 1 | 2 | 3 | 4)}
+              >
+                {cycle}주
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className={styles.inputGroup}>
-        <label>주 {wateringFrequency}회 급수</label>
-        <input
-          type="number"
-          min="1"
-          max="7"
-          value={wateringFrequency}
-          onChange={(e) => setWateringFrequency(Number(e.target.value))}
-        />
-      </div>
-
-      <div className={styles.inputGroup}>
-        <label>급수 요일</label>
-        <div className={styles.dayButtons}>
-          {['월', '화', '수', '목', '금', '토', '일'].map((day) => (
-            <button
-              key={day}
-              className={`${styles.dayButton} ${
-                wateringDays.has(day) ? styles.selected : ''
-              }`}
-              onClick={() => toggleWateringDay(day)}
-            >
-              {day}
-            </button>
-          ))}
+        <div className="flex flex-col gap-2">
+          <label className="font-bold text-[#333]">주 {wateringFrequency}회 급수</label>
+          <input
+            type="number"
+            min="1"
+            max="7"
+            value={wateringFrequency}
+            onChange={(e) => setWateringFrequency(Number(e.target.value))}
+            className="px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#4CAF50]"
+          />
         </div>
-        <p>선택된 요일: {Array.from(wateringDays).join(', ')}</p>
-      </div>
 
-      <button className={styles.nextButton} onClick={nextStep}>
-        다음으로
-      </button>
+        <div className="flex flex-col gap-2">
+          <label className="font-bold text-[#333]">급수 요일</label>
+          <div className="flex gap-2 flex-wrap justify-center">
+            {['월', '화', '수', '목', '금', '토', '일'].map((day) => (
+              <button
+                key={day}
+                className={`w-12 h-12 rounded-full border-2 transition-all flex items-center justify-center ${wateringDays.has(day)
+                  ? 'bg-[#4CAF50] text-white border-[#4CAF50]'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                  }`}
+                onClick={() => toggleWateringDay(day)}
+              >
+                {day}
+              </button>
+            ))}
+          </div>
+          <p className="text-center text-sm text-gray-600">선택된 요일: {Array.from(wateringDays).join(', ')}</p>
+        </div>
+
+        <button className="px-6 py-3 bg-[#4CAF50] text-white rounded-lg hover:bg-[#45a049] transition-colors mt-4" onClick={nextStep}>
+          다음으로
+        </button>
+      </div>
     </div>
   );
 
   const renderStep4 = () => (
-    <div className={styles.step}>
-      <h2>추가 정보 (선택)</h2>
+    <div className="flex flex-col items-center gap-6">
+      <h2 className="text-xl font-bold text-[#023735]">추가 정보 (선택)</h2>
 
-      <div className={styles.inputGroup}>
-        <label>구매일 (선택)</label>
-        <input
-          type="date"
-          value={purchaseDate}
-          onChange={(e) => setPurchaseDate(e.target.value)}
-        />
+      <div className="w-full max-w-md flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <label className="font-bold text-[#333]">구매일 (선택)</label>
+          <input
+            type="date"
+            value={purchaseDate}
+            onChange={(e) => setPurchaseDate(e.target.value)}
+            className="px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#4CAF50]"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="font-bold text-[#333]">구매처 (선택)</label>
+          <input
+            type="text"
+            value={purchasePlace}
+            onChange={(e) => setPurchasePlace(e.target.value)}
+            placeholder="구매처를 입력하세요"
+            className="px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#4CAF50]"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="font-bold text-[#333]">메모 (선택)</label>
+          <textarea
+            value={memo}
+            onChange={(e) => setMemo(e.target.value)}
+            placeholder="메모를 입력하세요"
+            className="px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#4CAF50] resize-none"
+            rows={4}
+          />
+        </div>
+
+        <button className="px-6 py-3 bg-[#FF9800] text-white rounded-lg hover:bg-[#F57C00] transition-colors mt-4" onClick={complete}>
+          완료하기
+        </button>
       </div>
-
-      <div className={styles.inputGroup}>
-        <label>구매처 (선택)</label>
-        <input
-          type="text"
-          value={purchasePlace}
-          onChange={(e) => setPurchasePlace(e.target.value)}
-          placeholder="구매처를 입력하세요"
-        />
-      </div>
-
-      <div className={styles.inputGroup}>
-        <label>메모 (선택)</label>
-        <textarea
-          value={memo}
-          onChange={(e) => setMemo(e.target.value)}
-          placeholder="메모를 입력하세요"
-        />
-      </div>
-
-      <button className={styles.completeButton} onClick={complete}>
-        완료하기
-      </button>
     </div>
   );
 
   const renderStep5 = () => (
-    <div className={styles.step}>
-      <div className={styles.completeContainer}>
+    <div className="flex flex-col items-center gap-6">
+      <div className="text-center">
         {imagePreview && (
-          <img src={imagePreview} alt="완료된 식물" className={styles.completeImage} />
+          <img src={imagePreview} alt="완료된 식물" className="max-w-48 max-h-48 rounded-lg shadow-md mx-auto mb-6" />
         )}
-        <h1 className={styles.completeTitle}>
+        <h1 className="text-3xl font-bold text-[#023735] mb-6">
           {nickname} - {plantName}
         </h1>
-        <button className={styles.homeButton} onClick={goHome}>
+        <button className="px-6 py-3 bg-[#FF9800] text-white rounded-lg hover:bg-[#F57C00] transition-colors" onClick={goHome}>
           홈으로
         </button>
       </div>
@@ -299,12 +318,22 @@ const AddPlantPage: React.FC = () => {
   );
 
   return (
-    <div className={styles.container}>
-      {step === 1 && renderStep1()}
-      {step === 2 && renderStep2()}
-      {step === 3 && renderStep3()}
-      {step === 4 && renderStep4()}
-      {step === 5 && renderStep5()}
+    <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] overflow-hidden">
+      {/* App Bar */}
+      <div className="flex items-center justify-between p-4 bg-transparent">
+        {step > 1 ? <BackButton /> : <div className="w-6" />}
+        <h1 className="text-[#023735] font-bold text-lg">식물 추가</h1>
+        <CloseButton />
+      </div>
+
+      {/* 스크롤 가능한 컨텐츠 영역 */}
+      <div className="flex-1 overflow-y-auto p-[18px] pb-[100px]">
+        {step === 1 && renderStep1()}
+        {step === 2 && renderStep2()}
+        {step === 3 && renderStep3()}
+        {step === 4 && renderStep4()}
+        {step === 5 && renderStep5()}
+      </div>
     </div>
   );
 };
