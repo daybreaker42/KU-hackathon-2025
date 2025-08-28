@@ -2,13 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { Plant } from '@/app/types/community/community';
 
 // 식물 데이터 타입 정의
-interface Plant {
-  id: number;
-  name: string;
-  imageUrl: string;
-}
+
 
 // Mock 데이터
 const mockPlants: Plant[] = [

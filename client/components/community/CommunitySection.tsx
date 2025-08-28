@@ -1,19 +1,10 @@
 'use client';
 
+import { CommunityPost } from '@/app/types/community/community';
 import { useEffect, useState } from 'react';
 
 // 게시글 데이터 타입 정의
-interface CommunityPost {
-  id: number;
-  title: string;
-  content: string;
-  author: string;
-  timeAgo: string;
-  likes: number;
-  comments: number;
-  category: 'question' | 'photo' | 'daily' | 'free';
-  hasImage?: boolean;
-}
+
 
 // Mock 데이터
 const mockPosts: CommunityPost[] = [
@@ -84,6 +75,7 @@ export default function CommunitySection({ title, category, showMoreButton = tru
   useEffect(() => {
     const fetchPosts = async () => {
       try {
+        // TODO - 커뮤니티 정보 가져오는 API 호출
         setLoading(true);
         
         // 네트워크 지연 시뮬레이션
