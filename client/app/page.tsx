@@ -116,7 +116,7 @@ export default function Home() {
           <Reaction />
         </div>
       </div>
-      <Footer/>
+      <Footer url=""/>
     </main>
   );
 }
