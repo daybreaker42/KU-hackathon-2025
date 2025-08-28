@@ -385,6 +385,34 @@ export const deleteCommunityComment = async (
   }
 };
 
+// 게시글 좋아요 토글 API
+export interface LikeResponse {
+  isLiked: boolean;
+  likesCount: number;
+}
+
+export const toggleCommunityPostLike = async (
+  postId: string | number
+): Promise<LikeResponse> => {
+  try {
+    const endpoint = `/community/posts/${postId}/like`;
+
+    const response = await apiRequest(endpoint, {
+      method: 'POST',
+    });
+
+    if (!response.ok) {
+      throw new Error(`좋아요 토글 실패: ${response.status}`);
+    }
+
+    const data: LikeResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error('좋아요 토글 중 오류 발생:', error);
+    throw error;
+  }
+};
+
 // 이미지 여러장 업로드 API
 export const uploadImages = async (
   files: File[]
