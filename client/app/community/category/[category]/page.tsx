@@ -160,7 +160,7 @@ export default function CategoryPostsPage() {
   }
 
   return (
-    <div className="p-[18px] bg-[#FAF6EC] min-h-screen w-[393px] mx-auto">
+    <div className="p-[18px] pb-[80px] bg-[#FAF6EC] min-h-screen w-[393px] mx-auto">
       {/* 헤더 */}
       <div className="flex flex-col mb-[20px]">
         <div className='flex items-center justify-between'>
