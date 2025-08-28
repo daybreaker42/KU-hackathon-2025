@@ -90,7 +90,7 @@ export const useLoginController = (
         password: password
       });
 
-      console.log('로그인 성공:', result);
+      // console.log('로그인 성공:', result);
 
       // 성공 콜백 실행
       if (onSuccess) {
@@ -225,7 +225,7 @@ export const useSignupController = (
         password: password
       });
 
-      console.log('회원가입 성공:', result);
+      // console.log('회원가입 성공:', result);
 
       // 성공 콜백 실행
       if (onSuccess) {

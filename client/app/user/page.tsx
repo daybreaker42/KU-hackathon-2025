@@ -34,8 +34,8 @@ export default function UserProfilePage() {
   const router = useRouter();
 
   // 실제 사용자 정보를 localStorage에서 가져와서 상태 관리
-  const [profileImageSrc] = useState('/plant-happy.png'); // 기본 이미지, localStorage에서 사용자 프로필 이미지 URL 설정
-  const [currentUsername, setCurrentUsername] = useState('사용자 이름'); // 기본값, localStorage에서 실제 사용자 이름 설정  
+  const [profileImageSrc, setProfileImageSrc] = useState('/plant-happy.png'); // 기본 이미지, localStorage에서 사용자 프로필 이미지 URL 설정
+  const [currentUsername, setCurrentUsername] = useState('사용자 이름'); // 기본값, localStorage에서 실제 사용자 이름 설정
   const [userEmail, setUserEmail] = useState('user@example.com'); // 기본값, localStorage에서 실제 사용자 이메일 설정
   const [isLoading, setIsLoading] = useState(true);
   const [userActivities, setUserActivities] = useState<UserActivity[]>([]); // 실제 API에서 가져온 사용자 활동 데이터
@@ -45,10 +45,9 @@ export default function UserProfilePage() {
   useEffect(() => {
     const user = getCurrentUser();
     if (user) {
+      setProfileImageSrc(user.profileImage || '/plant-happy.png'); // 프로필 이미지가 없으면 기본 이미지 사용
       setCurrentUsername(user.name);
       setUserEmail(user.email);
-      // 현재 user 타입에는 profile_img가 없으므로 기본 이미지 사용
-      // 향후 API 확장 시 프로필 이미지 지원 예정
     }
     setIsLoading(false);
   }, []);
@@ -252,8 +251,27 @@ export default function UserProfilePage() {
                 </Link>
               </li>
 
-              <li> 
-                <button onClick={handleLogout}>로그 아웃</button>
+              <li className="py-5 border-t border-gray-300/70 mt-6 pt-6">
+                <button 
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 py-4 px-6 rounded-lg border border-red-200 hover:border-red-300 transition-all duration-200 font-medium"
+                >
+                  <svg 
+                    className="w-5 h-5 mr-2" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" 
+                    />
+                  </svg>
+                  로그아웃
+                </button>
               </li>
             </ul>
           </nav>

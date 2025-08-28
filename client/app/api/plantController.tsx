@@ -60,3 +60,31 @@ export async function getPlantById(plantId: number): Promise<PlantDetailData | n
     return null;
   }
 }
+
+// 식물 갤러리 이미지 조회 함수
+export async function getPlantImages(): Promise<string[] | null> {
+  try {
+    const response = await fetch(`${url}/plants/images/all`, {
+      method: 'GET',
+      headers: getHeaders(),
+    });
+
+    if (response.ok) {
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('Gallery response is not JSON:', contentType);
+        return null;
+      }
+      const data: string[] = await response.json();
+      return data;
+    } else {
+      console.error('Failed to fetch plant gallery:', response.status, response.statusText);
+      const text = await response.text();
+      console.error('Gallery error response:', text.substring(0, 200));
+      return null;
+    }
+  } catch (error) {
+    console.error('Network error while fetching plant gallery:', error);
+    return null;
+  }
+}

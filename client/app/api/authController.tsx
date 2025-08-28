@@ -157,7 +157,7 @@ export const setAuthToken = (token: string): void => {
  * 
  * 로그인 성공 시 사용자 정보를 localStorage에 저장
  */
-export const setCurrentUser = (user: { id: number; email: string; name: string }): void => {
+export const setCurrentUser = (user: { id: number; email: string; name: string; profileImage?: string }): void => {
   if (typeof window !== 'undefined') {
     localStorage.setItem('currentUser', JSON.stringify(user));
   }
@@ -168,7 +168,7 @@ export const setCurrentUser = (user: { id: number; email: string; name: string }
  * 
  * @returns 저장된 현재 사용자 정보 또는 null
  */
-export const getCurrentUser = (): { id: number; email: string; name: string } | null => {
+export const getCurrentUser = (): { id: number; email: string; name: string; profileImage?: string } | null => {
   if (typeof window !== 'undefined') {
     const userStr = localStorage.getItem('currentUser');
     return userStr ? JSON.parse(userStr) : null;
@@ -249,7 +249,7 @@ export const apiRequest = async (
 ): Promise<Response> => {
   const url = `${BASE_URL}${endpoint}`;
   const headers = createAuthHeaders(requireAuth, isFormData);
-  console.log(headers);
+  // console.log(headers);
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -282,6 +282,7 @@ interface LoginResponse {
     id: number;
     email: string;
     name: string;
+    profileImage?: string; // 프로필 이미지 추가 (선택적 필드)
   };
 }
 
@@ -303,6 +304,7 @@ interface SignupResponse {
     id: number;
     email: string;
     name: string;
+    profileImage?: string; // 프로필 이미지 추가 (선택적 필드)
   };
 }
 
