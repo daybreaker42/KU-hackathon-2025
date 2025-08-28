@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Camera, ChevronDown, Image as ImageIcon, X } from 'lucide-react';
-import CloseButton from '@/app/component/common/CloseButton';
+import { Camera, ChevronDown, X } from 'lucide-react';
+import BackButton from '@/app/component/common/BackButton';
 
 // 카테고리 옵션
 const categoryOptions = [
@@ -47,62 +47,75 @@ export default function WritePostPage() {
     <div className="p-[18px] bg-[#FAF6EC] min-h-screen w-[393px] mx-auto flex flex-col">
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-[20px]">
-        <h1 className="text-[#023735] font-medium text-[20px]">글쓰기</h1>
-        <CloseButton />
+        <BackButton />
+        <h1 className="text-[#023735] font-medium text-[18px] flex-1 text-center">새로운 글 작성하기</h1>
+        <div className="w-[24px]"></div> {/* BackButton과 균형을 맞추기 위한 공간 */}
       </div>
 
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
         {/* 카테고리 선택 */}
-        <div className="relative mb-[15px]">
-          <button
-            type="button"
-            onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-            className="w-full flex justify-between items-center px-[15px] py-[10px] bg-white border border-[#E5E0D3] rounded-lg text-[#023735] text-[16px]"
-          >
-            <span>{selectedCategoryLabel}</span>
-            <ChevronDown size={20} className={`transition-transform ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
-          </button>
-          {isCategoryDropdownOpen && (
-            <ul className="absolute z-10 w-full mt-[5px] bg-white border border-[#E5E0D3] rounded-lg shadow-lg">
-              {categoryOptions.map(option => (
-                <li
-                  key={option.value}
-                  onClick={() => {
-                    setCategory(option.value);
-                    setIsCategoryDropdownOpen(false);
-                  }}
-                  className="px-[15px] py-[10px] hover:bg-[#F5F2E8] cursor-pointer"
-                >
-                  {option.label}
-                </li>
-              ))}
-            </ul>
-          )}
+        <div className="mb-[15px]">
+          <label className="block text-[#023735] font-medium text-[14px] mb-[8px]">
+            카테고리 선택하기
+          </label>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+              className="w-full flex justify-between items-center px-[15px] py-[10px] bg-white border border-[#E5E0D3] rounded-lg text-[#023735] text-[16px]"
+            >
+              <span>{selectedCategoryLabel}</span>
+              <ChevronDown size={20} className={`transition-transform ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {isCategoryDropdownOpen && (
+              <ul className="absolute z-10 w-full mt-[5px] bg-white border border-[#E5E0D3] rounded-lg shadow-lg">
+                {categoryOptions.map(option => (
+                  <li
+                    key={option.value}
+                    onClick={() => {
+                      setCategory(option.value);
+                      setIsCategoryDropdownOpen(false);
+                    }}
+                    className="px-[15px] py-[10px] hover:bg-[#F5F2E8] cursor-pointer"
+                  >
+                    {option.label}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
         {/* 제목 입력 */}
         <div className="mb-[15px]">
+          <label className="block text-[#023735] font-medium text-[14px] mb-[8px]">
+            제목
+          </label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="제목"
+            placeholder="글 제목을 입력하세요..."
             className="w-full px-[15px] py-[10px] bg-white border border-[#E5E0D3] rounded-lg text-[#023735] text-[16px] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-1 focus:ring-[#42CA71]"
           />
         </div>
 
         {/* 내용 입력 */}
+        <label className="block text-[#023735] font-medium text-[14px] mb-[8px]">
+          내용
+        </label>
         <div className="flex-1 mb-[15px]">
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="내용을 입력하세요."
+            placeholder="내용을 입력하세요..."
             className="w-full h-full min-h-[300px] px-[15px] py-[10px] bg-white border border-[#E5E0D3] rounded-lg text-[#023735] text-[16px] placeholder:text-[#9CA3AF] resize-none focus:outline-none focus:ring-1 focus:ring-[#42CA71]"
           />
         </div>
 
         {/* 이미지 첨부 */}
         <div className="mb-[20px]">
+          <h2 className="text-[#023735] font-medium text-[14px] mb-[8px]">이미지 첨부하기</h2>
           <div className="flex items-center gap-[10px] overflow-x-auto p-2">
             <label className="flex-shrink-0 w-[80px] h-[80px] bg-white border-2 border-dashed border-[#E5E0D3] rounded-lg flex flex-col items-center justify-center cursor-pointer hover:bg-[#F5F2E8]">
               <Camera size={24} className="text-[#9CA3AF]" />
