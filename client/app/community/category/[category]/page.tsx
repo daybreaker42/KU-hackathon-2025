@@ -6,6 +6,7 @@ import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Filter } from 'lucide-react';
 import PostCard from '@/app/component/community/PostCard'; // PostCard 컴포넌트 import 추가
 import Footer from '@/app/component/common/footer';
+import CloseButton from '@/app/component/common/CloseButton';
 
 // Mock 데이터 (실제로는 API에서 가져올 데이터)
 const mockPlants: Plant[] = [
@@ -192,15 +193,9 @@ export default function CategoryPostsPage() {
   return (
     <div className="p-[18px] bg-[#FAF6EC] min-h-screen w-[393px] mx-auto"> {/* 배경색을 #FAF6EC로 변경 */}
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-[20px]">
-        <div className="flex items-center">
-          {/* 뒤로가기 버튼 */}
-          <button
-            onClick={handleBack}
-            className="mr-[12px] p-[4px] hover:bg-[#F0ECE0] rounded-full transition-colors" // hover 색상을 새 배경에 맞게 조정
-          >
-            <ArrowLeft size={20} className="text-[#023735]" />
-          </button>          {/* 페이지 제목 */}
+      <div className="flex flex-col mb-[20px]">
+        <div className='flex items-center justify-between item'>
+          <div className="flex items-center">
           <h1 className="text-[#023735] font-medium text-[20px]">
             {categoryNames[category]}
             {category === 'plant' && plantId && (
@@ -211,14 +206,19 @@ export default function CategoryPostsPage() {
           </h1>
         </div>
         
+          {/* 뒤로가기 버튼 */}
+          <CloseButton />
+        </div>
         {/* 필터 토글 버튼 */}
-        <button 
-          onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center space-x-[4px] text-[#42CA71] text-[14px] hover:text-[#369F5C] transition-colors"
-        >
-          <Filter size={16} />
-          <span>필터</span>
-        </button>
+        {/* <div className='flex justify-end mt-2'>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center space-x-[4px] text-[#42CA71] text-[14px] hover:text-[#369F5C] transition-colors"
+          >
+            <Filter size={16} />
+            <span>필터</span>
+          </button>
+        </div> */}
       </div>
 
       {/* 필터 및 정렬 옵션 */}

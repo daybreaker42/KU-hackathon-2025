@@ -1,9 +1,10 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation'; // useRouter 제거
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ChevronLeft, Heart, RefreshCw } from 'lucide-react';
+import { Heart, RefreshCw } from 'lucide-react'; // ChevronLeft 제거 (BackButton에서 사용)
 import { CommunityPost } from '@/app/types/community/community';
+import BackButton from '@/app/component/common/BackButton'; // BackButton 컴포넌트 import 추가
 
 // Mock 댓글 데이터 타입
 interface Comment {
@@ -44,8 +45,7 @@ const mockComments: Comment[] = [
 
 export default function PostDetailPage() {
   const params = useParams();
-  const router = useRouter();
-  const postId = params.id as string;
+  const postId = params.id as string; // router 제거
   
   const [post, setPost] = useState<CommunityPost | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -76,11 +76,6 @@ export default function PostDetailPage() {
 
     fetchPostDetail();
   }, [postId]);
-
-  // 뒤로가기 핸들러
-  const handleBack = () => {
-    router.back();
-  };
 
   // 좋아요 토글 핸들러
   const handleLikeToggle = () => {
@@ -145,12 +140,11 @@ export default function PostDetailPage() {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <p className="text-gray-500 mb-[16px]">게시글을 찾을 수 없습니다.</p>
-            <button 
-              onClick={handleBack}
-              className="text-[#42CA71] hover:underline"
-            >
-              목록으로 돌아가기
-            </button>
+            <BackButton
+              className="mx-auto"
+              onClick={() => { }} // 빈 함수로 기본 router.back() 동작 사용
+            />
+            <p className="text-[#42CA71] mt-[8px] text-[14px]">목록으로 돌아가기</p>
           </div>
         </div>
       </div>
@@ -162,12 +156,7 @@ export default function PostDetailPage() {
       <div className="flex-1 overflow-y-auto p-[18px] pb-[100px]">
         {/* 헤더 */}
         <div className="flex items-center mb-[20px]">
-          <button 
-            onClick={handleBack}
-            className="mr-[12px] w-[54px] h-[54px] border border-[#E6DFD1] rounded-full flex items-center justify-center hover:bg-[#F0ECE0] transition-colors bg-transparent" // 새 배경에 맞게 색상 조정
-          >
-            <ChevronLeft size={20} className="text-[#023735]" />{/* 뒤로가기 아이콘 변경 */}
-          </button>
+          <BackButton className="mr-[12px]" /> {/* BackButton 컴포넌트 사용 */}
           <h1 className="text-[#023735] font-medium text-[18px]">
             {post.title}
           </h1>
