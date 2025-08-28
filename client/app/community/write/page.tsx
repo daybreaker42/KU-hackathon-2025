@@ -50,6 +50,19 @@ export default function WritePostPage() {
       const files = Array.from(e.target.files);
       if (files.length === 0) return;
 
+      if (images.length + files.length > 10) {
+        alert('이미지는 최대 10개까지 업로드할 수 있습니다.');
+        return;
+      }
+
+      const MAX_UPLOAD_SIZE = 50 * 1024 * 1024; // 50MB
+      const totalSize = files.reduce((acc, file) => acc + file.size, 0);
+
+      if (totalSize > MAX_UPLOAD_SIZE) {
+        alert('총 파일 크기가 서버 제한(50MB)을 초과했습니다. 더 작은 파일들을 선택해 주세요.');
+        return;
+      }
+
       setIsUploading(true);
       try {
         const response = await uploadImages(files);
