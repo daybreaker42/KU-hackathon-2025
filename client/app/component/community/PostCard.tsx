@@ -7,15 +7,25 @@ interface PostCardProps {
   post: CommunityPost;
   onClick: (postId: number) => void; // 게시글 클릭 핸들러
   variant?: 'compact' | 'full'; // 표시 방식 (컴팩트/풀 사이즈)
+  imagePosition?: 'left' | 'right';
+  showAuthor?: boolean;
 }
 
-export default function PostCard({ post, onClick, variant = 'compact' }: PostCardProps) {
+export default function PostCard({ post, onClick, variant = 'compact', imagePosition = 'right', showAuthor = true }: PostCardProps) {
   const isCompact = variant === 'compact';
+
+  const imageThumbnail = post.hasImage && (
+    <div className={`bg-[#EFEAD8] rounded-lg flex items-center justify-center flex-shrink-0 ${
+      isCompact ? 'w-[50px] h-[50px]' : 'w-[60px] h-[60px]'
+      }`}> {/* 이미지 배경을 새 배경에 맞게 조정 */}
+      <span className={isCompact ? 'text-[20px]' : 'text-[24px]'}>🌱</span>
+    </div>
+  );
   
   return (
     <button
       onClick={() => onClick(post.id)}
-      className="w-full bg-[#F5F1E7] rounded-lg p-[15px] border border-[#E8E3D5] hover:border-[#42CA71] hover:bg-[#F0ECE0] transition-all text-left shadow-sm" // 새 배경에 맞게 색상 조정
+      className="w-full bg-[#F5F1E7] rounded-lg p-[15px] border border-gray-300 hover:border-[#42CA71] hover:bg-[#F0ECE0] transition-all text-left" // 새 배경에 맞게 색상 조정
     >
       {/* 게시글 헤더 */}
       <div className="flex justify-between items-start mb-[8px]">
@@ -37,27 +47,24 @@ export default function PostCard({ post, onClick, variant = 'compact' }: PostCar
 
       {/* 게시글 내용 */}
       <div className="flex items-start space-x-[10px]">
+        {imagePosition === 'left' && imageThumbnail}
         <div className="flex-1">
           <p className={`text-[#495057] text-[14px] leading-[1.4] ${isCompact ? 'line-clamp-2' : 'line-clamp-3'}`}>
             {post.content}
           </p>
         </div>
-        
-        {/* 이미지 썸네일 (사진이 있는 경우) */}
-        {post.hasImage && (
-          <div className={`bg-[#EFEAD8] rounded-lg flex items-center justify-center flex-shrink-0 ${
-            isCompact ? 'w-[50px] h-[50px]' : 'w-[60px] h-[60px]'
-            }`}> {/* 이미지 배경을 새 배경에 맞게 조정 */}
-            <span className={isCompact ? 'text-[20px]' : 'text-[24px]'}>🌱</span>
-          </div>
-        )}
+        {imagePosition === 'right' && imageThumbnail}
       </div>
 
       {/* 게시글 푸터 (좋아요, 댓글) */}
       <div className="flex justify-between items-center mt-[12px]">
-        <span className="text-[#6C757D] text-[12px]">
-          {post.author}
-        </span>
+        {showAuthor ? (
+          <span className="text-[#6C757D] text-[12px]">
+            {post.author}
+          </span>
+        ) : (
+          <div /> // Omit author but keep space for alignment
+        )}
         <div className="flex items-center space-x-[10px]">
           {/* 좋아요 버튼 */}
           <div className="flex items-center space-x-[4px] text-[#6C757D] text-[12px] border border-[#D4CDB8] bg-[#F0ECE0] rounded-full px-[8px] py-[4px]"> {/* 새 배경에 맞게 색상 조정 */}

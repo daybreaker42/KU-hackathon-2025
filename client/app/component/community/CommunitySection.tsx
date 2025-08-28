@@ -4,7 +4,6 @@ import { CommunityPost, Plant } from '@/app/types/community/community'; // Plant
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // Next.js 라우터 import 추가
 import PostCard from './PostCard'; // PostCard 컴포넌트 import 추가
-import Footer from '../common/footer';
 
 // Mock 식물 데이터 추가
 const mockPlants: Plant[] = [

@@ -2,9 +2,10 @@
 
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image'; // next/image import
 import { Camera } from 'lucide-react';
-import BackButton from '../component/common/BackButton';
-import CloseButton from '../component/common/CloseButton';
+import BackButton from '@/app/component/common/BackButton';
+import CloseButton from '@/app/component/common/CloseButton';
 
 interface PlantData {
   name: string;
@@ -34,6 +35,8 @@ const AddPlantPage: React.FC = () => {
   const [memo, setMemo] = useState('');
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  // TODO - 실제로 사진 업로드, 식물 정보 추가 api 연동하기
 
   // 사진 업로드 핸들러
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,6 +90,8 @@ const AddPlantPage: React.FC = () => {
       newDays.add(day);
     }
     setWateringDays(newDays);
+    // 선택된 요일 수에 따라 주 n회 급수 자동 계산
+    setWateringFrequency(newDays.size);
   };
 
   // 다음 단계로 이동
@@ -96,6 +101,13 @@ const AddPlantPage: React.FC = () => {
       return;
     }
     setStep(step + 1);
+  };
+
+  // 이전 단계로 이동
+  const prevStep = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    }
   };
 
   // 완료 처리
@@ -133,11 +145,10 @@ const AddPlantPage: React.FC = () => {
         style={{ display: 'none' }}
       />
       <button
-        className="flex items-center gap-2 px-6 py-3 bg-[#4CAF50] text-white rounded-lg hover:bg-[#45a049] transition-colors"
+        className="w-24 h-24 bg-[#4CAF50] text-white rounded-lg hover:bg-[#45a049] transition-colors flex items-center justify-center"
         onClick={() => fileInputRef.current?.click()}
       >
-        <Camera size={20} />
-        사진 업로드
+        <Camera size={32} />
       </button>
     </div>
   );
@@ -145,7 +156,7 @@ const AddPlantPage: React.FC = () => {
   const renderStep2 = () => (
     <div className="flex flex-col items-center gap-6">
       {imagePreview && (
-        <img src={imagePreview} alt="식물 사진" className="max-w-64 max-h-64 rounded-lg shadow-md" />
+        <img src={imagePreview} alt="식물 사진" className="max-w-64 max-h-64 rounded-lg shadow-md border-4 border-[#4CAF50]" />
       )}
       <div className="w-full max-w-md flex flex-col gap-4">
         <div className="flex flex-col gap-2">
@@ -155,7 +166,7 @@ const AddPlantPage: React.FC = () => {
             value={plantName}
             onChange={(e) => setPlantName(e.target.value)}
             placeholder="식물 품종을 입력하세요"
-            className="px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#4CAF50]"
+            className="px-4 py-3 border-2 border-[#4CAF50] rounded-lg focus:outline-none focus:border-[#4CAF50]"
           />
         </div>
 
@@ -185,7 +196,7 @@ const AddPlantPage: React.FC = () => {
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
             placeholder="식물의 애칭을 입력하세요"
-            className="px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#4CAF50]"
+            className="px-4 py-3 border-2 border-[#4CAF50] rounded-lg focus:outline-none focus:border-[#4CAF50]"
           />
         </div>
 
@@ -197,13 +208,21 @@ const AddPlantPage: React.FC = () => {
   );
 
   const renderStep3 = () => (
-    <div className="flex flex-col items-center gap-6">
+    <div className="flex flex-col gap-6">
+      {imagePreview && (
+        // Image Component로 변경, layout="responsive"를 통해 반응형으로 설정, width, height 지정
+        <Image src={imagePreview} alt="식물 사진" width={80} height={80} className="rounded-lg border-4 border-[#4CAF50] object-cover mx-auto" />
+      )}
       <h2 className="text-xl font-bold text-[#023735]">급수 주기 설정</h2>
 
       <div className="w-full max-w-md flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <label className="font-bold text-[#333]">급수 주기</label>
-          <div className="flex gap-3 justify-center">
+          <div className='flex justify-between'>
+            <label className="font-bold text-[#333]">급수 주기</label>
+            <label className="font-bold text-[#333]">주 {wateringFrequency}회 급수</label>
+          </div>
+
+          <div className="flex gap-3">
             {[1, 2, 3, 4].map((cycle) => (
               <button
                 key={cycle}
@@ -220,20 +239,8 @@ const AddPlantPage: React.FC = () => {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label className="font-bold text-[#333]">주 {wateringFrequency}회 급수</label>
-          <input
-            type="number"
-            min="1"
-            max="7"
-            value={wateringFrequency}
-            onChange={(e) => setWateringFrequency(Number(e.target.value))}
-            className="px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#4CAF50]"
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
           <label className="font-bold text-[#333]">급수 요일</label>
-          <div className="flex gap-2 flex-wrap justify-center">
+          <div className="flex gap-2">
             {['월', '화', '수', '목', '금', '토', '일'].map((day) => (
               <button
                 key={day}
@@ -247,7 +254,9 @@ const AddPlantPage: React.FC = () => {
               </button>
             ))}
           </div>
-          <p className="text-center text-sm text-gray-600">선택된 요일: {Array.from(wateringDays).join(', ')}</p>
+          <p className="text-sm text-gray-600">
+            선택된 요일: {['월', '화', '수', '목', '금', '토', '일'].filter(day => wateringDays.has(day)).join(', ')}
+          </p>
         </div>
 
         <button className="px-6 py-3 bg-[#4CAF50] text-white rounded-lg hover:bg-[#45a049] transition-colors mt-4" onClick={nextStep}>
@@ -256,11 +265,15 @@ const AddPlantPage: React.FC = () => {
       </div>
     </div>
   );
-
   const renderStep4 = () => (
     <div className="flex flex-col items-center gap-6">
+      {imagePreview && (
+        // Image Component로 변경, layout="responsive"를 통해 반응형으로 설정, width, height 지정
+        <Image src={imagePreview} alt="식물 사진" width={80} height={80} className="rounded-lg border-4 border-[#4CAF50] object-cover mx-auto" />
+      )}
       <h2 className="text-xl font-bold text-[#023735]">추가 정보 (선택)</h2>
 
+      <div className="w-full max-w-md flex flex-col gap-4">
       <div className="w-full max-w-md flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <label className="font-bold text-[#333]">구매일 (선택)</label>
@@ -268,7 +281,7 @@ const AddPlantPage: React.FC = () => {
             type="date"
             value={purchaseDate}
             onChange={(e) => setPurchaseDate(e.target.value)}
-            className="px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#4CAF50]"
+              className="px-4 py-3 border-2 border-[#4CAF50] rounded-lg focus:outline-none focus:border-[#4CAF50]"
           />
         </div>
 
@@ -279,7 +292,7 @@ const AddPlantPage: React.FC = () => {
             value={purchasePlace}
             onChange={(e) => setPurchasePlace(e.target.value)}
             placeholder="구매처를 입력하세요"
-            className="px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#4CAF50]"
+              className="px-4 py-3 border-2 border-[#4CAF50] rounded-lg focus:outline-none focus:border-[#4CAF50]"
           />
         </div>
 
@@ -289,31 +302,31 @@ const AddPlantPage: React.FC = () => {
             value={memo}
             onChange={(e) => setMemo(e.target.value)}
             placeholder="메모를 입력하세요"
-            className="px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[#4CAF50] resize-none"
+              className="px-4 py-3 border-2 border-[#4CAF50] rounded-lg focus:outline-none focus:border-[#4CAF50] resize-none"
             rows={4}
           />
         </div>
 
-        <button className="px-6 py-3 bg-[#FF9800] text-white rounded-lg hover:bg-[#F57C00] transition-colors mt-4" onClick={complete}>
+          <button className="px-6 py-3 bg-[#4CAF50] text-white rounded-lg hover:bg-[#45a049] transition-colors mt-4" onClick={complete}>
           완료하기
         </button>
       </div>
     </div>
+    </div>
   );
-
   const renderStep5 = () => (
-    <div className="flex flex-col items-center gap-6">
-      <div className="text-center">
-        {imagePreview && (
-          <img src={imagePreview} alt="완료된 식물" className="max-w-48 max-h-48 rounded-lg shadow-md mx-auto mb-6" />
+    <div className="text-center">
+      {imagePreview && (
+        // Image Component로 변경, layout="responsive"를 통해 반응형으로 설정, width, height 지정
+        <Image src={imagePreview} alt="완료된 식물" width={192} height={192} className="rounded-lg shadow-md mx-auto mb-6 border-4 border-[#4CAF50]" />
         )}
         <h1 className="text-3xl font-bold text-[#023735] mb-6">
           {nickname} - {plantName}
         </h1>
-        <button className="px-6 py-3 bg-[#FF9800] text-white rounded-lg hover:bg-[#F57C00] transition-colors" onClick={goHome}>
+      <button className="px-6 py-3 bg-[#4CAF50] text-white rounded-lg hover:bg-[#45a049] transition-colors" onClick={goHome}>
           홈으로
         </button>
-      </div>
+      {/* </div> */}
     </div>
   );
 
@@ -321,7 +334,7 @@ const AddPlantPage: React.FC = () => {
     <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] overflow-hidden">
       {/* App Bar */}
       <div className="flex items-center justify-between p-4 bg-transparent">
-        {step > 1 ? <BackButton /> : <div className="w-6" />}
+        {step > 1 && step < 5 ? <BackButton onClick={prevStep} /> : <div className="w-6" />}
         <h1 className="text-[#023735] font-bold text-lg">식물 추가</h1>
         <CloseButton />
       </div>
