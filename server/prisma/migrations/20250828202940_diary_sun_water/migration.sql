@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `Diary` ADD COLUMN `sun` VARCHAR(191) NULL,
+    ADD COLUMN `water` VARCHAR(191) NULL;

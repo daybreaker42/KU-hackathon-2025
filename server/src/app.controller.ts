@@ -9,4 +9,9 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  @Get('mock-up')
+  async getMockUp(): Promise<string> {
+    return await this.appService.seedMockupData();
+  }
 }
