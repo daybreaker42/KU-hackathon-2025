@@ -104,7 +104,7 @@ function Diary({ dayIndex, onClick, diaryData, weeklyDiaryIndexes = [] }: DiaryP
   const getCurrentWeekDates = () => {
     const today = new Date();
     const currentDay = today.getDay(); // 0(일) ~ 6(토)
-    const dates = [];
+    const dates: Date[] = [];
     
     // 일요일부터 시작하는 주간 계산
     const startOfWeek = new Date(today);
@@ -331,7 +331,7 @@ export default function Home() {
       const getCurrentWeekDates = () => {
         const today = new Date();
         const currentDay = today.getDay();
-        const dates = [];
+        const dates: Date[] = [];
         
         const startOfWeek = new Date(today);
         startOfWeek.setDate(today.getDate() - currentDay);
@@ -375,7 +375,7 @@ export default function Home() {
     const getCurrentWeekDates = () => {
       const today = new Date();
       const currentDay = today.getDay();
-      const dates = [];
+      const dates: Date[] = [];
       
       const startOfWeek = new Date(today);
       startOfWeek.setDate(today.getDate() - currentDay);
