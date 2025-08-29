@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -81,7 +81,7 @@ const getEmotionEmoji = (emotionLabel: string): string => {
   return emotionMap[emotionLabel] || emotionLabel;
 };
 
-export default function DiaryPage() {
+function DiaryPageContent() {
   const searchParams = useSearchParams();
   
   // URL 파라미터에서 날짜 가져오기
@@ -607,5 +607,13 @@ export default function DiaryPage() {
         </div>
       )}
     </main>
+  );
+}
+
+export default function DiaryPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DiaryPageContent />
+    </Suspense>
   );
 }

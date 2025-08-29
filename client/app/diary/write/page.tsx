@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import styles from './page.module.css';
 import { postDiary, getPlant } from '@/app/api/diaryController';
 
-export default function DiaryWritePage() {
+function DiaryWriteContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -403,5 +403,13 @@ export default function DiaryWritePage() {
         </button>
       </div>
     </main>
+  );
+}
+
+export default function DiaryWritePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DiaryWriteContent />
+    </Suspense>
   );
 }
