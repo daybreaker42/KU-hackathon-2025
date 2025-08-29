@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Diary` MODIFY `date` VARCHAR(191) NOT NULL DEFAULT '2025-08-29';

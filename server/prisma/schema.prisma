@@ -18,7 +18,7 @@ model User {
   name        String
   password    String
   email       String       @unique
-  profile_img String?
+  profile_img String?      @db.Text
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   diary       Diary[]
@@ -42,7 +42,7 @@ model Diary {
   sun       Boolean    @default(false)
   water     Boolean    @default(false)
   plant_id  Int?
-  date      String     @default("2022-08-29")
+  date      String     @default("2025-08-29")
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   user      User       @relation(fields: [user_id], references: [id])
@@ -140,7 +140,7 @@ model PostImg {
 model DiaryImg {
   id       Int    @id @default(autoincrement())
   diary_id Int
-  img_url  String
+  img_url  String @db.Text
   diary    Diary  @relation(fields: [diary_id], references: [id])
 }
 

@@ -810,7 +810,7 @@ export class DiaryService {
         ? Math.floor(
             (new Date().getTime() - new Date(lastDiary.date).getTime()) / (1000 * 60 * 60 * 24),
           )
-        : undefined,
+        : 0,
     };
   }
 }
