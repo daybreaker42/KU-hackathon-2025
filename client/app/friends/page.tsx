@@ -40,8 +40,9 @@ export default function FriendsPage() {
     try {
       const data = await getFriendsList();
       setFriends(data);
-    } catch (err: any) {
-      setFriendsError(err.message || '친구 목록을 불러오는데 실패했습니다.');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : '친구 목록을 불러오는데 실패했습니다.';
+      setFriendsError(errorMessage);
     } finally {
       setFriendsLoading(false);
     }
@@ -60,8 +61,9 @@ export default function FriendsPage() {
       const data = await getFriendRequests();
       setReceivedRequests(data.received);
       setSentRequests(data.sent);
-    } catch (err: any) {
-      setRequestsError(err.message || '친구 요청 목록을 불러오는데 실패했습니다.');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : '친구 요청 목록을 불러오는데 실패했습니다.';
+      setRequestsError(errorMessage);
     } finally {
       setRequestsLoading(false);
     }
@@ -86,8 +88,9 @@ export default function FriendsPage() {
       try {
         const data = await searchUsers(searchQuery);
         setSearchResults(data);
-      } catch (err: any) {
-        setSearchError(err.message || '사용자 검색에 실패했습니다.');
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : '사용자 검색에 실패했습니다.';
+        setSearchError(errorMessage);
       } finally {
         setSearchLoading(false);
       }
@@ -97,6 +100,24 @@ export default function FriendsPage() {
       clearTimeout(handler);
     };
   }, [searchQuery]);
+
+  // --- Tab Handlers ---
+
+  // 탭 클릭 핸들러 - 모든 탭 클릭 시 해당 데이터 새로고침
+  const handleTabClick = (tab: 'friends' | 'received' | 'sent') => {
+    // 탭 변경 및 검색 초기화
+    setSelectedTab(tab);
+    setSearchQuery(''); // 검색어 초기화
+    setSearchResults([]); // 검색 결과 초기화
+    setSearchError(null); // 검색 오류 초기화
+
+    // 해당 탭의 데이터 새로고침
+    if (tab === 'friends') {
+      fetchFriends();
+    } else if (tab === 'received' || tab === 'sent') {
+      fetchRequests();
+    }
+  };
 
   // --- Action Handlers ---
 
@@ -108,8 +129,9 @@ export default function FriendsPage() {
       const response = await sendFriendRequest(friendId);
       setActionStatus({ id: friendId, message: response.message, type: 'success' });
       // Optionally, refresh the list or update friend status in state
-    } catch (err: any) {
-      setActionStatus({ id: friendId, message: err.message || '친구 요청 실패', type: 'error' });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : '친구 요청 실패';
+      setActionStatus({ id: friendId, message: errorMessage, type: 'error' });
     } finally {
       setSendingRequestId(null);
       setTimeout(() => setActionStatus(null), 3000);
@@ -131,8 +153,9 @@ export default function FriendsPage() {
       setActionStatus({ id: requestId, message: response.message, type: 'success' });
       fetchRequests(); // Refresh the list after action
       fetchFriends(); // Also refresh friends list in case of accept
-    } catch (err: any) {
-      setActionStatus({ id: requestId, message: err.message || `${action} 실패`, type: 'error' });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : `${action} 실패`;
+      setActionStatus({ id: requestId, message: errorMessage, type: 'error' });
     } finally {
       setProcessingRequestId(null);
       setTimeout(() => setActionStatus(null), 3000);
@@ -288,7 +311,7 @@ export default function FriendsPage() {
         {/* Tabs */}
         <div className="flex justify-around mb-4 p-2 rounded-lg">
           <button
-            onClick={() => setSelectedTab('friends')}
+            onClick={() => handleTabClick('friends')}
             className={`flex-1 py-2 text-center font-bold rounded-md transition-colors mx-1
               ${selectedTab === 'friends' ? 'bg-[#4CAF50] text-white' : 'text-gray-600 hover:bg-gray-100'}
             `}
@@ -301,7 +324,7 @@ export default function FriendsPage() {
             )}
           </button>
           <button
-            onClick={() => setSelectedTab('received')}
+            onClick={() => handleTabClick('received')}
             className={`flex-1 py-2 text-center font-bold rounded-md transition-colors mx-1
               ${selectedTab === 'received' ? 'bg-[#4CAF50] text-white' : 'text-gray-600 hover:bg-gray-100'}
             `}
@@ -314,7 +337,7 @@ export default function FriendsPage() {
             )}
           </button>
           <button
-            onClick={() => setSelectedTab('sent')}
+            onClick={() => handleTabClick('sent')}
             className={`flex-1 py-2 text-center font-bold rounded-md transition-colors mx-1
               ${selectedTab === 'sent' ? 'bg-[#4CAF50] text-white' : 'text-gray-600 hover:bg-gray-100'}
             `}
