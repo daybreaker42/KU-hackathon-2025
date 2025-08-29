@@ -141,38 +141,65 @@ export default function FriendsPage() {
 
   // --- Render Helpers ---
 
-  const renderFriendItem = (friend: Friend) => (
-    <li key={friend.id} className="flex items-center p-4 rounded-lg border-2 border-[#a8a8a8] justify-between">
-      <div className="flex items-center">
-        {friend.profile_img ? (
-          <Image
-            src={friend.profile_img}
-            alt={friend.name}
-            width={60}
-            height={60}
-            className="rounded-full object-cover border-2 border-[#4A6741] mr-4"
-          />
-        ) : (
-          <div className="w-[60px] h-[60px] rounded-full bg-gray-300 mr-4"></div>
-        )}
-        <div>
-          <p className="font-bold text-lg text-[#023735]">{friend.name}</p>
-          {friend.email && <p className="text-sm text-gray-500">{friend.email}</p>}
+  const renderFriendItem = (friend: Friend) => {
+    // 친구 요청 버튼 상태 결정 로직
+    const isAlreadyFriend = friend.isFriend;
+    const hasPendingRequest = friend.hasPendingRequest;
+    const isButtonDisabled = sendingRequestId === friend.id || isAlreadyFriend || hasPendingRequest;
+
+    // 버튼 텍스트 결정
+    const getButtonText = () => {
+      if (sendingRequestId === friend.id) return '요청 중...';
+      if (isAlreadyFriend) return '이미 친구';
+      if (hasPendingRequest) return '요청 전송됨';
+      return '친구 신청';
+    };
+
+    // 버튼 스타일 결정
+    const getButtonClassName = () => {
+      if (isAlreadyFriend) {
+        return 'bg-blue-500 cursor-not-allowed'; // 이미 친구인 경우 파란색
+      }
+      if (hasPendingRequest) {
+        return 'bg-orange-500 cursor-not-allowed'; // 요청 대기 중인 경우 주황색
+      }
+      if (sendingRequestId === friend.id) {
+        return 'bg-gray-400 cursor-not-allowed'; // 요청 처리 중인 경우 회색
+      }
+      return 'bg-[#4CAF50] hover:bg-[#45a049]'; // 기본 상태 초록색
+    };
+
+    return (
+      <li key={friend.id} className="flex items-center p-4 rounded-lg border-2 border-[#a8a8a8] justify-between">
+        <div className="flex items-center">
+          {friend.profile_img ? (
+            <Image
+              src={friend.profile_img}
+              alt={friend.name}
+              width={60}
+              height={60}
+              className="rounded-full object-cover border-2 border-[#4A6741] mr-4"
+            />
+          ) : (
+            <div className="w-[60px] h-[60px] rounded-full bg-gray-300 mr-4"></div>
+          )}
+          <div>
+            <p className="font-bold text-lg text-[#023735]">{friend.name}</p>
+            {friend.email && <p className="text-sm text-gray-500">{friend.email}</p>}
+          </div>
         </div>
-      </div>
-      {searchQuery.trim() !== '' && (
-        <button
-          onClick={() => handleSendRequest(friend.id)}
-          disabled={sendingRequestId === friend.id}
-          className={`px-4 py-2 rounded-md text-white text-sm font-medium transition-colors
-            ${sendingRequestId === friend.id ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#4CAF50] hover:bg-[#45a049]'}
-          `}
-        >
-          {sendingRequestId === friend.id ? '요청 중...' : '친구 신청'}
-        </button>
-      )}
-    </li>
-  );
+        {searchQuery.trim() !== '' && (
+          <button
+            onClick={() => handleSendRequest(friend.id)}
+            disabled={isButtonDisabled}
+            className={`px-4 py-2 rounded-md text-white text-sm font-medium transition-colors ${getButtonClassName()}`}
+          >
+            {getButtonText()}
+          </button>
+        )}
+      </li>
+    );
+  };
 
   const renderRequestItem = (request: FriendRequest, type: 'received' | 'sent') => {
     const user = type === 'received' ? request.requester : request.recipient;
