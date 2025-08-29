@@ -309,7 +309,8 @@ export async function getLastUploaded(): Promise<number | null> {
 
       try {
         const data = await response.json();
-        // console.log(data);
+        console.log(data);
+
 
         // 새로운 응답 구조에 맞춘 처리: {lastUploadedAt: string, daysSinceLastUpload: number}
         if (typeof data.daysSinceLastUpload === 'number') {

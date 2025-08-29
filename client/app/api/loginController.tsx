@@ -87,9 +87,18 @@ export const useLoginController = (
     try {
       // 개발/프로덕션 모드에 따라 다른 함수 사용
       const loginFunction = loginWithServer;
+      
+      console.log('[LOGIN_CONTROLLER] 로그인 시도 시작:', {
+        email,
+        environment: typeof window !== 'undefined' && window.location.hostname.includes('ngrok') ? 'ngrok' : 'localhost'
+      });
 
-
-      // console.log('로그인 성공:', result);
+      const result = await loginFunction({ email, password });
+      
+      console.log('[LOGIN_CONTROLLER] 로그인 성공:', {
+        hasAccessToken: !!result.access_token,
+        userEmail: result.user?.email
+      });
 
       // 성공 콜백 실행
       if (onSuccess) {
