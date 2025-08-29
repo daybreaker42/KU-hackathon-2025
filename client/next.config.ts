@@ -74,6 +74,18 @@ const nextConfig: NextConfig = {
         hostname: 'search.pstatic.net',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'postfiles.pstatic.net',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.pstatic.net',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
