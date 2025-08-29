@@ -1,0 +1,356 @@
+.container{
+    padding:18px;
+    background-color: #FAF6EC;
+    height:100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: x-large;
+  font-weight: bold;
+  color: #023735;
+  margin: 0;
+}
+
+.head{
+    font-size:20px;
+    font-weight: bold;
+    color: #023735;
+    margin: 0;
+}
+
+.uploadButton{
+    width: 152px;
+    height: 152px;
+    background-color: #4CAF50;
+    color: #023735;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+}
+
+.uploadButton:hover{
+    background-color: #45a049;
+}
+
+/* Step container styles */
+.stepContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+/* Image container styles */
+.imageContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.imageBox {
+    width: 200px;
+    height: 200px;
+    border-radius: 30px;
+    border: 4px solid #4CAF50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.textCenter {
+    text-align: center;
+}
+
+/* Loading spinner */
+.loadingSpinner {
+    animation: spin 1s linear infinite;
+    width: 2rem;
+    height: 2rem;
+    border: 4px solid #4CAF50;
+    border-top: 4px solid transparent;
+    border-radius: 50%;
+    margin: 0 auto 0.5rem;
+}
+
+.loadingSpinnerSmall {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loadingText {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.successText {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.successIcon {
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+}
+
+.celebrationIcon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Image preview styles */
+.imagePreview {
+    width: 200px;
+    height: 200px;
+    border-radius: 30px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 4px solid #4CAF50;
+    object-fit: cover;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.imagePreview:hover {
+    opacity: 0.9;
+}
+
+.imageLabel {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+}
+
+.identificationText {
+    color: #827D73;
+}
+
+/* Form container */
+.formContainer {
+    width: 100%;
+    max-width: 400px;
+}
+
+.inputGroup {
+    margin-bottom: 1rem;
+}
+
+.textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    background-color: white;
+    color: #374151;
+    resize: vertical;
+    min-height: 100px;
+}
+
+.textarea:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+/* Cycle buttons */
+.cycleButtons {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.cycleButton {
+    flex: 1;
+    padding: 0.75rem;
+    border: 2px solid #d1d5db;
+    border-radius: 0.5rem;
+    background-color: white;
+    color: #374151;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.cycleButton:hover {
+    border-color: #4CAF50;
+}
+
+.cycleButtonActive {
+    border-color: #4CAF50;
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Custom weeks input */
+.customWeeksInput {
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px solid #4CAF50;
+    border-radius: 0.375rem;
+    margin-top: 0.5rem;
+    text-align: center;
+    font-weight: 500;
+}
+
+.customWeeksInput:focus {
+    outline: none;
+    border-color: #45a049;
+}
+
+/* Day buttons */
+.dayButtons {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.dayButton {
+    padding: 0.75rem 0.5rem;
+    border: 2px solid #d1d5db;
+    border-radius: 0.5rem;
+    background-color: white;
+    color: #374151;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.dayButton:hover {
+    border-color: #4CAF50;
+}
+
+.dayButtonActive {
+    border-color: #4CAF50;
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Navigation buttons */
+.navigationButtons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.button {
+    width:100%;
+    padding: 0.75rem 1.5rem;
+    border-radius: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+}
+
+.buttonPrimary {
+    background-color: #4CAF50;
+    color: #0D1C0D;
+    height:53px;
+}
+
+.buttonPrimary:hover {
+    background-color: #45a049;
+}
+
+.buttonSecondary {
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 2px solid #d1d5db;
+}
+
+.buttonSecondary:hover {
+    background-color: #e5e7eb;
+}
+
+.buttonDisabled {
+    background-color: #d1d5db;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.buttonDisabled:hover {
+    background-color: #d1d5db;
+}
+
+/* Suggestions */
+.suggestionsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.suggestionItem {
+    border: none;
+    border-radius: 0.5rem;
+    background-color: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.expectation{
+    width:100%;
+    border-radius: 17px;
+    text-align: center;
+}
+
+.label {
+    display:block;
+    color:#827D73;
+    font-weight: bold;
+    font-size:small;
+    margin: 0 0 7px 7px;
+}
+
+.input {
+    border: 2px solid #DED9CC;
+    border-radius: 17px;
+    padding: 13px;
+    width: 100%;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.input:focus {
+    border-color: #023735;
+    outline: none;
+}
+
+.inputContainer {
+    margin-bottom: 20px;
+    width:100%;
+}
+
+.expectationSection{
+    border-radius: 17px;
+    border:2px solid #42CA71;
+    padding:13px;
+    display:flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.divider{
+    margin: 7px 0;
+    border: 1px solid #42CA71;
+}

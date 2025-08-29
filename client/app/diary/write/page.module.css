@@ -1,0 +1,551 @@
+.container {
+  width: 393px;
+  height: 852px;
+  margin: 0 auto;
+  background-color: #FAF6EC;
+  padding: 18px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: x-large;
+  font-weight: bold;
+  color: #023735;
+  margin: 0;
+}
+
+.closeButton {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid #DED9CC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #023735;
+}
+
+.dateSection{
+  font-size: large;
+  margin-bottom: 10px;
+}
+
+.date {
+  font-size: 18px;
+  font-weight: bold;
+  color: #023735;
+  margin: 0;
+}
+
+.label {
+    display:block;
+    color:#827D73;
+    font-weight: bold;
+    font-size:small;
+    margin: 0 0 7px 7px;
+}
+
+.input {
+    border: 2px solid #DED9CC;
+    border-radius: 17px;
+    padding: 13px;
+    width: 100%;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.input:focus {
+    border-color: #023735;
+    outline: none;
+}
+
+.inputContainer {
+    margin-bottom: 20px;
+}
+
+
+.imageSection {
+  margin-bottom: 20px;
+}
+
+.imageContainer {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.selectedImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.removeImageButton {
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: #F9D131;
+  border: none;
+  font-size: 20px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.addImageButton {
+  width: 100px;
+  height: 100px;
+  border: 2px solid #DED9CC;
+  background-color: transparent;
+  border-radius: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #827D73;
+  cursor: pointer;
+}
+
+.addImageButton:hover {
+  background-color: #F0EBE0;
+}
+
+.contentSection {
+  margin-bottom: 20px;
+}
+
+.contentTextarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 15px;
+  border: 2px solid #DED9CC;
+  border-radius: 17px;
+  font-size: medium;
+  color: #023735;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: none;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.contentTextarea::placeholder {
+  color: #827D73;
+}
+
+.contentTextarea:focus {
+  border-color: #023735;
+}
+
+.moodSection {
+  margin-bottom: 30px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: bold;
+  color: #023735;
+  margin: 0 0 15px 0;
+}
+
+.moodOptions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.moodButton {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid #DED9CC;
+  background-color: #FAF6EC;
+  font-size: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.moodButton:hover {
+  background-color: #F0EBE0;
+}
+
+.moodButton.selected {
+  background-color: #43C970;
+  border-color: #43C970;
+  transform: scale(1.1);
+}
+
+.growthSection {
+  margin-bottom: 30px;
+}
+
+.growthInput {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  background-color: #F0EBE0;
+  border-radius: 12px;
+  font-size: 16px;
+  color: #023735;
+  outline: none;
+}
+
+.growthInput::placeholder {
+  color: #827D73;
+}
+
+.careSection {
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.careItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #F0EBE0;
+  border-radius: 12px;
+}
+
+.careLabel {
+  font-size: 16px;
+  color: #023735;
+  font-weight: 500;
+}
+
+.careControls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.careButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: none;
+  background-color: #008261;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.careButton:hover {
+  background-color: #006a52;
+}
+
+.careValue {
+  font-size: 16px;
+  font-weight: bold;
+  color: #023735;
+  min-width: 30px;
+  text-align: center;
+}
+
+.sunlightButton {
+  padding: 10px 20px;
+  border: none;
+  background-color: #008261;
+  color: white;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.sunlightButton:hover {
+  background-color: #006a52;
+}
+
+.saveButton {
+  width: 100%;
+  padding: 18px;
+  border: none;
+  background-color: #43C970;
+  color: #023735;
+  border-radius: 17px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.saveButton:hover {
+  background-color: #39b563;
+}
+
+.saveButton:disabled {
+  background-color: #DED9CC;
+  cursor: not-allowed;
+}
+
+/* 스크롤바 스타일링 */
+.container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: #DED9CC;
+  border-radius: 2px;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+  background: #C8C0B6;
+}
+
+/* 식물별 섹션 스타일 */
+.plantSection {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #F0EBE0;
+  border-radius: 12px;
+  border: 1px solid #DED9CC;
+}
+
+.plantTitle {
+  font-size: 18px;
+  font-weight: bold;
+  color: #023735;
+  margin: 0 0 15px 0;
+  text-align: center;
+  padding: 10px;
+  background-color: #DED9CC;
+  border-radius: 8px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: bold;
+  color: #023735;
+  margin: 15px 0 10px 0;
+}
+
+.sunlightControls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sunlightButton {
+  padding: 8px 12px;
+  border: 2px solid #DED9CC;
+  background-color: #FAF6EC;
+  color: #023735;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sunlightButton:hover {
+  background-color: #F0EBE0;
+}
+
+.sunlightButton.selected {
+  background-color: #008261;
+  border-color: #008261;
+  color: white;
+}
+
+/* 식물 카드 섹션 스타일 */
+.plantCardsSection {
+  margin-bottom: 10px;
+}
+
+.plantCardsContainer {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+}
+
+.plantCardsContainer::-webkit-scrollbar {
+  height: 4px;
+}
+
+.plantCardsContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.plantCardsContainer::-webkit-scrollbar-thumb {
+  background: #DED9CC;
+  border-radius: 2px;
+}
+
+.plantCard {
+  display: block;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 17px;
+  padding: 10px;
+  margin: 0 2px;
+  width: 120px;
+  min-width: 120px;
+  max-width: 120px;
+  flex-shrink: 0;
+}
+
+.plantCard.selectedCard {
+  border: 2px solid #DED9CC;
+  margin: none;
+}
+
+.plantImageContainer {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.plantCardImage {
+  border-radius: 7px;
+  width: 100px !important;
+  height: 100px !important;
+  min-width: 100px;
+  max-width: 100px;
+  object-fit: cover;
+  display: block;
+}
+
+.plantCardName {
+  font-size: medium;
+  font-weight: bold;
+  color: #023735;
+  margin: 0;
+  word-break: keep-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+  max-width: 100px;
+}
+
+/* 선택된 식물 관리 영역 */
+.managementTitle {
+  font-size: 18px;
+  font-weight: bold;
+  color: #023735;
+  margin: 0 0 20px 0;
+  text-align: center;
+  padding: 10px;
+  background-color: #43C970;
+  color: white;
+  border-radius: 8px;
+}
+
+.wateringControls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  justify-content: center;
+}
+
+.controlButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: none;
+  background-color: #008261;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.controlButton:hover {
+  background-color: #006a52;
+}
+
+.wateringValue {
+  font-size: 16px;
+  font-weight: bold;
+  color: #023735;
+  min-width: 50px;
+  text-align: center;
+  padding: 8px 12px;
+  background-color: white;
+  border-radius: 8px;
+  border: 2px solid #DED9CC;
+}
+
+.loadingMessage,
+.emptyMessage {
+  text-align: center;
+  padding: 40px 20px;
+  
+}
+
+.plantContainer{
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom:15px;
+}
+
+.plantLabel {
+    font-size:medium;
+    color: #023735;
+    font-weight: bold;
+}
+
+.plantBox{
+    padding: 10px;
+    border: 1px solid #DED9CC;
+    border-radius: 8px;
+    background-color: #FAF6EC;
+}
+
+/* 토글 버튼 스타일 */
+.toggleButton {
+    padding: 10px 20px;
+    border: 2px solid #008261;
+    border-radius: 40px;
+    background-color: transparent;
+    color: #023735;
+    font-size: medium;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 80px;
+}
+
+.toggleButton.active {
+    background-color: #008261;
+    color: #FAF6EC;
+}

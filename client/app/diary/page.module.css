@@ -1,0 +1,453 @@
+.container {
+  width: 393px;
+  height: 852px;
+  margin: 0 auto;
+  background-color: #FAF6EC;
+  padding: 18px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* 헤더 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: x-large;
+  font-weight: bold;
+  color: #023735;
+  margin: 0;
+}
+
+.closeButton {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid #DED9CC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #023735;
+}
+
+/* 월 헤더 */
+.monthHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.monthNavigation {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.monthArrow {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #827D73;
+  transition: all 0.2s;
+}
+
+.monthArrow:hover {
+  background-color: #DED9CC;
+}
+
+.monthTitle {
+  font-size: x-large;
+  font-weight: bold;
+  color: #023735;
+  margin: 0;
+}
+
+.viewModeButton {
+  background-color: transparent;
+  border: 2px solid #42CA71;
+  border-radius: 20px;
+  padding: 8px 16px;
+  color: #023735;
+  font-size: small;
+  cursor: pointer;
+}
+
+.viewModeButton.selected {
+  background-color: #42CA71;
+  color: #FAF6EC;
+}
+
+/* 달력 */
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-bottom: 20px;
+  cursor: grab;
+  touch-action: pan-x; /* 수평 터치만 허용 */
+}
+
+.calendar:active {
+  cursor: grabbing;
+}
+
+.emptyDay {
+  height: 40px;
+}
+
+.dayItem {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: #827D73;
+  position: relative;
+  border: 2px solid transparent;
+}
+
+.dayItem.hasContent {
+  background-color: #FFD700;
+  color: #023735;
+  font-weight: bold;
+}
+
+.dayItem.selected {
+  border: 2px solid #DCB519;
+  color: #023735;
+  font-weight: bold;
+}
+
+.dayItem.today {
+  border: 2px solid #42CA71 !important;
+  color: #023735;
+  font-weight: bold;
+}
+
+.dayItem.emotionMode {
+  font-size: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 2px solid #E6DFD1;
+}
+
+.dayItem.emotionMode.selected {
+  border: 2px solid #DCB519;
+  background-color: rgba(220, 181, 25, 0.2);
+}
+
+.dayItem.emotionMode.today {
+  border: 2px solid #42CA71 !important;
+  background-color: rgba(66, 202, 113, 0.2);
+}
+
+.todayIndicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 6px;
+  height: 6px;
+  background-color: #42CA71;
+  border-radius: 50%;
+}
+
+/* 선택된 날짜 */
+.selectedDateHeader {
+  font-size: large;
+  margin-bottom: 10px;
+}
+
+.selectedDate {
+  font-size: 18px;
+  font-weight: bold;
+  color: #023735;
+  margin: 0;
+}
+
+/* 일기 섹션 */
+.diarySection {
+  margin-bottom: 20px;
+}
+
+.diaryContent {
+  border-radius: 27px;
+  padding: 17px;
+  border: 2px solid #DED9CC;
+}
+
+.diaryTitle {
+  font-size: 18px;
+  font-weight: bold;
+  color: #023735;
+  margin-bottom: 15px;
+}
+
+.imageContainer {
+  display: flex;
+  gap: 10px;
+}
+
+.diaryImage {
+  border-radius: 10px;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.diaryText {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 15px 0;
+}
+
+.diaryActions {
+  display: flex;
+  gap: 7px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.actionButton {
+  background-color: #42CA71;
+  color:#023735;
+  border-radius: 30px;
+  padding: 10px 20px;
+  font-size: small;
+  font-weight: bold;
+}
+
+.actionButton.plant{
+  background-color: #008261;
+  color: #FAF6EC;
+}
+
+.actionButton.emotionBtn {
+  width:41px;
+  text-align: center;
+  font-size:medium;
+  height:41px;
+  padding:10px 0;
+}
+
+.noDiary {
+  text-align: center;
+  padding: 20px 0;
+  color: #827D73;
+}
+
+.noDiary p {
+  margin-bottom: 20px;
+  font-size: medium;
+}
+
+
+.deleteButtonContainer{
+  width:100%;
+  display:flex;
+  justify-content: end;
+}
+
+.deleteButton{
+  font-weight:bold;
+  color:#023735;
+}
+
+.addDiaryButton {
+  display: block;
+  background-color: #023735;
+  color: #FAF6EC;
+  border-radius: 17px;
+  padding: 12px 30px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: bold;
+}
+
+.addDiaryButton:hover {
+  background-color: #034d4a;
+}
+
+/* 댓글 섹션 */
+.commentsSection {
+  border-radius: 27px;
+  padding: 20px;
+  border: 2px solid #DED9CC;
+}
+
+/* 스크롤바 스타일링 */
+.container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* 미래 날짜 메시지 */
+.futureMessage {
+  color: #827D73;
+  font-size: 12px;
+  margin: 10px 0;
+  text-align: center;
+}
+
+/* 감정과 기억 표시 */
+.emotionMemory {
+  margin: 15px 0;
+  padding: 12px;
+  background-color: #F5F1E8;
+  border-radius: 8px;
+  border: 1px solid #DED9CC;
+}
+
+.emotion, .memory {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #023735;
+}
+
+/* 식물 상태 표시 */
+.plantStatus {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.statusItem {
+  flex: 1;
+  padding: 8px;
+  background-color: #F5F1E8;
+  border-radius: 6px;
+  border: 1px solid #DED9CC;
+  text-align: center;
+  font-size: 12px;
+  color: #827D73;
+}
+
+.statusItem.active {
+  background-color: #E8F5E8;
+  border-color: #C8E6C9;
+  color: #2E7D32;
+}
+
+/* 작성자 정보 */
+.authorInfo {
+  margin: 10px 0;
+  font-size: 12px;
+  color: #827D73;
+  text-align: right;
+}
+
+/* 삭제 확인 모달 */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: white;
+  border-radius: 12px;
+  padding: 0;
+  width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.modalHeader {
+  padding: 20px 20px 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #023735;
+  text-align: center;
+}
+
+.modalBody {
+  padding: 20px;
+  text-align: center;
+}
+
+.modalText {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+}
+
+.modalSubText {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+.cancelButton,
+.confirmDeleteButton {
+  flex: 1;
+  padding: 16px;
+  border: none;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancelButton {
+  color: #666;
+  border-right: 1px solid #f0f0f0;
+}
+
+.cancelButton:hover {
+  background-color: #f8f8f8;
+}
+
+.confirmDeleteButton {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+.confirmDeleteButton:hover {
+  background-color: #fef2f2;
+}

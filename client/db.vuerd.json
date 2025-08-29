@@ -4,9 +4,9 @@
   "settings": {
     "width": 2000,
     "height": 2000,
-    "scrollTop": -395.3347,
-    "scrollLeft": -393.3333,
-    "zoomLevel": 0.72,
+    "scrollTop": 0,
+    "scrollLeft": 0,
+    "zoomLevel": 1,
     "show": 447,
     "database": 4,
     "databaseName": "",

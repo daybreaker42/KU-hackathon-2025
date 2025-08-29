@@ -1,0 +1,403 @@
+.container {
+  background-color: #FAF6EC;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px;
+  padding-bottom: 80px; /* footer 높이만큼 여백 */
+}
+
+
+/* 스크롤바 스타일링 */
+.container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.nav{
+    display:flex;
+    height: 48px;
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom:45px;
+}
+
+.profile{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background-color: #42CA71;
+}
+
+.profile span{
+    cursor:pointer;
+    color: #008261;
+    font-size: 44px;
+}
+
+.navTitle{
+    font-size: x-large;
+    font-weight: bold;
+    color: #333;
+}
+
+.plant {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.plantImg{
+    width: 199px;
+    margin-bottom:20px;
+}
+
+.plantTitle {
+    font-size: large;
+    font-weight: bold;
+    color: #333;
+    margin: 0 20px;
+    text-align: center;
+}
+
+.todo{
+    width:100%;
+    border-radius: 27px;
+    border: 2px solid #DED9CC;
+    padding: 13px;
+    display:flex;
+    justify-content: center;   
+    color:#023735;
+    display:flex;
+    flex-direction: column;
+    text-align: center;
+    margin-bottom:20px;
+}
+
+.todoTitle{
+    font-size:small;
+    margin-bottom:10px;
+    font-weight:bold;
+}
+
+.todoList{
+    font-size:medium;
+    display: flex;
+    gap:8px;
+    flex-direction: column;
+}
+
+.todoItem {
+    display:flex;
+    gap:8px;
+    flex-direction: column;
+    align-items: center;
+}
+
+.todoItem hr{
+    width:100%;
+    border:1px solid #DED9CC;
+}
+
+/* 물주기 컴포넌트 스타일 */
+.wateringInfo {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: small;
+}
+
+.totalCount {
+    color: #42CA71;
+    font-weight: bold;
+}
+
+.wateringItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.wateringPlantInfo {
+    flex: 1;
+    text-align: left;
+}
+
+.wateringPlantName {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.wateringPlantDetails {
+    display: flex;
+    gap: 8px;
+    font-size: small;
+    color: #666;
+}
+
+.wateringCycle {
+    color: #42CA71;
+}
+
+.overdue {
+    color: #FF6B6B;
+    font-weight: bold;
+}
+
+.wateringStatus {
+    font-size: large;
+}
+
+/* 식물 이름 리스트 스타일 */
+.plantNameList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.plantNamePill {
+    background-color: #008261;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #FAF6EC;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    font-weight:bold;
+}
+
+.label{
+    font-size:large;
+    font-weight: bold;
+    color:#023735;
+    margin-bottom:7px;
+}
+
+.labelContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 7px;
+}
+
+.moreLink {
+    font-size: small;
+    color: #827D73;
+    text-decoration: none;
+    cursor: pointer;
+    margin-bottom:7px;
+}
+
+.moreLink:hover {
+    text-decoration: underline;
+}
+
+.weekContainer {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    margin-bottom:10px;
+}
+
+.dayItem {
+    cursor:pointer;
+    background-color: #FAF6EC;
+    border: 2px solid #DED9CC;
+    text-align: center;
+    width:45px;
+    height:45px;
+    border-radius: 50%;
+    line-height: 41px;
+    font-size: medium;
+    color:#023735;
+}
+
+.dayItem.today {
+    border: 2px solid #42CA71;
+}
+
+.dayItem.selected{
+    border: 2px solid #b1ada2;
+}
+
+.dayItem.fill{
+    background-color:#F9D131;
+    border:none;
+    line-height: 45px;
+}
+
+.diarySection{
+    border: 2px solid #DED9CC;
+    border-radius: 27px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.diaryTitle{
+    font-size:large;
+    font-weight: bold;
+    color:#023735;
+    margin:3px 3px 5px 3px;
+}
+
+.diaryContent{
+    display:flex;
+    align-items: center;
+}
+
+.diaryImage{
+    width:80px;
+    height:80px;
+    object-fit:cover;
+    object-position: center;
+    border-radius:17px;
+    margin-right: 7px;
+}
+
+.diaryText{
+    margin: 3px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3; /* 표준 속성 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+    max-height: calc(1.4em * 3); /* line-height * 3줄 */
+}
+
+.reactionList{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.reactionDayItem{
+    border: 2px solid #DED9CC;
+    border-radius: 27px;
+    padding: 10px;
+}
+
+.reactionDayHeader{
+    display:flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.reactionDay{
+    height: 36px;
+    width:36px;
+    text-align: center;
+    line-height: 36px;
+    background-color: #42CA71;
+    border-radius: 17px;
+    color:#023735;
+    font-size:14px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.reactionTitle{
+    font-weight: bold;
+    color:#023735;
+}
+
+.reactionItem {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 4px 3px;
+}
+
+.reactionUser {
+    font-weight: bold;
+    color: #023735;
+    flex-shrink: 0;
+    width: 70px;
+}
+
+.reactionComment {
+    color: #333;
+    flex: 1;
+}
+
+.reactionDivider {
+    border: none;
+    border-top: 2px solid #DED9CC;
+    margin: 4px 0;
+}
+
+/* 식물 추가 버튼 스타일 */
+.addPlantContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+}
+
+.addPlantButton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 238px;
+    height: 238px;
+    background-color: transparent;
+    border: 3px solid #DED9CC;
+    border-radius: 27px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.addPlantButton:hover {
+    border-color: #42CA71;
+    transform: translateY(-2px);
+}
+
+.addPlantIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color:#023735;
+    margin-top: 20px;
+}
+
+.addPlantIcon span{
+    font-size: 40px;
+}
+
+.addPlantText {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #023735;
+    font-weight: bold;
+    font-size: large;
+    text-align: center;
+}
+
