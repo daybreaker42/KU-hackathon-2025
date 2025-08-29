@@ -6,6 +6,8 @@ export interface Friend {
   name: string;
   profile_img?: string; // Assuming friends might have a profile image
   email?: string; // Assuming email might be part of friend info
+  isFriend?: boolean; // 이미 친구인지 여부 (검색 결과에서 사용)
+  hasPendingRequest?: boolean; // 대기 중인 친구 요청이 있는지 여부 (검색 결과에서 사용)
 }
 
 // New interfaces for Friend Requests
