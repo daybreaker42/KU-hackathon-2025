@@ -1,98 +1,85 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 식물 관리 앱 API 기능 목록
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+일단은 대분류 위에 있는 것부터 만들기.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 1. 홈 페이지 (Home)
+1.1. 내 식물 리스트 가져오기
+1.1.1 식물별 상태도
+1.2. 오늘 할 일 가져오기 (이거 조금 더 생각 필요, 오늘 급수+햇빛 일정 있는 식물들만 filter해서 count()?)
+1.3. 일주일치 일기 작성 현황 가져오기
+1.4. 특정 날짜 일기 내용 가져오기
+1.5. 친구들 반응 가져오기 - 최근 친구들 댓글, 작성한 일기 현황, 최근 3개만
 
-## Description
+## 2. 식물 등록하기
+2.1. 식물 이미지 업로드
+2.2. 이미지로 식물 종류명 검색 (gemini로 한국어 translate까지)
+2.3. 식물 이름, 품종, 급주 주기 등등 입력 정보 저장
+2.4. 식물 이름, 품종, 급주 주기 등등 입력 정보 수정
+2.5. 등록 식물 삭제
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 3. 커뮤니티 (Community)
+3.1. 커뮤니티 최근 작성글 pagination
+3.2. 특정 게시판, 식물 관련 글 pagination
+3.3. 해당 글의 내용, 댓글 정보 fetch
+3.4. 댓글 pagination
+3.5. 커뮤니티 글 작성
+3.5.1 식물 이미지 업로드
+3.6. 커뮤니티 글 수정
+3.7. 커뮤니티 글 임시저장
+3.8. 커뮤니티 글 좋아요
+3.9. 커뮤니티 글 좋아요 취소
+3.10. 글에 댓글 작성
+3.11. 글에 댓글 수정
+3.12. 글에 댓글 삭제
+3.13. 대댓글 작성
+3.14. 대댓글 수정
+3.15. 대댓글 삭제
+3.16. (추가기능) 커뮤니티에서 검색
 
-## Project setup
+## 4. 일기 작성 (Diary)
+4.1. 일기 작성
+4.1.1 성장일기에 텍스트 있으면 해당 일기는 memories에 자동으로 등록
+4.2. 일기 수정
+4.3. 일기 삭제
+4.4. 특정 유저 특정 날 일기 조회 (나랑 상대, 각각? 구현은 선택)
+4.5. 특정 달 일기 작성했던 날짜 조회
+4.6. 특정 달 일기 작성했던 날짜의 감정 조회
+4.7. 일기에 댓글 작성
+4.8. 일기에 댓글 수정
+4.9. 일기에 댓글 삭제
+4.10. 일기 대댓글 작성
+4.11. 일기 대댓글 수정
+4.12. 일기 대댓글 삭제
+4.13. 해당 식물 다음 급수까지 며칠 남았는지 조회 (일기 작성)
+4.14. 해당 식물 햇빛조절 정보 fetch (일기 작성)
+4.15. 식물 이미지 업로드 (일기 작성)
 
-```bash
-$ npm install
-```
+## 5. 친구 관리 (Friends)
+5.1. 친구 리스트 조회 - 현재 친구인 애들, 언제부터 친구였는지
+5.2. 친구 id 검색
+5.3. 친구신청 받은 리스트 조회
+5.4. 친구신청 수락
+5.5. 친구신청 보낸 리스트 조회
+5.6. 친구신청 보냄 취소
+5.7. 친구 취소
 
-## Compile and run the project
+## 6. 식물 검색하기 (도감)
+6.1. 이미지로 식물 검색
+6.2. 해당 받은 name korean으로 변환 (gemini api) / 근데 front에서 요청할 일은 없을 듯?
+6.3. (추가 기능) 도감 페이지는 추가기능으로
 
-```bash
-# development
-$ npm run start
+## 7. 회원가입/로그인 (Authentication)
+7.1. user 회원가입 - email, password
+7.2. user login - email, password
+7.3. (추가기능) kakao login 추가
 
-# watch mode
-$ npm run start:dev
+## 8. 식물 알림 (Notifications) - 추가기능
+8.1. 특정 시간에 설정한 알림 주기 (frontend)
+8.2. 알림 서버 동기화 api
 
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## 9. 사용자 프로필 (User Profile)
+9.1. user id로 이름, profile 이미지등 profile page 내용 조회
+9.2. 내 활동 조회 (내가 작성한 글)
+9.3. user 이름 바꾸기
+9.4. user profile 사진 바꾸기
+9.5. (추가기능) 회원탈퇴

@@ -54,16 +54,33 @@ export async function postDiary(data: {
 }) {
   try {
 
-    // 새로운 구조에 맞게 수정
 
-
+    const req:{
+      title: string;
+      content: string;
+      emotion: string;
+      memory: string;
+      plant_id: number;
+      water: boolean;
+      sun: boolean;
+      images: string[];
+    } = {
+      title: data.title,
+      content: data.content,
+      emotion: data.emotion,
+      memory: data.memory,
+      plant_id: data.plant_id,
+      water: data.water,
+      sun: data.sun,
+      images: []
+    };
     let res;
     // 이미지가 있으면 먼저 이미지 업로드
-    const images = [];
+    const images: string[] = [];
     if (data.images && data.images.length > 0) {
       // FormData를 사용하여 이미지 업로드
       const formData = new FormData();
-      req.images.forEach((file) => {
+      data.images.forEach((file) => {
         formData.append(`file`, file);
       });
 
@@ -82,11 +99,11 @@ export async function postDiary(data: {
       images.push(result.imageUrl);
     }
 
-    data.images = images;
+    req.images = images;
     // 다이어리 데이터 전송
     const response = await apiRequest("/diaries", {
       method: "POST",
-      body: JSON.stringify(data)
+      body: JSON.stringify(req)
     });
     
     if (!response.ok) {

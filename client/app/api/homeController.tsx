@@ -386,9 +386,9 @@ export async function getRecentDiaryComments(): Promise<any[] | null> {
         .filter((date: number, index: number, array: number[]) => array.indexOf(date) === index) // 중복 제거
         .sort((a: number, b: number) => b - a)
         .slice(0, 3);
-      
-      const reactionData = [];
-      
+
+      const reactionData: { day: Date; title: string; list: { user: string; comment: string }[] }[] = [];
+
       // 각 날짜의 일기와 댓글 조회
       for (const date of recentDates) {
         const diaryDate = new Date(currentYear, currentMonth - 1, date);

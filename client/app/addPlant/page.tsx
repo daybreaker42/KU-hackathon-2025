@@ -7,6 +7,7 @@ import { Camera } from 'lucide-react';
 import BackButton from '@/app/component/common/BackButton';
 import CloseButton from '@/app/component/common/CloseButton';
 import { uploadPlantImage, createPlant, CreatePlantData, identifyPlant } from '@/app/api/communityController'; // identifyPlant API 추가
+import styles from './page.module.css';
 
 const AddPlantPage: React.FC = () => {
   const router = useRouter();
@@ -225,7 +226,7 @@ const AddPlantPage: React.FC = () => {
   // 단계별 렌더링
   const renderStep1 = () => (
     <div className="flex flex-col items-center gap-6">
-      <h1 className="text-2xl font-bold text-center text-[#023735]">추가할 식물의 사진을 업로드하세요</h1>
+      <h1 className={styles.title}>추가할 식물의 사진을 업로드하세요</h1>
       <input
         ref={fileInputRef}
         type="file"
@@ -498,23 +499,25 @@ const AddPlantPage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen max-h-screen flex flex-col bg-[#FAF6EC] overflow-hidden">
-      {/* App Bar */}
-      <div className="flex items-center justify-between p-4 bg-transparent">
-        {step > 1 && step < 5 ? <BackButton onClick={prevStep} /> : <div className="w-6" />}
-        <h1 className="text-[#023735] font-bold text-lg">식물 추가</h1>
-        <CloseButton />
-      </div>
+    <main>
+      <div className={styles.container}>
+        {/* App Bar */}
+        <div className={styles.header}>
+          {step > 1 && step < 5 ? <BackButton onClick={prevStep} /> : <div className="w-6" />}
+          <h1 className={styles.title}>일기 작성</h1>
+          <CloseButton />
+        </div>
 
-      {/* 스크롤 가능한 컨텐츠 영역 */}
-      <div className="flex-1 overflow-y-auto p-[18px] pb-[100px]">
-        {step === 1 && renderStep1()}
-        {step === 2 && renderStep2()}
-        {step === 3 && renderStep3()}
-        {step === 4 && renderStep4()}
-        {step === 5 && renderStep5()}
+        {/* 스크롤 가능한 컨텐츠 영역 */}
+        <div className="flex-1 overflow-y-auto p-[18px] pb-[100px]">
+          {step === 1 && renderStep1()}
+          {step === 2 && renderStep2()}
+          {step === 3 && renderStep3()}
+          {step === 4 && renderStep4()}
+          {step === 5 && renderStep5()}
+        </div>
       </div>
-    </div>
+    </main>
   );
 };
 
