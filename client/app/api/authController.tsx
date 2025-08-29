@@ -276,7 +276,7 @@ interface LoginRequest {
 /**
  * 로그인 응답 데이터 타입
  */
-interface LoginResponse {
+export interface LoginResponse {
   access_token: string; // API 문서에 따라 access_token으로 수정
   user: {
     id: number;

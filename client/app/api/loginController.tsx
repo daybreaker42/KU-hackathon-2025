@@ -6,6 +6,9 @@ import {
   isAuthenticated 
 } from './authController';
 
+// LoginResponse 타입 import
+import type { LoginResponse } from './authController';
+
 // authController에서 타입들 가져오기
 interface LoginRequest {
   email: string;
@@ -84,11 +87,7 @@ export const useLoginController = (
     try {
       // 개발/프로덕션 모드에 따라 다른 함수 사용
       const loginFunction = loginWithServer;
-      
-      const result = await loginFunction({
-        email: email.trim(),
-        password: password
-      });
+
 
       // console.log('로그인 성공:', result);
 

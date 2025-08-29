@@ -367,7 +367,7 @@ export async function getDiaryComments(diaryId: number): Promise<CommentData[]> 
 }
 
 // 이번달 최근 3일치 일기의 댓글 조회
-export async function getRecentDiaryComments(): Promise<any[] | null> {
+export async function getRecentDiaryComments(): Promise<{ day: Date; title: string; list: { user: string; comment: string }[]}[]| null> {
   try {
     const today = new Date();
     const currentYear = today.getFullYear();

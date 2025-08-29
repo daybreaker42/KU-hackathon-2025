@@ -129,7 +129,7 @@ export default function DiaryPage() {
   const getDaysInMonth = (year: number, month: number) => {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDayOfMonth = new Date(year, month, 1).getDay();
-    const days = [];
+    const days: (number | null)[] = [];
 
     // 이전 달의 빈 칸들
     for (let i = 0; i < firstDayOfMonth; i++) {
@@ -442,7 +442,7 @@ export default function DiaryPage() {
           onMouseLeave={handleMouseUp} // 마우스가 달력 영역을 벗어날 때도 드래그 종료
           style={{ userSelect: 'none' }} // 텍스트 선택 방지
         >
-          {days.map((day, index) => {
+          {days.map((day: number | null, index) => {
             if (day === null) {
               return <div key={index} className={styles.emptyDay}></div>;
             }
