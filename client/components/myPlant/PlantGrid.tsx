@@ -6,10 +6,19 @@ import PlantCardSkeleton from "./PlantCardSkeleton";
 interface PlantGridProps {
   plants: Plant[];
   loading: boolean;
+  isDeleteMode?: boolean;
+  selectedPlantIds?: number[];
+  onToggleSelect?: (plantId: number) => void;
 }
 
 // 식물 그리드 컴포넌트 (빈 상태 포함)
-export default function PlantGrid({ plants, loading }: PlantGridProps) {
+export default function PlantGrid({
+  plants,
+  loading,
+  isDeleteMode = false,
+  selectedPlantIds = [],
+  onToggleSelect
+}: PlantGridProps) {
   // 로딩 상태
   if (loading) {
     return (
@@ -52,7 +61,13 @@ export default function PlantGrid({ plants, loading }: PlantGridProps) {
   return (
     <div className="grid grid-cols-2 gap-[16px]">
       {plants.map((plant) => (
-        <PlantCard key={plant.id} plant={plant} />
+        <PlantCard
+          key={plant.id}
+          plant={plant}
+          isDeleteMode={isDeleteMode}
+          isSelected={selectedPlantIds.includes(plant.id)}
+          onToggleSelect={onToggleSelect}
+        />
       ))}
     </div>
   );

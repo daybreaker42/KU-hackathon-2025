@@ -163,7 +163,7 @@ export default function PlantDetailPage() {
     
     try {
       // purchase_date를 기준으로 cycle_value만큼 더한 날짜 계산
-      const purchaseDate = new Date(plant.purchase_date);
+      const purchaseDate = new Date(plant.purchase_date || '0001-01-01');
       const cycleValue = parseInt(plant.cycle_value);
       
       if (isNaN(cycleValue)) return "정보 없음";
