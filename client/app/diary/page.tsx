@@ -81,7 +81,7 @@ const getEmotionEmoji = (emotionLabel: string): string => {
   return emotionMap[emotionLabel] || emotionLabel;
 };
 
-function DiaryPageContent() {
+function DiaryContent() {
   const searchParams = useSearchParams();
   
   // URL 파라미터에서 날짜 가져오기
@@ -613,7 +613,7 @@ function DiaryPageContent() {
 export default function DiaryPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <DiaryPageContent />
+      <DiaryContent />
     </Suspense>
   );
 }

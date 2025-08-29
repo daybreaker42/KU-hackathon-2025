@@ -381,7 +381,7 @@ export default function Home() {
       startOfWeek.setDate(today.getDate() - currentDay);
       
       for (let i = 0; i < 7; i++) {
-        const date = new Date(startOfWeek);
+        const date: Date = new Date(startOfWeek);
         date.setDate(startOfWeek.getDate() + i);
         dates.push(date);
       }

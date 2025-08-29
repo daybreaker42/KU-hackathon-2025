@@ -201,10 +201,14 @@ export default function FriendsPage() {
               alt={friend.name}
               width={60}
               height={60}
-              className="rounded-full object-cover border-2 border-[#4A6741] mr-4"
+              className="w-[60px] h-[60px] rounded-full object-cover border-2 border-[#4A6741] mr-4 aspect-square"
             />
           ) : (
-            <div className="w-[60px] h-[60px] rounded-full bg-gray-300 mr-4"></div>
+            <div className="w-[60px] h-[60px] rounded-full bg-gray-300 mr-4 flex items-center justify-center aspect-square">
+              <span className="text-[#4A6741] font-bold text-lg">
+                {friend.name.charAt(0)}
+              </span>
+            </div>
           )}
           <div>
             <p className="font-bold text-lg text-[#023735]">{friend.name}</p>
@@ -237,10 +241,14 @@ export default function FriendsPage() {
               alt={user.name}
               width={60}
               height={60}
-              className="rounded-full object-cover border-2 border-[#4A6741] mr-4"
+              className="w-[60px] h-[60px] rounded-full object-cover border-2 border-[#4A6741] mr-4 aspect-square"
             />
           ) : (
-            <div className="w-[60px] h-[60px] rounded-full bg-gray-300 mr-4"></div>
+            <div className="w-[60px] h-[60px] rounded-full bg-gray-300 mr-4 flex items-center justify-center aspect-square">
+              <span className="text-[#4A6741] font-bold text-lg">
+                {user.name.charAt(0)}
+              </span>
+            </div>
           )}
           <div>
             <p className="font-bold text-lg text-[#023735]">{user.name}</p>

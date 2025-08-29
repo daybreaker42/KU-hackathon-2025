@@ -75,9 +75,25 @@ const setCookie = (name: string, value: string, days: number = 7): void => {
     const expires = new Date();
     expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
     
-    // httpOnly는 클라이언트에서 설정할 수 없으므로 secure와 SameSite만 설정
-    // 실제 httpOnly 설정은 서버에서 처리해야 함
-    document.cookie = `${name}=${value}; expires=${expires.toUTCString()}; path=/; SameSite=Strict; Secure`;
+    // ngrok 환경을 고려한 쿠키 설정
+    const isNgrok = window.location.hostname.includes('ngrok');
+    const isHttps = window.location.protocol === 'https:';
+    
+    let cookieString = `${name}=${value}; expires=${expires.toUTCString()}; path=/`;
+    
+    if (isNgrok) {
+      // ngrok 환경에서는 SameSite를 None으로 설정하고 Secure 필요
+      cookieString += `; SameSite=None; Secure`;
+    } else if (isHttps) {
+      // HTTPS 환경에서는 Secure 사용
+      cookieString += `; SameSite=Lax; Secure`;
+    } else {
+      // HTTP 로컬 환경에서는 Secure 제외
+      cookieString += `; SameSite=Lax`;
+    }
+    
+    console.log('Setting cookie:', cookieString);
+    document.cookie = cookieString;
   }
 };
 
@@ -109,7 +125,20 @@ const getCookie = (name: string): string | null => {
  */
 const deleteCookie = (name: string): void => {
   if (typeof window !== 'undefined') {
-    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict; Secure`;
+    const isNgrok = window.location.hostname.includes('ngrok');
+    const isHttps = window.location.protocol === 'https:';
+    
+    let cookieString = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+    
+    if (isNgrok) {
+      cookieString += `; SameSite=None; Secure`;
+    } else if (isHttps) {
+      cookieString += `; SameSite=Lax; Secure`;
+    } else {
+      cookieString += `; SameSite=Lax`;
+    }
+    
+    document.cookie = cookieString;
   }
 };
 
@@ -122,7 +151,12 @@ const deleteCookie = (name: string): void => {
  * XSS 공격에 대한 보안성 향상
  */
 export const getAuthToken = (): string | null => {
-  return getCookie('authToken');
+  const token = getCookie('authToken');
+  console.log('Getting auth token:', token ? 'exists' : 'missing');
+  if (token) {
+    console.log('Token preview:', token.substring(0, 20) + '...');
+  }
+  return token;
 };
 
 /**
@@ -222,8 +256,17 @@ export const createAuthHeaders = (includeAuth: boolean = true, isFormData: boole
   // 인증이 필요한 경우 Authorization 헤더 추가
   if (includeAuth) {
     const token = getAuthToken();
+    console.log('Creating auth headers:', {
+      includeAuth,
+      hasToken: !!token,
+      isFormData,
+      hostname: typeof window !== 'undefined' ? window.location.hostname : 'server'
+    });
+    
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
+    } else {
+      console.warn('No auth token available for request');
     }
   }
 
@@ -249,13 +292,43 @@ export const apiRequest = async (
 ): Promise<Response> => {
   const url = `${BASE_URL}${endpoint}`;
   const headers = createAuthHeaders(requireAuth, isFormData);
-  // console.log(headers);
+  
+  const isNgrok = typeof window !== 'undefined' && window.location.hostname.includes('ngrok');
+  
+  console.log('[API_REQUEST] 요청 시작:', {
+    environment: isNgrok ? 'ngrok' : 'localhost',
+    endpoint,
+    url,
+    requireAuth,
+    isFormData,
+    method: options.method || 'GET',
+    hasBody: !!options.body,
+    headers: {
+      ...Object.fromEntries(
+        Object.entries(headers).map(([key, value]) => [
+          key,
+          key.toLowerCase().includes('authorization') 
+            ? value ? (typeof value === 'string' ? value.substring(0, 20) + '...' : 'Bearer [token]') 
+            : 'none'
+            : value
+        ])
+      )
+    }
+  });
+
   const response = await fetch(url, {
     ...options,
     headers: {
       ...headers,
       ...options.headers,
     },
+  });
+
+  console.log('[API_REQUEST] 응답 받음:', {
+    status: response.status,
+    statusText: response.statusText,
+    ok: response.ok,
+    url: response.url
   });
 
   return response;
@@ -535,27 +608,54 @@ export const isAuthenticated = (): boolean => {
  */
 export const loginWithServer = async (loginData: LoginRequest): Promise<LoginResponse> => {
   try {
+    const isNgrok = typeof window !== 'undefined' && window.location.hostname.includes('ngrok');
+    console.log('[LOGIN] 로그인 시작:', {
+      environment: isNgrok ? 'ngrok' : 'localhost',
+      hostname: typeof window !== 'undefined' ? window.location.hostname : 'undefined',
+      loginData: { email: loginData.email } // 비밀번호는 제외하고 로그
+    });
+
     const response = await apiRequest(`/auth/login`, {
       method: 'POST',
       body: JSON.stringify(loginData),
     }, false); // 로그인은 인증 토큰이 필요 없음
+
+    console.log('[LOGIN] 서버 응답:', {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok
+    });
 
     if (!response.ok) {
       throw new Error(`로그인 실패: ${response.status}`);
     }
 
     const data: LoginResponse = await response.json();
-    // console.log(`login token - ${JSON.stringify(data.access_token)}`); // access_token으로 수정
-    // console.log('전체 응답 데이터:', data); // 디버깅용 로그 추가
+    console.log('[LOGIN] 응답 데이터 받음:', {
+      hasAccessToken: !!data.access_token,
+      tokenPreview: data.access_token ? data.access_token.substring(0, 20) + '...' : 'none',
+      hasUser: !!data.user,
+      userEmail: data.user?.email
+    });
     
     // 로그인 성공 시 토큰을 보안 쿠키에 저장
+    console.log('[LOGIN] 토큰 저장 시작...');
     setAuthToken(data.access_token); // access_token으로 수정
+    
     // 사용자 정보 저장
+    console.log('[LOGIN] 사용자 정보 저장 시작...');
     setCurrentUser(data.user);
+
+    // 저장 후 확인
+    const savedToken = getAuthToken();
+    console.log('[LOGIN] 토큰 저장 확인:', {
+      tokenSaved: !!savedToken,
+      tokenMatch: savedToken === data.access_token
+    });
 
     return data;
   } catch (error) {
-    console.error('서버 로그인 중 오류 발생:', error);
+    console.error('[LOGIN] 서버 로그인 중 오류 발생:', error);
     throw error;
   }
 };
