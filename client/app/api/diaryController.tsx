@@ -64,6 +64,7 @@ export async function postDiary(data: {
       water: boolean;
       sun: boolean;
       images: string[];
+      date:string;
     } = {
       title: data.title,
       content: data.content,
@@ -72,7 +73,8 @@ export async function postDiary(data: {
       plant_id: data.plant_id,
       water: data.water,
       sun: data.sun,
-      images: []
+      images: [],
+      date: data.date
     };
     let res;
     // 이미지가 있으면 먼저 이미지 업로드

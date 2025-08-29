@@ -55,7 +55,7 @@ const categoryNames = {
   plant: '식물별 카테고리'
 };
 
-export default function CategoryPostsPage() {
+function CategoryPostsContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -279,5 +279,13 @@ export default function CategoryPostsPage() {
       <Footer url='community' />
       <WritePostButton />
     </div>
+  );
+}
+
+export default function CategoryPostsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CategoryPostsContent />
+    </Suspense>
   );
 }

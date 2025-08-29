@@ -144,7 +144,7 @@ export interface MonthlyDiaryData {
 
 /* DIARY */
 export async function getDayDiary(date: Date): Promise<SimpleDiaryData | null> {
-  // console.log(date);
+  console.log(date);
   // 현지 시간대를 기준으로 날짜 문자열 생성 (시간대 변환 문제 해결)
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
