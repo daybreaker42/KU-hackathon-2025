@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -81,7 +81,7 @@ const getEmotionEmoji = (emotionLabel: string): string => {
   return emotionMap[emotionLabel] || emotionLabel;
 };
 
-export default function DiaryPage() {
+function DiaryPageContent() {
   const searchParams = useSearchParams();
   
   // URL 파라미터에서 날짜 가져오기
@@ -129,7 +129,7 @@ export default function DiaryPage() {
   const getDaysInMonth = (year: number, month: number) => {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDayOfMonth = new Date(year, month, 1).getDay();
-    const days = [];
+    const days: (number | null)[] = [];
 
     // 이전 달의 빈 칸들
     for (let i = 0; i < firstDayOfMonth; i++) {
@@ -442,7 +442,7 @@ export default function DiaryPage() {
           onMouseLeave={handleMouseUp} // 마우스가 달력 영역을 벗어날 때도 드래그 종료
           style={{ userSelect: 'none' }} // 텍스트 선택 방지
         >
-          {days.map((day, index) => {
+          {days.map((day: number | null, index) => {
             if (day === null) {
               return <div key={index} className={styles.emptyDay}></div>;
             }
@@ -607,5 +607,13 @@ export default function DiaryPage() {
         </div>
       )}
     </main>
+  );
+}
+
+export default function DiaryPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DiaryPageContent />
+    </Suspense>
   );
 }

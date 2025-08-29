@@ -40,8 +40,9 @@ export default function FriendsPage() {
     try {
       const data = await getFriendsList();
       setFriends(data);
-    } catch (err: any) {
-      setFriendsError(err.message || '친구 목록을 불러오는데 실패했습니다.');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : '친구 목록을 불러오는데 실패했습니다.';
+      setFriendsError(errorMessage);
     } finally {
       setFriendsLoading(false);
     }
@@ -60,8 +61,9 @@ export default function FriendsPage() {
       const data = await getFriendRequests();
       setReceivedRequests(data.received);
       setSentRequests(data.sent);
-    } catch (err: any) {
-      setRequestsError(err.message || '친구 요청 목록을 불러오는데 실패했습니다.');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : '친구 요청 목록을 불러오는데 실패했습니다.';
+      setRequestsError(errorMessage);
     } finally {
       setRequestsLoading(false);
     }
@@ -86,8 +88,9 @@ export default function FriendsPage() {
       try {
         const data = await searchUsers(searchQuery);
         setSearchResults(data);
-      } catch (err: any) {
-        setSearchError(err.message || '사용자 검색에 실패했습니다.');
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : '사용자 검색에 실패했습니다.';
+        setSearchError(errorMessage);
       } finally {
         setSearchLoading(false);
       }
@@ -97,6 +100,24 @@ export default function FriendsPage() {
       clearTimeout(handler);
     };
   }, [searchQuery]);
+
+  // --- Tab Handlers ---
+
+  // 탭 클릭 핸들러 - 모든 탭 클릭 시 해당 데이터 새로고침
+  const handleTabClick = (tab: 'friends' | 'received' | 'sent') => {
+    // 탭 변경 및 검색 초기화
+    setSelectedTab(tab);
+    setSearchQuery(''); // 검색어 초기화
+    setSearchResults([]); // 검색 결과 초기화
+    setSearchError(null); // 검색 오류 초기화
+
+    // 해당 탭의 데이터 새로고침
+    if (tab === 'friends') {
+      fetchFriends();
+    } else if (tab === 'received' || tab === 'sent') {
+      fetchRequests();
+    }
+  };
 
   // --- Action Handlers ---
 
@@ -108,8 +129,9 @@ export default function FriendsPage() {
       const response = await sendFriendRequest(friendId);
       setActionStatus({ id: friendId, message: response.message, type: 'success' });
       // Optionally, refresh the list or update friend status in state
-    } catch (err: any) {
-      setActionStatus({ id: friendId, message: err.message || '친구 요청 실패', type: 'error' });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : '친구 요청 실패';
+      setActionStatus({ id: friendId, message: errorMessage, type: 'error' });
     } finally {
       setSendingRequestId(null);
       setTimeout(() => setActionStatus(null), 3000);
@@ -131,8 +153,9 @@ export default function FriendsPage() {
       setActionStatus({ id: requestId, message: response.message, type: 'success' });
       fetchRequests(); // Refresh the list after action
       fetchFriends(); // Also refresh friends list in case of accept
-    } catch (err: any) {
-      setActionStatus({ id: requestId, message: err.message || `${action} 실패`, type: 'error' });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : `${action} 실패`;
+      setActionStatus({ id: requestId, message: errorMessage, type: 'error' });
     } finally {
       setProcessingRequestId(null);
       setTimeout(() => setActionStatus(null), 3000);
@@ -141,38 +164,65 @@ export default function FriendsPage() {
 
   // --- Render Helpers ---
 
-  const renderFriendItem = (friend: Friend) => (
-    <li key={friend.id} className="flex items-center p-4 rounded-lg border-2 border-[#a8a8a8] justify-between">
-      <div className="flex items-center">
-        {friend.profile_img ? (
-          <Image
-            src={friend.profile_img}
-            alt={friend.name}
-            width={60}
-            height={60}
-            className="rounded-full object-cover border-2 border-[#4A6741] mr-4"
-          />
-        ) : (
-          <div className="w-[60px] h-[60px] rounded-full bg-gray-300 mr-4"></div>
-        )}
-        <div>
-          <p className="font-bold text-lg text-[#023735]">{friend.name}</p>
-          {friend.email && <p className="text-sm text-gray-500">{friend.email}</p>}
+  const renderFriendItem = (friend: Friend) => {
+    // 친구 요청 버튼 상태 결정 로직
+    const isAlreadyFriend = friend.isFriend;
+    const hasPendingRequest = friend.hasPendingRequest;
+    const isButtonDisabled = sendingRequestId === friend.id || isAlreadyFriend || hasPendingRequest;
+
+    // 버튼 텍스트 결정
+    const getButtonText = () => {
+      if (sendingRequestId === friend.id) return '요청 중...';
+      if (isAlreadyFriend) return '이미 친구';
+      if (hasPendingRequest) return '요청 전송됨';
+      return '친구 신청';
+    };
+
+    // 버튼 스타일 결정
+    const getButtonClassName = () => {
+      if (isAlreadyFriend) {
+        return 'bg-blue-500 cursor-not-allowed'; // 이미 친구인 경우 파란색
+      }
+      if (hasPendingRequest) {
+        return 'bg-orange-500 cursor-not-allowed'; // 요청 대기 중인 경우 주황색
+      }
+      if (sendingRequestId === friend.id) {
+        return 'bg-gray-400 cursor-not-allowed'; // 요청 처리 중인 경우 회색
+      }
+      return 'bg-[#4CAF50] hover:bg-[#45a049]'; // 기본 상태 초록색
+    };
+
+    return (
+      <li key={friend.id} className="flex items-center p-4 rounded-lg border-2 border-[#a8a8a8] justify-between">
+        <div className="flex items-center">
+          {friend.profile_img ? (
+            <Image
+              src={friend.profile_img}
+              alt={friend.name}
+              width={60}
+              height={60}
+              className="rounded-full object-cover border-2 border-[#4A6741] mr-4"
+            />
+          ) : (
+            <div className="w-[60px] h-[60px] rounded-full bg-gray-300 mr-4"></div>
+          )}
+          <div>
+            <p className="font-bold text-lg text-[#023735]">{friend.name}</p>
+            {friend.email && <p className="text-sm text-gray-500">{friend.email}</p>}
+          </div>
         </div>
-      </div>
-      {searchQuery.trim() !== '' && (
-        <button
-          onClick={() => handleSendRequest(friend.id)}
-          disabled={sendingRequestId === friend.id}
-          className={`px-4 py-2 rounded-md text-white text-sm font-medium transition-colors
-            ${sendingRequestId === friend.id ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#4CAF50] hover:bg-[#45a049]'}
-          `}
-        >
-          {sendingRequestId === friend.id ? '요청 중...' : '친구 신청'}
-        </button>
-      )}
-    </li>
-  );
+        {searchQuery.trim() !== '' && (
+          <button
+            onClick={() => handleSendRequest(friend.id)}
+            disabled={isButtonDisabled}
+            className={`px-4 py-2 rounded-md text-white text-sm font-medium transition-colors ${getButtonClassName()}`}
+          >
+            {getButtonText()}
+          </button>
+        )}
+      </li>
+    );
+  };
 
   const renderRequestItem = (request: FriendRequest, type: 'received' | 'sent') => {
     const user = type === 'received' ? request.requester : request.recipient;
@@ -261,7 +311,7 @@ export default function FriendsPage() {
         {/* Tabs */}
         <div className="flex justify-around mb-4 p-2 rounded-lg">
           <button
-            onClick={() => setSelectedTab('friends')}
+            onClick={() => handleTabClick('friends')}
             className={`flex-1 py-2 text-center font-bold rounded-md transition-colors mx-1
               ${selectedTab === 'friends' ? 'bg-[#4CAF50] text-white' : 'text-gray-600 hover:bg-gray-100'}
             `}
@@ -274,7 +324,7 @@ export default function FriendsPage() {
             )}
           </button>
           <button
-            onClick={() => setSelectedTab('received')}
+            onClick={() => handleTabClick('received')}
             className={`flex-1 py-2 text-center font-bold rounded-md transition-colors mx-1
               ${selectedTab === 'received' ? 'bg-[#4CAF50] text-white' : 'text-gray-600 hover:bg-gray-100'}
             `}
@@ -287,7 +337,7 @@ export default function FriendsPage() {
             )}
           </button>
           <button
-            onClick={() => setSelectedTab('sent')}
+            onClick={() => handleTabClick('sent')}
             className={`flex-1 py-2 text-center font-bold rounded-md transition-colors mx-1
               ${selectedTab === 'sent' ? 'bg-[#4CAF50] text-white' : 'text-gray-600 hover:bg-gray-100'}
             `}

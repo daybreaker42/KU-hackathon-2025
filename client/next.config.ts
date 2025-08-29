@@ -68,6 +68,24 @@ const nextConfig: NextConfig = {
         hostname: '*.s3.*.amazonaws.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'search.pstatic.net',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'postfiles.pstatic.net',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.pstatic.net',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
