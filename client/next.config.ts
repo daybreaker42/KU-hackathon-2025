@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // ngrok을 통한 개발 서버 접근 허용
+  allowedDevOrigins: [
+    '*.ngrok-free.app',
+    '*.ngrok.io',
+    '*.ngrok.app'
+  ],
   images: {
     remotePatterns: [
       {
@@ -72,18 +78,6 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'search.pstatic.net',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'postfiles.pstatic.net',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: '*.pstatic.net',
         port: '',
         pathname: '/**',
       }
